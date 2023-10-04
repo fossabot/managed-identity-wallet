@@ -30,18 +30,26 @@ import java.time.OffsetDateTime;
 
 @Data
 @MappedSuperclass
-public abstract class TimedEntity {
+public abstract class AbstractEntity {
+
+    public static final String COLUMN_CREATED_AT = "created_at";
+    public static final String COLUMN_MODIFIED_AT = "modified_at";
+    public static final String COLUMN_VERSION = "version";
 
     // TODO define column names
 
     @CreationTimestamp
     @Temporal(value = TemporalType.TIMESTAMP)
-    @Column(nullable = false)
+    @Column(name = COLUMN_CREATED_AT, nullable = false)
     private OffsetDateTime createdAt;
 
     @UpdateTimestamp
     @Temporal(value = TemporalType.TIMESTAMP)
+    @Column(name = COLUMN_MODIFIED_AT, nullable = false)
     private OffsetDateTime modifiedAt;
+
+    @Column(name = COLUMN_VERSION, nullable = false, length = 8)
+    private String version;
 
     @PrePersist
     public void prePersist() {

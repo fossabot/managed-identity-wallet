@@ -27,7 +27,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "verifiable_credential_type")
-public class VerifiableCredentialTypeEntity extends TimedEntity {
+public class VerifiableCredentialTypeEntity extends AbstractEntity {
     @Id
     private String type;
 }

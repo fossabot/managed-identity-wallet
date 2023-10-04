@@ -22,14 +22,13 @@
 package org.eclipse.tractusx.managedidentitywallets.repository.entity;
 
 import jakarta.persistence.*;
-import lombok.*;
 
 /**
  * The type Wallet key.
  */
 @Entity
 @Table(name = "key_ed25519")
-public class Ed25519KeyEntity extends TimedEntity {
+public class Ed25519KeyEntity extends AbstractEntity {
 
     @Id
     private String id;

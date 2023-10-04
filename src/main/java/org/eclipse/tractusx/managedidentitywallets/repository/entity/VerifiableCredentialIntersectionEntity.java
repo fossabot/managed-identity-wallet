@@ -33,7 +33,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(of = "id")
 @Entity
 @Table(name = "verifiable_credential_intersection")
-public class VerifiableCredentialIntersectionEntity extends TimedEntity {
+public class VerifiableCredentialIntersectionEntity extends AbstractEntity {
 
     @EmbeddedId
     private VerifiableCredentialIntersectionEntityId id;

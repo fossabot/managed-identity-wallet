@@ -36,7 +36,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @Table(name = "wallet")
-public class WalletEntity extends TimedEntity {
+public class WalletEntity extends AbstractEntity {
 
     @Id
     private String id;

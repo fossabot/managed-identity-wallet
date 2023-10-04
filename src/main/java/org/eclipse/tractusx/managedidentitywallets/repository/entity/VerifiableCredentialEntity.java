@@ -33,7 +33,7 @@ import java.util.Set;
 @EqualsAndHashCode(of = {"id"}, callSuper = false)
 @Entity(name = VerifiableCredentialEntity.TABLE_NAME)
 @Table(name = VerifiableCredentialEntity.TABLE_NAME)
-public class VerifiableCredentialEntity extends TimedEntity {
+public class VerifiableCredentialEntity extends AbstractEntity {
 
     public static final String TABLE_NAME = "verifiable_credential";
 
