@@ -32,6 +32,7 @@ import com.smartsensesolutions.java.commons.specification.SpecificationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringEscapeUtils;
+import org.eclipse.tractusx.managedidentitywallets.repository.repository.VerifiableCredentialRepository;
 import org.eclipse.tractusx.managedidentitywallets.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.v1.entity.HoldersCredential;
 import org.eclipse.tractusx.managedidentitywallets.v1.entity.Wallet;
@@ -42,14 +43,13 @@ import org.eclipse.tractusx.managedidentitywallets.v1.utils.Validate;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * The type Credential service.
@@ -68,18 +68,31 @@ public class HoldersCredentialService {
 
     private final WalletKeyService walletKeyService;
 
+    private final VerifiableCredentialRepository verifiableCredentialRepository;
+
     /**
      * Gets list of holder's credentials
      *
      * @param credentialId     the credentialId
      * @param issuerIdentifier the issuer identifier
      * @param type             the type
-     * @param sortColumn       the sort column
-     * @param sortType         the sort type
      * @param callerBPN        the caller bpn
      * @return the credentials
      */
-    public PageImpl<VerifiableCredential> getCredentials(String credentialId, String issuerIdentifier, List<String> type, String sortColumn, String sortType, int pageNumber, int size, String callerBPN) {
+    public PageImpl<VerifiableCredential> getCredentials(String credentialId, String issuerIdentifier, List<String> type, int pageNumber, int size, String callerBPN) {
+
+        if (credentialId != null) {
+            final Optional<VerifiableCredential> credential = verifiableCredentialRepository.findByHolderAndId(callerBPN, credentialId);
+            if (credential.isEmpty()) {
+                return new PageImpl<>(Collections.emptyList(), PageRequest.of(pageNumber, size), 0);
+            } else {
+                return new PageImpl<>(Collections.singletonList(credential.get()), PageRequest.of(pageNumber, size), 1);
+            }
+        }
+
+        Pageable pageable = PageRequest.of(pageNumber, size);
+
+
         FilterRequest filterRequest = new FilterRequest();
         filterRequest.setPage(pageNumber);
         filterRequest.setSize(size);

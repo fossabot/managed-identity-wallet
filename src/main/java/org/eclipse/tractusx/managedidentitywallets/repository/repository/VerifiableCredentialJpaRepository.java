@@ -22,12 +22,21 @@
 package org.eclipse.tractusx.managedidentitywallets.repository.repository;
 
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialEntity;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.OffsetDateTime;
+import java.util.Optional;
+
 @Repository
 interface VerifiableCredentialJpaRepository
         extends PagingAndSortingRepository<VerifiableCredentialEntity, String>,
-            CrudRepository<VerifiableCredentialEntity, String> {
+        CrudRepository<VerifiableCredentialEntity, String> {
+
+    Optional<VerifiableCredentialEntity> findByIdAndWalletIntersections_Wallet_Id(String id, String walletId);
+
+    Page<VerifiableCredentialEntity>  findByCredentialIssuerIntersections_Issuer(String issuerId);
 }

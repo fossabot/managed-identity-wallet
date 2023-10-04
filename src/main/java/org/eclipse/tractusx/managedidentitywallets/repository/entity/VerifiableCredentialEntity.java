@@ -46,6 +46,9 @@ public class VerifiableCredentialEntity extends AbstractEntity {
     private String json;
 
     @OneToMany(mappedBy = "verifiableCredential", cascade = CascadeType.REMOVE)
+    private Set<VerifiableCredentialIntersectionEntity> walletIntersections;
+
+    @OneToMany(mappedBy = "verifiableCredential", cascade = CascadeType.REMOVE)
     private Set<VerifiableCredentialTypeIntersectionEntity> credentialTypeIntersections;
 
     @OneToMany(mappedBy = "verifiableCredential", cascade = CascadeType.REMOVE)

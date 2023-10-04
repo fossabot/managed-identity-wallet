@@ -21,26 +21,36 @@
 
 package org.eclipse.tractusx.managedidentitywallets.repository.repository;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialEntity;
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialIntersectionEntity;
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
+import lombok.SneakyThrows;
+import lombok.extern.java.Log;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.*;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Map;
+import java.util.Objects;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
+@Slf4j
 @RequiredArgsConstructor
 public class VerifiableCredentialRepository {
+
+    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final WalletJpaRepository walletJpaRepository;
     private final VerifiableCredentialJpaRepository verifiableCredentialJpaRepository;
     private final VerifiableCredentialIntersectionJpaRepository verifiableCredentialIntersectionJpaRepository;
     private final VerifiableCredentialIssuerIntersectionJpaRepository verifiableCredentialIssuerIntersectionJpaRepository;
+    private final VerifiableCredentialTypeIntersectionJpaRepository verifiableCredentialTypeIntersectionJpaRepository;
 
     @Transactional
     public void save(VerifiableCredential vc, String walletName) {
@@ -51,7 +61,8 @@ public class VerifiableCredentialRepository {
         final VerifiableCredentialEntity verifiableCredentialEntity = new VerifiableCredentialEntity();
         verifiableCredentialEntity.setId(UUID.randomUUID().toString());
         verifiableCredentialEntity.setJson(vc.toJson());
-        verifiableCredentialJpaRepository.save(verifiableCredentialEntity);
+        if (!verifiableCredentialJpaRepository.existsById(verifiableCredentialEntity.getId()))
+            verifiableCredentialJpaRepository.save(verifiableCredentialEntity);
 
         // Verifiable Credential - Wallet Intersection
         final VerifiableCredentialIntersectionEntity.VerifiableCredentialIntersectionEntityId verifiableCredentialIntersectionEntityId = new VerifiableCredentialIntersectionEntity.VerifiableCredentialIntersectionEntityId();
@@ -59,14 +70,52 @@ public class VerifiableCredentialRepository {
         verifiableCredentialIntersectionEntityId.setWallet(walletEntity);
         final VerifiableCredentialIntersectionEntity verifiableCredentialIntersectionEntity = new VerifiableCredentialIntersectionEntity();
         verifiableCredentialIntersectionEntity.setId(verifiableCredentialIntersectionEntityId);
-        verifiableCredentialIntersectionJpaRepository.save(verifiableCredentialIntersectionEntity);
+        if (!verifiableCredentialIntersectionJpaRepository.existsById(verifiableCredentialIntersectionEntityId))
+            verifiableCredentialIntersectionJpaRepository.save(verifiableCredentialIntersectionEntity);
 
         // Verifiable Credential - Issuer Intersection
-        // TODO
+        final VerifiableCredentialIssuerEntity verifiableCredentialIssuerEntity = new VerifiableCredentialIssuerEntity();
+        verifiableCredentialIssuerEntity.setIssuer(vc.getIssuer().toString());
+        final VerifiableCredentialIssuerIntersectionEntity.VerifiableCredentialIssuerIntersectionEntityId verifiableCredentialIssuerIntersectionEntityId = new VerifiableCredentialIssuerIntersectionEntity.VerifiableCredentialIssuerIntersectionEntityId();
+        verifiableCredentialIssuerIntersectionEntityId.setVerifiableCredential(verifiableCredentialEntity);
+        verifiableCredentialIssuerIntersectionEntityId.setVerifiableCredentialIssuer(verifiableCredentialIssuerEntity);
+        final VerifiableCredentialIssuerIntersectionEntity verifiableCredentialIssuerIntersectionEntity = new VerifiableCredentialIssuerIntersectionEntity();
+        verifiableCredentialIssuerIntersectionEntity.setId(verifiableCredentialIssuerIntersectionEntityId);
+        if (!verifiableCredentialIssuerIntersectionJpaRepository.existsById(verifiableCredentialIssuerIntersectionEntityId))
+            verifiableCredentialIssuerIntersectionJpaRepository.save(verifiableCredentialIssuerIntersectionEntity);
+
+        // Verifiable Credential - Type Intersection
+        for (final String type : vc.getTypes()) {
+            final VerifiableCredentialTypeEntity verifiableCredentialType = new VerifiableCredentialTypeEntity();
+            verifiableCredentialType.setType(type);
+            final VerifiableCredentialTypeIntersectionEntity.VerifiableCredentialTypeIntersectionEntityId verifiableCredentialTypeIntersectionEntityId = new VerifiableCredentialTypeIntersectionEntity.VerifiableCredentialTypeIntersectionEntityId();
+            verifiableCredentialTypeIntersectionEntityId.setVerifiableCredential(verifiableCredentialEntity);
+            verifiableCredentialTypeIntersectionEntityId.setVerifiableCredentialType(verifiableCredentialType);
+            final VerifiableCredentialTypeIntersectionEntity verifiableCredentialTypeIntersectionEntity = new VerifiableCredentialTypeIntersectionEntity();
+            verifiableCredentialTypeIntersectionEntity.setId(verifiableCredentialTypeIntersectionEntityId);
+            if (!verifiableCredentialTypeIntersectionJpaRepository.existsById(verifiableCredentialTypeIntersectionEntityId))
+                verifiableCredentialTypeIntersectionJpaRepository.save(verifiableCredentialTypeIntersectionEntity);
+        }
     }
 
-    public Page<VerifiableCredential> getCredentialsByIssuer(String issuer, Pageable p) {
-        QWalletEntity walletEntity = QWalletEntity.walletEntity;
+
+    public Optional<VerifiableCredential> findByHolderAndId(String walletOwner, String id) {
+        return verifiableCredentialJpaRepository
+                .findByIdAndWalletIntersections_Wallet_Id(id, walletOwner)
+                .map(VerifiableCredentialEntity::getJson)
+                .map(json -> {
+                    try {
+                        return MAPPER.readValue(json, Map.class);
+                    } catch (JsonProcessingException e) {
+                        log.error("Could not deserialize VerifiableCredential JSON", e);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .map(VerifiableCredential::new);
+    }
+
+    public Page<VerifiableCredential> findByIssuer(String issuer, Pageable p) {
         return null; // TODO
     }
 }

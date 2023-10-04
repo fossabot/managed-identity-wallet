@@ -25,7 +25,13 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(of = "issuer", callSuper = false)
 @Entity(name= VerifiableCredentialIssuerEntity.TABLE_NAME)
 @Table(name = VerifiableCredentialIssuerEntity.TABLE_NAME)
 public class VerifiableCredentialIssuerEntity extends AbstractEntity {
@@ -36,5 +42,5 @@ public class VerifiableCredentialIssuerEntity extends AbstractEntity {
 
     @Id
     @Column(name = COLUMN_ISSUER, nullable = false)
-    public String issuer;
+    private String issuer;
 }
