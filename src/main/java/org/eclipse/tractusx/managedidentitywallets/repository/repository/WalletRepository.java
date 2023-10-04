@@ -22,7 +22,6 @@
 package org.eclipse.tractusx.managedidentitywallets.repository.repository;
 
 import lombok.RequiredArgsConstructor;
-import org.eclipse.tractusx.managedidentitywallets.v2.entity.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
 import org.springframework.stereotype.Component;
 
@@ -34,7 +33,7 @@ public class WalletRepository {
 
     private final WalletJpaRepository walletJpaRepository;
 
-    public Optional<WalletEntity> get(String walletName) {
+    public Optional<WalletEntity> getByName(String walletName) {
 
         final Optional<WalletEntity> entityOptional = walletJpaRepository.findByName(walletName);
 

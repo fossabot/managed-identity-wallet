@@ -24,12 +24,16 @@ package org.eclipse.tractusx.managedidentitywallets.v1.service;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringEscapeUtils;
+import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotExistsException;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.v1.entity.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.v1.utils.CommonUtils;
 import org.eclipse.tractusx.managedidentitywallets.v1.utils.Validate;
 import org.eclipse.tractusx.ssi.lib.exception.DidParseException;
+import org.eclipse.tractusx.ssi.lib.model.did.Did;
+import org.eclipse.tractusx.ssi.lib.model.did.DidParser;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.stereotype.Service;
 
@@ -65,6 +69,14 @@ public class CommonService {
         return wallet;
     }
 
+    public Wallet getWalletByBpn(String bpn) {
+        WalletEntity walletEntity = walletRepository.getByName(bpn)
+                .orElseThrow(WalletNotExistsException::new);
+
+    }
+
+
+
     public static boolean validateExpiry(boolean withCredentialExpiryDate, VerifiableCredential verifiableCredential, Map<String, Object> response) {
         //validate expiry date
         boolean dateValidation = true;
@@ -80,4 +92,13 @@ public class CommonService {
         return dateValidation;
     }
 
+    private String asBpn(String identifier) {
+        try {
+            Did did = DidParser.parse(identifier);
+            return did.getMethodIdentifier().getValue();
+        } catch (DidParseException e) {
+            // not a did ->  ignore
+            return identifier;
+        }
+    }
 }
