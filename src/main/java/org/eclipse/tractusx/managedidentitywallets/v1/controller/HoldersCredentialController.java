@@ -31,7 +31,7 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.tractusx.managedidentitywallets.v1.constant.RestURI;
-import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
+import org.eclipse.tractusx.managedidentitywallets.v1.service.HoldersCredentialService;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.HttpStatus;
@@ -51,7 +51,7 @@ import java.util.Map;
 @Tag(name = "Verifiable Credential - Holder")
 public class HoldersCredentialController extends BaseController {
 
-    private final VerifiableCredentialService holdersCredentialService;
+    private final HoldersCredentialService holdersCredentialService;
 
 
     /**
