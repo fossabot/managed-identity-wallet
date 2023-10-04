@@ -21,31 +21,45 @@
 
 package org.eclipse.tractusx.managedidentitywallets.v1.service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.text.StringEscapeUtils;
-import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotExistsException;
+import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.v1.entity.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.v1.utils.CommonUtils;
-import org.eclipse.tractusx.managedidentitywallets.v1.utils.Validate;
+import org.eclipse.tractusx.managedidentitywallets.v1.exception.WalletNotFoundProblem;
+import org.eclipse.tractusx.managedidentitywallets.v2.service.VaultService;
+import org.eclipse.tractusx.ssi.lib.crypt.IPrivateKey;
+import org.eclipse.tractusx.ssi.lib.crypt.IPublicKey;
+import org.eclipse.tractusx.ssi.lib.crypt.jwk.JsonWebKey;
+import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559PrivateKey;
+import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559PublicKey;
+import org.eclipse.tractusx.ssi.lib.did.web.DidWebFactory;
 import org.eclipse.tractusx.ssi.lib.exception.DidParseException;
-import org.eclipse.tractusx.ssi.lib.model.did.Did;
-import org.eclipse.tractusx.ssi.lib.model.did.DidParser;
+import org.eclipse.tractusx.ssi.lib.model.did.*;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 @Service
 @Slf4j
 @RequiredArgsConstructor
 public class CommonService {
 
+    private static final ObjectMapper MAPPER = new ObjectMapper();
+
     private final WalletRepository walletRepository;
+    private final VaultService vaultService;
+    private final MIWSettings miwSettings;
 
     /**
      * Gets wallet by identifier(BPN or did).
@@ -54,27 +68,84 @@ public class CommonService {
      * @return the wallet by identifier
      */
     public Wallet getWalletByIdentifier(String identifier) {
-        Wallet wallet;
-        if (CommonUtils.getIdentifierType(identifier).equals(StringPool.BPN)) {
-            wallet = walletRepository.getByBpn(identifier);
-        } else {
-            try {
-                wallet = walletRepository.getByDid(identifier);
-            } catch (DidParseException e) {
-                log.error("Error while parsing did {}", StringEscapeUtils.escapeJava(identifier), e);
-                throw new WalletNotFoundProblem("Error while parsing did " + identifier);
-            }
-        }
-        Validate.isNull(wallet).launch(new WalletNotFoundProblem("Wallet not found for identifier " + identifier));
-        return wallet;
+        return getWalletByBpn(asBpn(identifier));
     }
 
     public Wallet getWalletByBpn(String bpn) {
-        WalletEntity walletEntity = walletRepository.getByName(bpn)
-                .orElseThrow(WalletNotExistsException::new);
+        final WalletEntity walletEntity = walletRepository.getByName(bpn)
+                .orElseThrow(() -> new WalletNotFoundProblem("Error while parsing did " + bpn));
 
+        final Did did = getDidByBpn(bpn);
+        final DidDocument didDocument = getDidDocument(walletEntity);
+        final List<VerifiableCredential> verifiableCredentials = walletEntity.getCredentialIntersections()
+                .stream()
+                .map(credentialIntersectionEntity -> credentialIntersectionEntity.getId().getVerifiableCredential())
+                .map(credential -> {
+                    try {
+                        return MAPPER.readValue(credential.getJson(), Map.class);
+                    } catch (Exception e) {
+                        log.error("Error while parsing credential", e);
+                        return null;
+                    }
+                })
+                .filter(Objects::nonNull)
+                .map(VerifiableCredential::new)
+                .toList();
+
+        return Wallet.builder()
+                .bpn(walletEntity.getId())
+                .did(did.toString())
+                .name(walletEntity.getName())
+                .algorithm(StringPool.ED_25519)
+                .didDocument(didDocument)
+                .verifiableCredentials(verifiableCredentials)
+                .build();
     }
 
+    public Did getDidByIdentifier(String identifier) {
+        return getDidByBpn(asBpn(identifier));
+    }
+
+    public Did getDidByBpn(String bpn) {
+        return DidWebFactory.fromHostnameAndPath(miwSettings.host(), bpn);
+    }
+
+    @SneakyThrows
+    public DidDocument getDidDocument(WalletEntity walletEntity) {
+
+        Did did = getDidByBpn(walletEntity.getId());
+        DidDocumentBuilder didDocumentBuilder = new DidDocumentBuilder();
+        didDocumentBuilder.id(did.toUri());
+
+        for (var key : walletEntity.getEd25519Keys()) {
+
+            final byte[] privateKey = vaultService.resolvePrivateKey(key.getVaultSecret());
+            IPrivateKey x21559PrivateKey = new x21559PrivateKey(privateKey);
+
+            final byte[] publicKey = vaultService.resolvePublicKey(key.getVaultSecret());
+            IPublicKey x21559PublicKey = new x21559PublicKey(publicKey);
+
+            final String keyId = key.getDidIdentifier();
+            JsonWebKey jwk = new JsonWebKey(keyId, x21559PublicKey, x21559PrivateKey);
+            JWKVerificationMethod jwkVerificationMethod =
+                    new JWKVerificationMethodBuilder().did(did).jwk(jwk).build();
+
+            didDocumentBuilder.verificationMethod(jwkVerificationMethod);
+        }
+
+        DidDocument didDocument = didDocumentBuilder.build();
+        //modify context URLs
+        List<URI> context = didDocument.getContext();
+        List<URI> mutableContext = new ArrayList<>(context);
+        miwSettings.didDocumentContextUrls().forEach(uri -> {
+            if (!mutableContext.contains(uri)) {
+                mutableContext.add(uri);
+            }
+        });
+        didDocument.put("@context", mutableContext);
+        didDocument = DidDocument.fromJson(didDocument.toJson());
+        return didDocument;
+    }
 
 
     public static boolean validateExpiry(boolean withCredentialExpiryDate, VerifiableCredential verifiableCredential, Map<String, Object> response) {

@@ -19,44 +19,25 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.exception;
+package org.eclipse.tractusx.managedidentitywallets.v2.service;
 
-/**
- * The type Forbidden exception.
- */
-public class ForbiddenException extends RuntimeException {
+import org.springframework.stereotype.Service;
 
-    /**
-     * Instantiates a new Forbidden exception.
-     */
-    public ForbiddenException() {
+@Service
+public class VaultService {
+    public byte[] resolvePublicKey(String secretName) {
+        return null;
     }
 
-    /**
-     * Instantiates a new Forbidden exception.
-     *
-     * @param message the message
-     */
-    public ForbiddenException(String message) {
-        super(message);
+    public byte[] resolvePrivateKey(String secretName) {
+        return null;
     }
 
-    /**
-     * Instantiates a new Forbidden exception.
-     *
-     * @param message the message
-     * @param cause   the cause
-     */
-    public ForbiddenException(String message, Throwable cause) {
-        super(message, cause);
+    public void storePublicKey(String secretName) {
+
     }
 
-    /**
-     * Instantiates a new Forbidden exception.
-     *
-     * @param cause the cause
-     */
-    public ForbiddenException(Throwable cause) {
-        super(cause);
+    public void storePrivateKey(String secretName) {
+
     }
 }

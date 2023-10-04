@@ -19,44 +19,45 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.exception;
+package org.eclipse.tractusx.managedidentitywallets.v1.exception;
 
 /**
- * The type Bad data exception.
+ * The type Duplicate wallet problem.
  */
-public class BadDataException extends RuntimeException {
+public class DuplicateCredentialProblem extends RuntimeException {
 
     /**
-     * Instantiates a new Bad data exception.
+     * Instantiates a new Duplicate wallet problem.
      */
-    public BadDataException() {
+    public DuplicateCredentialProblem() {
     }
 
     /**
-     * Instantiates a new Bad data exception.
+     * Instantiates a new Duplicate wallet problem.
      *
      * @param message the message
      */
-    public BadDataException(String message) {
+    public DuplicateCredentialProblem(String message) {
         super(message);
     }
 
     /**
-     * Instantiates a new Bad data exception.
+     * Instantiates a new Duplicate wallet problem.
      *
      * @param message the message
      * @param cause   the cause
      */
-    public BadDataException(String message, Throwable cause) {
+    public DuplicateCredentialProblem(String message, Throwable cause) {
         super(message, cause);
     }
 
     /**
-     * Instantiates a new Bad data exception.
+     * Instantiates a new Duplicate wallet problem.
      *
      * @param cause the cause
      */
-    public BadDataException(Throwable cause) {
+    public DuplicateCredentialProblem(Throwable cause) {
         super(cause);
     }
+
 }

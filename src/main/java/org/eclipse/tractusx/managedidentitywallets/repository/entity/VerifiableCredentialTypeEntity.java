@@ -33,7 +33,7 @@ import lombok.NoArgsConstructor;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(of = "type", callSuper = false)
-@Entity
+@Entity(name= VerifiableCredentialTypeEntity.TABLE_NAME)
 @Table(name = VerifiableCredentialTypeEntity.TABLE_NAME)
 public class VerifiableCredentialTypeEntity extends AbstractEntity {
 

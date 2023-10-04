@@ -21,20 +21,15 @@
 
 package org.eclipse.tractusx.managedidentitywallets.v1.service;
 
-import com.smartsensesolutions.java.commons.base.repository.BaseRepository;
-import com.smartsensesolutions.java.commons.base.service.BaseService;
-import com.smartsensesolutions.java.commons.specification.SpecificationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.bouncycastle.util.io.pem.PemReader;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.WalletKey;
-import org.eclipse.tractusx.managedidentitywallets.dao.repository.WalletKeyRepository;
-import org.eclipse.tractusx.managedidentitywallets.utils.EncryptionUtils;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
+import org.eclipse.tractusx.managedidentitywallets.repository.repository.WalletRepository;
+import org.eclipse.tractusx.managedidentitywallets.v1.exception.WalletNotFoundProblem;
+import org.eclipse.tractusx.managedidentitywallets.v2.service.VaultService;
 import org.eclipse.tractusx.ssi.lib.crypt.ed25519.Ed25519Key;
 import org.springframework.stereotype.Service;
-
-import java.io.StringReader;
 
 /**
  * The type Wallet key service.
@@ -42,23 +37,10 @@ import java.io.StringReader;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class WalletKeyService extends BaseService<WalletKey, Long> {
+public class WalletKeyService {
 
-    private final WalletKeyRepository walletKeyRepository;
-
-    private final SpecificationUtil<WalletKey> specificationUtil;
-
-    private final EncryptionUtils encryptionUtils;
-
-    @Override
-    protected BaseRepository<WalletKey, Long> getRepository() {
-        return walletKeyRepository;
-    }
-
-    @Override
-    protected SpecificationUtil<WalletKey> getSpecificationUtil() {
-        return specificationUtil;
-    }
+    private final WalletRepository walletRepository;
+    private final VaultService vaultService;
 
     /**
      * Get private key by wallet identifier as bytes byte [ ].
@@ -67,7 +49,7 @@ public class WalletKeyService extends BaseService<WalletKey, Long> {
      * @return the byte [ ]
      */
     @SneakyThrows
-    public byte[] getPrivateKeyByWalletIdentifierAsBytes(long walletId) {
+    public byte[] getPrivateKeyByWalletIdentifierAsBytes(String walletId) {
         return getPrivateKeyByWalletIdentifier(walletId).getEncoded();
     }
 
@@ -79,11 +61,17 @@ public class WalletKeyService extends BaseService<WalletKey, Long> {
      */
     @SneakyThrows
 
-    public Ed25519Key getPrivateKeyByWalletIdentifier(long walletId) {
-        WalletKey wallet = walletKeyRepository.getByWalletId(walletId);
-        String privateKey = encryptionUtils.decrypt(wallet.getPrivateKey());
-        byte[] content = new PemReader(new StringReader(privateKey)).readPemObject().getContent();
-        return Ed25519Key.asPrivateKey(content);
+    public Ed25519Key getPrivateKeyByWalletIdentifier(String walletId) {
+
+        final WalletEntity walletEntity = walletRepository.getById(walletId)
+                .orElseThrow(() -> new WalletNotFoundProblem(walletId));
+
+        var latestKey = walletEntity.getEd25519Keys().stream()
+                .max((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()))
+                .orElseThrow(() -> new RuntimeException("No key found for wallet " + walletId));
+
+        final byte[] key = vaultService.resolvePrivateKey(latestKey.getVaultSecret());
+        return Ed25519Key.asPrivateKey(key);
     }
 
 }

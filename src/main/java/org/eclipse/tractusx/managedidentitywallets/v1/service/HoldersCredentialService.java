@@ -36,8 +36,8 @@ import org.eclipse.tractusx.managedidentitywallets.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.v1.entity.HoldersCredential;
 import org.eclipse.tractusx.managedidentitywallets.v1.entity.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.dao.repository.HoldersCredentialRepository;
-import org.eclipse.tractusx.managedidentitywallets.exception.CredentialNotFoundProblem;
-import org.eclipse.tractusx.managedidentitywallets.exception.ForbiddenException;
+import org.eclipse.tractusx.managedidentitywallets.v1.exception.CredentialNotFoundProblem;
+import org.eclipse.tractusx.managedidentitywallets.v1.exception.ForbiddenException;
 import org.eclipse.tractusx.managedidentitywallets.v1.utils.CommonUtils;
 import org.eclipse.tractusx.managedidentitywallets.v1.utils.Validate;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
@@ -58,31 +58,16 @@ import java.util.Map;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class HoldersCredentialService extends BaseService<HoldersCredential, Long> {
+public class HoldersCredentialService {
 
     /**
      * The constant BASE_WALLET_BPN_IS_NOT_MATCHING_WITH_REQUEST_BPN_FROM_TOKEN.
      */
     public static final String BASE_WALLET_BPN_IS_NOT_MATCHING_WITH_REQUEST_BPN_FROM_TOKEN = "Base wallet BPN is not matching with request BPN(from token)";
 
-    private final HoldersCredentialRepository holdersCredentialRepository;
-
     private final CommonService commonService;
 
-    private final SpecificationUtil<HoldersCredential> credentialSpecificationUtil;
-
     private final WalletKeyService walletKeyService;
-
-    @Override
-    protected BaseRepository<HoldersCredential, Long> getRepository() {
-        return holdersCredentialRepository;
-    }
-
-    @Override
-    protected SpecificationUtil<HoldersCredential> getSpecificationUtil() {
-        return credentialSpecificationUtil;
-    }
-
 
     /**
      * Gets list of holder's credentials

@@ -34,7 +34,7 @@ import org.eclipse.tractusx.managedidentitywallets.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.v1.entity.HoldersCredential;
 import org.eclipse.tractusx.managedidentitywallets.v1.entity.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.dao.repository.HoldersCredentialRepository;
-import org.eclipse.tractusx.managedidentitywallets.exception.BadDataException;
+import org.eclipse.tractusx.managedidentitywallets.v1.exception.BadDataException;
 import org.eclipse.tractusx.managedidentitywallets.v1.utils.Validate;
 import org.eclipse.tractusx.ssi.lib.crypt.ed25519.Ed25519Key;
 import org.eclipse.tractusx.ssi.lib.crypt.octet.OctetKeyPairFactory;
@@ -74,28 +74,13 @@ import java.util.*;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class PresentationService extends BaseService<HoldersCredential, Long> {
-
-    private final HoldersCredentialRepository holdersCredentialRepository;
-
-
-    private final SpecificationUtil<HoldersCredential> credentialSpecificationUtil;
+public class PresentationService {
 
     private final CommonService commonService;
 
     private final WalletKeyService walletKeyService;
 
     private final MIWSettings miwSettings;
-
-    @Override
-    protected BaseRepository<HoldersCredential, Long> getRepository() {
-        return holdersCredentialRepository;
-    }
-
-    @Override
-    protected SpecificationUtil<HoldersCredential> getSpecificationUtil() {
-        return credentialSpecificationUtil;
-    }
 
     /**
      * Create presentation map.
@@ -132,7 +117,7 @@ public class PresentationService extends BaseService<HoldersCredential, Long> {
                     new SignedJwtFactory(new OctetKeyPairFactory()), new JsonLdSerializerImpl(), vpIssuerDid);
 
             //Build JWT
-            Ed25519Key ed25519Key = walletKeyService.getPrivateKeyByWalletIdentifier(callerWallet.getId());
+            Ed25519Key ed25519Key = walletKeyService.getPrivateKeyByWalletIdentifier(callerWallet.getBpn());
             x21559PrivateKey privateKey = new x21559PrivateKey(ed25519Key.getEncoded());
             SignedJWT presentation = presentationFactory.createPresentation(vpIssuerDid
                     , verifiableCredentials, audience, privateKey);

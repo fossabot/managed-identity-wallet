@@ -28,6 +28,7 @@ import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableC
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -65,7 +66,7 @@ public class VerifiableCredentialRepository {
         // Verifiable Credential - Issuer Intersection
     }
 
-    public Page<VerifiableCredential> getCredentialsByIssuer(String issuer) {
+    public Page<VerifiableCredential> getCredentialsByIssuer(String issuer, Pageable p) {
         return null; // TODO
     }
 }

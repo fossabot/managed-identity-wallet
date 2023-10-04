@@ -34,7 +34,7 @@ import java.util.Set;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id", callSuper = false)
-@Entity
+@Entity(name = WalletEntity.TABLE_NAME)
 @Table(name = WalletEntity.TABLE_NAME)
 public class WalletEntity extends AbstractEntity {
 

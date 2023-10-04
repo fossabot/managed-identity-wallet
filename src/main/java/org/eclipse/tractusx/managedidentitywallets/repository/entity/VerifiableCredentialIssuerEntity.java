@@ -26,7 +26,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
-@Entity
+@Entity(name= VerifiableCredentialIssuerEntity.TABLE_NAME)
 @Table(name = VerifiableCredentialIssuerEntity.TABLE_NAME)
 public class VerifiableCredentialIssuerEntity extends AbstractEntity {
 

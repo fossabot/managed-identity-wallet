@@ -24,7 +24,7 @@ package org.eclipse.tractusx.managedidentitywallets.config;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.managedidentitywallets.exception.*;
+import org.eclipse.tractusx.managedidentitywallets.v1.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.validation.FieldError;
@@ -55,8 +55,8 @@ public class ExceptionHandling {
      * @param e the e
      * @return the problem detail
      */
-    @ExceptionHandler(WalletNotExistsException.class)
-    ProblemDetail handleWalletNotFoundProblem(WalletNotExistsException e) {
+    @ExceptionHandler(WalletNotFoundProblem.class)
+    ProblemDetail handleWalletNotFoundProblem(WalletNotFoundProblem e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
         problemDetail.setTitle(e.getMessage());
         problemDetail.setProperty(TIMESTAMP, System.currentTimeMillis());

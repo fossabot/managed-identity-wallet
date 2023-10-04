@@ -19,45 +19,43 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.exception;
+package org.eclipse.tractusx.managedidentitywallets.v1.exception;
 
 /**
- * The type Duplicate wallet problem.
+ * The type Wallet creation problem.
  */
-public class DuplicateSummaryCredentialProblem extends RuntimeException {
-
+public class WalletCreationProblem extends RuntimeException {
     /**
-     * Instantiates a new Duplicate wallet problem.
+     * Instantiates a new Wallet creation problem.
      */
-    public DuplicateSummaryCredentialProblem() {
+    public WalletCreationProblem() {
     }
 
     /**
-     * Instantiates a new Duplicate wallet problem.
+     * Instantiates a new Wallet creation problem.
      *
      * @param message the message
      */
-    public DuplicateSummaryCredentialProblem(String message) {
+    public WalletCreationProblem(String message) {
         super(message);
     }
 
     /**
-     * Instantiates a new Duplicate wallet problem.
+     * Instantiates a new Wallet creation problem.
      *
      * @param message the message
      * @param cause   the cause
      */
-    public DuplicateSummaryCredentialProblem(String message, Throwable cause) {
+    public WalletCreationProblem(String message, Throwable cause) {
         super(message, cause);
     }
 
     /**
-     * Instantiates a new Duplicate wallet problem.
+     * Instantiates a new Wallet creation problem.
      *
      * @param cause the cause
      */
-    public DuplicateSummaryCredentialProblem(Throwable cause) {
+    public WalletCreationProblem(Throwable cause) {
         super(cause);
     }
-
 }

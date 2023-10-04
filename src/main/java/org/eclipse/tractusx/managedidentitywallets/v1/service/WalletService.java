@@ -22,11 +22,8 @@
 package org.eclipse.tractusx.managedidentitywallets.v1.service;
 
 import com.smartsensesolutions.java.commons.FilterRequest;
-import com.smartsensesolutions.java.commons.base.repository.BaseRepository;
-import com.smartsensesolutions.java.commons.base.service.BaseService;
 import com.smartsensesolutions.java.commons.sort.Sort;
 import com.smartsensesolutions.java.commons.sort.SortType;
-import com.smartsensesolutions.java.commons.specification.SpecificationUtil;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -35,22 +32,21 @@ import org.apache.commons.text.StringEscapeUtils;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemWriter;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
+import org.eclipse.tractusx.managedidentitywallets.repository.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.v1.constant.StringPool;
+import org.eclipse.tractusx.managedidentitywallets.v1.dto.CreateWalletRequest;
 import org.eclipse.tractusx.managedidentitywallets.v1.entity.HoldersCredential;
 import org.eclipse.tractusx.managedidentitywallets.v1.entity.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.WalletKey;
-import org.eclipse.tractusx.managedidentitywallets.dao.repository.HoldersCredentialRepository;
-import org.eclipse.tractusx.managedidentitywallets.dao.repository.WalletRepository;
-import org.eclipse.tractusx.managedidentitywallets.v1.dto.CreateWalletRequest;
-import org.eclipse.tractusx.managedidentitywallets.exception.BadDataException;
-import org.eclipse.tractusx.managedidentitywallets.exception.DuplicateWalletProblem;
-import org.eclipse.tractusx.managedidentitywallets.exception.ForbiddenException;
-import org.eclipse.tractusx.managedidentitywallets.utils.EncryptionUtils;
+import org.eclipse.tractusx.managedidentitywallets.v1.exception.BadDataException;
+import org.eclipse.tractusx.managedidentitywallets.v1.exception.DuplicateWalletProblem;
+import org.eclipse.tractusx.managedidentitywallets.v1.exception.ForbiddenException;
 import org.eclipse.tractusx.managedidentitywallets.v1.utils.Validate;
 import org.eclipse.tractusx.ssi.lib.crypt.IKeyGenerator;
 import org.eclipse.tractusx.ssi.lib.crypt.KeyPair;
 import org.eclipse.tractusx.ssi.lib.crypt.jwk.JsonWebKey;
 import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559Generator;
+import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559PrivateKey;
+import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559PublicKey;
 import org.eclipse.tractusx.ssi.lib.did.web.DidWebFactory;
 import org.eclipse.tractusx.ssi.lib.model.did.*;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
@@ -74,7 +70,7 @@ import java.util.UUID;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class WalletService extends BaseService<Wallet, Long> {
+public class WalletService {
 
 
     /**
@@ -85,28 +81,12 @@ public class WalletService extends BaseService<Wallet, Long> {
 
     private final MIWSettings miwSettings;
 
-    private final EncryptionUtils encryptionUtils;
-
     private final WalletKeyService walletKeyService;
-
-    private final HoldersCredentialRepository holdersCredentialRepository;
-
-    private final SpecificationUtil<Wallet> walletSpecificationUtil;
 
     private final IssuersCredentialService issuersCredentialService;
 
     private final CommonService commonService;
 
-
-    @Override
-    protected BaseRepository<Wallet, Long> getRepository() {
-        return walletRepository;
-    }
-
-    @Override
-    protected SpecificationUtil<Wallet> getSpecificationUtil() {
-        return walletSpecificationUtil;
-    }
 
     /**
      * Store credential map.
@@ -222,6 +202,8 @@ public class WalletService extends BaseService<Wallet, Long> {
         Did did = DidWebFactory.fromHostnameAndPath(miwSettings.host(), request.getBpn());
 
         String keyId = UUID.randomUUID().toString();
+
+        KeyPair pair = new KeyPair(x21559PublicKey, x21559PrivateKey);
 
         JsonWebKey jwk = new JsonWebKey(keyId, keyPair.getPublicKey(), keyPair.getPrivateKey());
         JWKVerificationMethod jwkVerificationMethod =

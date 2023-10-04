@@ -22,7 +22,7 @@
 package org.eclipse.tractusx.managedidentitywallets.v1.controller;
 
 import org.eclipse.tractusx.managedidentitywallets.v1.constant.StringPool;
-import org.eclipse.tractusx.managedidentitywallets.exception.ForbiddenException;
+import org.eclipse.tractusx.managedidentitywallets.v1.exception.ForbiddenException;
 import org.eclipse.tractusx.managedidentitywallets.v1.utils.Validate;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;

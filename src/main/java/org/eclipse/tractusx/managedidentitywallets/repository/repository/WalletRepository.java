@@ -33,6 +33,14 @@ public class WalletRepository {
 
     private final WalletJpaRepository walletJpaRepository;
 
+    public boolean existsById(String id) {
+        return false;
+    }
+
+    public Optional<WalletEntity> getById(String id) {
+        return null;
+    }
+
     public Optional<WalletEntity> getByName(String walletName) {
 
         final Optional<WalletEntity> entityOptional = walletJpaRepository.findByName(walletName);

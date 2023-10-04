@@ -42,9 +42,9 @@ import org.eclipse.tractusx.managedidentitywallets.dao.repository.IssuersCredent
 import org.eclipse.tractusx.managedidentitywallets.v1.dto.IssueDismantlerCredentialRequest;
 import org.eclipse.tractusx.managedidentitywallets.v1.dto.IssueFrameworkCredentialRequest;
 import org.eclipse.tractusx.managedidentitywallets.v1.dto.IssueMembershipCredentialRequest;
-import org.eclipse.tractusx.managedidentitywallets.exception.BadDataException;
-import org.eclipse.tractusx.managedidentitywallets.exception.DuplicateCredentialProblem;
-import org.eclipse.tractusx.managedidentitywallets.exception.ForbiddenException;
+import org.eclipse.tractusx.managedidentitywallets.v1.exception.BadDataException;
+import org.eclipse.tractusx.managedidentitywallets.v1.exception.DuplicateCredentialProblem;
+import org.eclipse.tractusx.managedidentitywallets.v1.exception.ForbiddenException;
 import org.eclipse.tractusx.managedidentitywallets.v1.utils.CommonUtils;
 import org.eclipse.tractusx.managedidentitywallets.v1.utils.Validate;
 import org.eclipse.tractusx.ssi.lib.did.resolver.DidDocumentResolverRegistry;

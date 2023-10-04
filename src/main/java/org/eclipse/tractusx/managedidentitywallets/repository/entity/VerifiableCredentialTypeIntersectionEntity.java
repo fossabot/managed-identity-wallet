@@ -31,7 +31,7 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id", callSuper = false)
-@Entity
+@Entity(name= VerifiableCredentialTypeIntersectionEntity.TABLE_NAME)
 @Table(name = VerifiableCredentialTypeIntersectionEntity.TABLE_NAME)
 public class VerifiableCredentialTypeIntersectionEntity extends AbstractEntity {
 

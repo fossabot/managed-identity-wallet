@@ -19,24 +19,44 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.exception;
-
-import lombok.Getter;
+package org.eclipse.tractusx.managedidentitywallets.v1.exception;
 
 /**
- * The type Wallet not found exception.
+ * The type Forbidden exception.
  */
-public class WalletNotExistsException extends Exception {
-
-    @Getter
-    private final String name;
+public class ForbiddenException extends RuntimeException {
 
     /**
-     * Instantiates a new Wallet not found problem.
-     *
-     * @param name of the wallet
+     * Instantiates a new Forbidden exception.
      */
-    public WalletNotExistsException(String name) {
-        this.name = name;
+    public ForbiddenException() {
+    }
+
+    /**
+     * Instantiates a new Forbidden exception.
+     *
+     * @param message the message
+     */
+    public ForbiddenException(String message) {
+        super(message);
+    }
+
+    /**
+     * Instantiates a new Forbidden exception.
+     *
+     * @param message the message
+     * @param cause   the cause
+     */
+    public ForbiddenException(String message, Throwable cause) {
+        super(message, cause);
+    }
+
+    /**
+     * Instantiates a new Forbidden exception.
+     *
+     * @param cause the cause
+     */
+    public ForbiddenException(Throwable cause) {
+        super(cause);
     }
 }
