@@ -27,20 +27,30 @@ import jakarta.persistence.*;
  * The type Wallet key.
  */
 @Entity
-@Table(name = "key_ed25519")
+@Table(name = Ed25519KeyEntity.TABLE_NAME)
 public class Ed25519KeyEntity extends AbstractEntity {
 
+    public static final String TABLE_NAME = "key_ed25519";
+
+    public static final String COLUMN_ID = "id";
+    public static final String COLUMN_WALLET_ID = "wallet_id";
+    public static final String COLUMN_DID_IDENTIFIER = "did_identifier";
+    public static final String COLUMN_DESCRIPTION = "description";
+    public static final String COLUMN_VAULT_SECRET = "vault_secret";
+
     @Id
+    @Column(name = COLUMN_ID, nullable = false)
     private String id;
 
-    @Column(nullable = false)
+    @Column(name = COLUMN_WALLET_ID, nullable = false)
     private String walletId;
 
-    @Column(nullable = false)
+    @Column(name = COLUMN_DID_IDENTIFIER, nullable = false)
     private String didIdentifier;
 
+    @Column(name = COLUMN_DESCRIPTION)
     private String description;
 
-    @Column(nullable = false)
+    @Column(name = COLUMN_VAULT_SECRET, nullable = false)
     private String vaultSecret;
 }

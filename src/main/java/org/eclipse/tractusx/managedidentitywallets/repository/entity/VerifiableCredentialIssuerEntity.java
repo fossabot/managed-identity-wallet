@@ -21,13 +21,20 @@
 
 package org.eclipse.tractusx.managedidentitywallets.repository.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "verifiable_credential_issuer")
+@Table(name = VerifiableCredentialIssuerEntity.TABLE_NAME)
 public class VerifiableCredentialIssuerEntity extends AbstractEntity {
+
+    public static final String TABLE_NAME = "verifiable_credential_issuer";
+
+    public static final String COLUMN_ISSUER = "issuer";
+
     @Id
+    @Column(name = COLUMN_ISSUER, nullable = false)
     public String issuer;
 }

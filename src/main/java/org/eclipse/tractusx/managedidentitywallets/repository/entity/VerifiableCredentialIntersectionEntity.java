@@ -30,26 +30,31 @@ import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "id", callSuper = false)
 @Entity
-@Table(name = "verifiable_credential_intersection")
+@Table(name = VerifiableCredentialIntersectionEntity.TABLE_NAME)
 public class VerifiableCredentialIntersectionEntity extends AbstractEntity {
+
+    public static final String TABLE_NAME = "verifiable_credential_intersection";
+
+    public static final String COLUMN_WALLET_ID = "wallet_id";
+    public static final String COLUMN_VERIFIABLE_CREDENTIAL_ID = "verifiable_credential_id";
 
     @EmbeddedId
     private VerifiableCredentialIntersectionEntityId id;
 
     @Data
     @NoArgsConstructor
-    @EqualsAndHashCode(of = {"wallet_id", "verifiable_credential_id"})
+    @EqualsAndHashCode(of = {"wallet", "verifiableCredential"})
     @Embeddable
     public static class VerifiableCredentialIntersectionEntityId implements Serializable {
 
         @ManyToOne
-        @JoinColumn(name = "wallet_id")
+        @JoinColumn(name = COLUMN_WALLET_ID)
         private WalletEntity wallet;
 
         @ManyToOne
-        @JoinColumn(name = "verifiable_credential_id")
+        @JoinColumn(name = COLUMN_VERIFIABLE_CREDENTIAL_ID)
         private VerifiableCredentialEntity verifiableCredential;
     }
 }

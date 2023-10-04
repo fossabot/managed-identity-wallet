@@ -30,26 +30,31 @@ import java.io.Serializable;
 
 @Data
 @NoArgsConstructor
-@EqualsAndHashCode(of = "id")
+@EqualsAndHashCode(of = "id", callSuper = false)
 @Entity
-@Table(name = "verifiable_credential_issuer_intersection")
-public class VerifiableCredentialIssuerIntersectionEntity {
+@Table(name = VerifiableCredentialIssuerIntersectionEntity.TABLE_NAME)
+public class VerifiableCredentialIssuerIntersectionEntity extends AbstractEntity {
+
+    public static final String TABLE_NAME = "verifiable_credential_issuer_intersection";
+
+    public static final String COLUMN_VERIFIABLE_CREDENTIAL_ID = "verifiable_credential_id";
+    public static final String COLUMN_VERIFIABLE_CREDENTIAL_ISSUER_ID = "verifiable_credential_issuer_id";
 
     @EmbeddedId
     private VerifiableCredentialIssuerIntersectionEntityId id;
 
     @Data
     @NoArgsConstructor
-    @EqualsAndHashCode(of = {"wallet_id", "verifiable_credential_id"})
+    @EqualsAndHashCode(of = {"verifiableCredential", "verifiableCredentialIssuer"})
     @Embeddable
     public static class VerifiableCredentialIssuerIntersectionEntityId implements Serializable {
 
         @ManyToOne
-        @JoinColumn(name = "verifiable_credential_id")
-        private  VerifiableCredentialEntity verifiableCredential;
+        @JoinColumn(name = COLUMN_VERIFIABLE_CREDENTIAL_ID)
+        private VerifiableCredentialEntity verifiableCredential;
 
         @ManyToOne
-        @JoinColumn(name = "verifiable_credential_issuer_id")
+        @JoinColumn(name = COLUMN_VERIFIABLE_CREDENTIAL_ISSUER_ID)
         private VerifiableCredentialIssuerEntity verifiableCredentialIssuer;
     }
 }

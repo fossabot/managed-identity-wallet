@@ -22,25 +22,39 @@
 package org.eclipse.tractusx.managedidentitywallets.repository.entity;
 
 import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(of = "id", callSuper = false)
 @Entity
-@IdClass(IntersectionKey.class)
-@Table(name = "verifiable_credential_type_intersection")
-public class VerifiableCredentialTypeIntersectionEntity {
+@Table(name = VerifiableCredentialTypeIntersectionEntity.TABLE_NAME)
+public class VerifiableCredentialTypeIntersectionEntity extends AbstractEntity {
 
-    @Id
-    @Column(name = "verifiable_credential_id", nullable = false)
-    private String key1;
+    public static final String TABLE_NAME = "verifiable_credential_type_intersection";
 
-    @Id
-    @Column(name = "verifiable_credential_type_id", nullable = false)
-    private String key2;
+    public static final String COLUMN_VERIFIABLE_CREDENTIAL_ID = "verifiable_credential_id";
+    public static final String COLUMN_VERIFIABLE_CREDENTIAL_ISSUER_ID = "verifiable_credential_issuer_id";
 
-    @ManyToOne
-    @JoinColumn(name = "verifiable_credential_id", referencedColumnName = "id", insertable = false, updatable = false)
-    private VerifiableCredentialEntity verifiableCredential;
+    @EmbeddedId
+    private VerifiableCredentialTypeIntersectionEntityId id;
 
-    @ManyToOne
-    @JoinColumn(name = "verifiable_credential_type_id", referencedColumnName = "type", insertable = false, updatable = false)
-    private VerifiableCredentialTypeEntity verifiableCredentialType;
+    @Data
+    @NoArgsConstructor
+    @EqualsAndHashCode(of = {"verifiableCredential", "verifiableCredentialType"})
+    @Embeddable
+    public static class VerifiableCredentialTypeIntersectionEntityId implements Serializable {
+
+        @ManyToOne
+        @JoinColumn(name = COLUMN_VERIFIABLE_CREDENTIAL_ID)
+        private VerifiableCredentialEntity verifiableCredential;
+
+        @ManyToOne
+        @JoinColumn(name = COLUMN_VERIFIABLE_CREDENTIAL_ISSUER_ID)
+        private VerifiableCredentialTypeEntity verifiableCredentialType;
+    }
 }

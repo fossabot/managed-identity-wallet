@@ -21,13 +21,27 @@
 
 package org.eclipse.tractusx.managedidentitywallets.repository.entity;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
+
+@Data
+@NoArgsConstructor
+@EqualsAndHashCode(of = "type", callSuper = false)
 @Entity
-@Table(name = "verifiable_credential_type")
+@Table(name = VerifiableCredentialTypeEntity.TABLE_NAME)
 public class VerifiableCredentialTypeEntity extends AbstractEntity {
+
+    public static final String TABLE_NAME = "verifiable_credential_type";
+
+    public static final String COLUMN_TYPE = "type";
+
     @Id
+    @Column(name = COLUMN_TYPE, nullable = false)
     private String type;
 }

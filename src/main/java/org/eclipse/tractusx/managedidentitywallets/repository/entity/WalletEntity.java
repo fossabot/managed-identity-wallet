@@ -23,20 +23,26 @@ package org.eclipse.tractusx.managedidentitywallets.repository.entity;
 
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import org.checkerframework.common.aliasing.qual.Unique;
 
 import java.util.List;
 import java.util.Set;
 
-/**
- * The type Wallet.
- */
-@Entity
+
 @Data
 @NoArgsConstructor
-@Table(name = "wallet")
+@EqualsAndHashCode(of = "id", callSuper = false)
+@Entity
+@Table(name = WalletEntity.TABLE_NAME)
 public class WalletEntity extends AbstractEntity {
+
+    public static final String TABLE_NAME = "wallet";
+
+    public static final String COLUMN_ID = "id";
+    public static final String COLUMN_NAME = "name";
+    public static final String COLUMN_DESCRIPTION = "description";
 
     @Id
     private String id;
