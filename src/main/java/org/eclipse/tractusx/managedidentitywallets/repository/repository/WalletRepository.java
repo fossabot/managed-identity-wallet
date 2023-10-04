@@ -34,7 +34,7 @@ public class WalletRepository {
 
     private final WalletJpaRepository walletJpaRepository;
 
-    public Optional<Wallet> get(String walletName) {
+    public Optional<WalletEntity> get(String walletName) {
 
         final Optional<WalletEntity> entityOptional = walletJpaRepository.findByName(walletName);
 
