@@ -22,7 +22,6 @@
 package org.eclipse.tractusx.managedidentitywallets.repository.repository;
 
 import lombok.RequiredArgsConstructor;
-import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotExistsException;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialIntersectionEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
@@ -44,10 +43,9 @@ public class VerifiableCredentialRepository {
     private final VerifiableCredentialIssuerIntersectionJpaRepository verifiableCredentialIssuerIntersectionJpaRepository;
 
     @Transactional
-    public void save(VerifiableCredential vc, String walletName)
-            throws WalletNotExistsException {
+    public void save(VerifiableCredential vc, String walletName) {
         final WalletEntity walletEntity = walletJpaRepository.findByName(walletName)
-                .orElseThrow(() -> new WalletNotExistsException(walletName));
+                .orElseThrow(() -> new RuntimeException()); // TODO
 
         // Verifiable Credential
         final VerifiableCredentialEntity verifiableCredentialEntity = new VerifiableCredentialEntity();
@@ -64,9 +62,11 @@ public class VerifiableCredentialRepository {
         verifiableCredentialIntersectionJpaRepository.save(verifiableCredentialIntersectionEntity);
 
         // Verifiable Credential - Issuer Intersection
+        // TODO
     }
 
     public Page<VerifiableCredential> getCredentialsByIssuer(String issuer, Pageable p) {
+        QWalletEntity walletEntity = QWalletEntity.walletEntity;
         return null; // TODO
     }
 }

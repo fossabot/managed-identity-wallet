@@ -38,6 +38,10 @@ ext {
 }
 
 dependencies {
+    // QueryDSL
+    compileOnly "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    annotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
+
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation 'org.springframework.boot:spring-boot-starter-web'
@@ -58,6 +62,10 @@ dependencies {
     //Added explicitly to mitigate CVE 2023-24998
     implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
 
+    /* TEST */
+    // Querydsl
+    compileOnly "com.querydsl:querydsl-jpa:${queryDslVersion}"
+    testAnnotationProcessor "com.querydsl:querydsl-apt:${queryDslVersion}"
 
     testImplementation 'org.projectlombok:lombok:1.18.28'
     runtimeOnly 'org.postgresql:postgresql'

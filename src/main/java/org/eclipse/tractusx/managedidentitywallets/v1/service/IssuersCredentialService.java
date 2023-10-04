@@ -29,6 +29,8 @@ import com.smartsensesolutions.java.commons.operator.Operator;
 import com.smartsensesolutions.java.commons.sort.Sort;
 import com.smartsensesolutions.java.commons.sort.SortType;
 import com.smartsensesolutions.java.commons.specification.SpecificationUtil;
+import jdk.jfr.Registered;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringEscapeUtils;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
@@ -37,8 +39,6 @@ import org.eclipse.tractusx.managedidentitywallets.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.v1.entity.HoldersCredential;
 import org.eclipse.tractusx.managedidentitywallets.v1.entity.IssuersCredential;
 import org.eclipse.tractusx.managedidentitywallets.v1.entity.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.dao.repository.HoldersCredentialRepository;
-import org.eclipse.tractusx.managedidentitywallets.dao.repository.IssuersCredentialRepository;
 import org.eclipse.tractusx.managedidentitywallets.v1.dto.IssueDismantlerCredentialRequest;
 import org.eclipse.tractusx.managedidentitywallets.v1.dto.IssueFrameworkCredentialRequest;
 import org.eclipse.tractusx.managedidentitywallets.v1.dto.IssueMembershipCredentialRequest;
@@ -75,56 +75,21 @@ import java.util.*;
  */
 @Service
 @Slf4j
-public class IssuersCredentialService extends BaseService<IssuersCredential, Long> {
+@RequiredArgsConstructor
+public class IssuersCredentialService {
 
     /**
      * The constant BASE_WALLET_BPN_IS_NOT_MATCHING_WITH_REQUEST_BPN_FROM_TOKEN.
      */
     public static final String BASE_WALLET_BPN_IS_NOT_MATCHING_WITH_REQUEST_BPN_FROM_TOKEN = "Base wallet BPN is not matching with request BPN(from token)";
 
-    private final IssuersCredentialRepository issuersCredentialRepository;
     private final MIWSettings miwSettings;
 
-    private final SpecificationUtil<IssuersCredential> credentialSpecificationUtil;
 
     private final WalletKeyService walletKeyService;
 
-    private final HoldersCredentialRepository holdersCredentialRepository;
 
     private final CommonService commonService;
-
-    /**
-     * Instantiates a new Issuers credential service.
-     *
-     * @param issuersCredentialRepository the issuers credential repository
-     * @param miwSettings                 the miw settings
-     * @param credentialSpecificationUtil the credential specification util
-     * @param walletKeyService            the wallet key service
-     * @param holdersCredentialRepository the holders credential repository
-     * @param commonService               the common service
-     */
-    public IssuersCredentialService(IssuersCredentialRepository issuersCredentialRepository, MIWSettings miwSettings,
-                                    SpecificationUtil<IssuersCredential> credentialSpecificationUtil,
-                                    WalletKeyService walletKeyService, HoldersCredentialRepository holdersCredentialRepository, CommonService commonService) {
-        this.issuersCredentialRepository = issuersCredentialRepository;
-        this.miwSettings = miwSettings;
-        this.credentialSpecificationUtil = credentialSpecificationUtil;
-        this.walletKeyService = walletKeyService;
-        this.holdersCredentialRepository = holdersCredentialRepository;
-        this.commonService = commonService;
-    }
-
-
-    @Override
-    protected BaseRepository<IssuersCredential, Long> getRepository() {
-        return issuersCredentialRepository;
-    }
-
-    @Override
-    protected SpecificationUtil<IssuersCredential> getSpecificationUtil() {
-        return credentialSpecificationUtil;
-    }
-
 
     /**
      * Gets credentials.

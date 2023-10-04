@@ -45,18 +45,6 @@ public class WalletRepository {
 
         final Optional<WalletEntity> entityOptional = walletJpaRepository.findByName(walletName);
 
-
-        if (entityOptional.isPresent()) {
-            final WalletEntity entity = entityOptional.get();
-
-            entity.getCredentialIntersections().forEach(intersection -> {
-                intersection.getVerifiableCredentialIntersectionEntityId().getVerifiableCredentialEntity().getJson();
-            });
-            return Optional.of(entity.get().toModel());
-        } else {
-            return Optional.empty();
-        }
-
-        return walletJpaRepository.save(walletEntity);
+        return entityOptional;
     }
 }

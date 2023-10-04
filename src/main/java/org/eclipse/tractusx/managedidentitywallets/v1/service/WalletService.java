@@ -234,7 +234,6 @@ public class WalletService {
                 .algorithm(StringPool.ED_25519)
                 .build());
 
-
         //Save key
         walletKeyService.getRepository().save(WalletKey.builder()
                 .walletId(wallet.getId())
