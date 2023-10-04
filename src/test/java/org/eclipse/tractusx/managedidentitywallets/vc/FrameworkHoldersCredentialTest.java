@@ -29,12 +29,12 @@ import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer
 import org.eclipse.tractusx.managedidentitywallets.constant.MIWVerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.constant.RestURI;
 import org.eclipse.tractusx.managedidentitywallets.constant.StringPool;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.HoldersCredential;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.IssuersCredential;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.dao.repository.HoldersCredentialRepository;
-import org.eclipse.tractusx.managedidentitywallets.dao.repository.IssuersCredentialRepository;
-import org.eclipse.tractusx.managedidentitywallets.dao.repository.WalletRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.HoldersCredential;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.IssuersCredential;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
+import org.eclipse.tractusx.managedidentitywallets.repository.repository.VerifiableCredentialRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.repository.IssuersCredentialRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.dto.IssueFrameworkCredentialRequest;
 import org.eclipse.tractusx.managedidentitywallets.dto.IssueMembershipCredentialRequest;
 import org.eclipse.tractusx.managedidentitywallets.utils.AuthenticationUtils;
@@ -62,7 +62,7 @@ import java.util.stream.Stream;
 @ContextConfiguration(initializers = {TestContextInitializer.class})
 class FrameworkHoldersCredentialTest {
     @Autowired
-    private HoldersCredentialRepository holdersCredentialRepository;
+    private VerifiableCredentialRepository holdersCredentialRepository;
     @Autowired
     private WalletRepository walletRepository;
 
@@ -113,7 +113,7 @@ class FrameworkHoldersCredentialTest {
         String bpn = miwSettings.authorityWalletBpn();
         String type = "PcfCredential";
         //create wallet
-        Wallet wallet = walletRepository.getByBpn(miwSettings.authorityWalletBpn());
+        WalletEntity wallet = walletRepository.getByBpn(miwSettings.authorityWalletBpn());
         String oldSummaryCredentialId = TestUtils.getSummaryCredentialId(wallet.getDid(), holdersCredentialRepository);
 
         HttpHeaders headers = AuthenticationUtils.getValidUserHttpHeaders(miwSettings.authorityWalletBpn());
@@ -169,7 +169,7 @@ class FrameworkHoldersCredentialTest {
     void issueFrameworkCredentialTest400() throws JsonProcessingException, JSONException {
         String bpn = UUID.randomUUID().toString();
         String did = DidWebFactory.fromHostnameAndPath(miwSettings.host(), bpn).toString();
-        Wallet wallet = TestUtils.createWallet(bpn, did, walletRepository);
+        WalletEntity wallet = TestUtils.createWallet(bpn, did, walletRepository);
 
 
         String type = "cx-traceability1";
@@ -188,7 +188,7 @@ class FrameworkHoldersCredentialTest {
     private void createAndValidateVC(String bpn, String did, String type) throws JsonProcessingException {
         //create wallet
         String baseBpn = miwSettings.authorityWalletBpn();
-        Wallet wallet = TestUtils.getWalletFromString(TestUtils.createWallet(bpn, bpn, restTemplate,baseBpn).getBody());
+        WalletEntity wallet = TestUtils.getWalletFromString(TestUtils.createWallet(bpn, bpn, restTemplate,baseBpn).getBody());
         String oldSummaryCredentialId = TestUtils.getSummaryCredentialId(wallet.getDid(), holdersCredentialRepository);
 
         HttpHeaders headers = AuthenticationUtils.getValidUserHttpHeaders(miwSettings.authorityWalletBpn());
@@ -204,7 +204,7 @@ class FrameworkHoldersCredentialTest {
 
     }
 
-    private void validate(Wallet wallet, String type, ResponseEntity<String> response, MIWSettings miwSettings, String oldSummaryCredentialId) throws JsonProcessingException {
+    private void validate(WalletEntity wallet, String type, ResponseEntity<String> response, MIWSettings miwSettings, String oldSummaryCredentialId) throws JsonProcessingException {
         ObjectMapper objectMapper = new ObjectMapper();
         Map<String, Object> map = objectMapper.readValue(response.getBody(), Map.class);
         VerifiableCredential verifiableCredential = new VerifiableCredential(map);

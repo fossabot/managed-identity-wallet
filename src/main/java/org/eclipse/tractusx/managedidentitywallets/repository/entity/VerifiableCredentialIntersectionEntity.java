@@ -19,43 +19,37 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.dao.entity;
+package org.eclipse.tractusx.managedidentitywallets.repository.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
-import lombok.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
-/**
- * The type Wallet key.
- */
-@Getter
-@Setter
-@Entity
-@AllArgsConstructor
+import java.io.Serializable;
+
+@Data
 @NoArgsConstructor
-@Builder
-public class WalletKey extends MIWBaseEntity {
+@EqualsAndHashCode(of = "id")
+@Entity
+@Table(name = "verifiable_credential_intersection")
+public class VerifiableCredentialIntersectionEntity extends TimedEntity {
 
-    @Id
-    @JsonIgnore
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id", columnDefinition = "serial", nullable = false, unique = true)
-    private Long id;
+    @EmbeddedId
+    private VerifiableCredentialIntersectionEntityId id;
 
-    @Column(nullable = false)
-    private Long walletId;
+    @Data
+    @NoArgsConstructor
+    @EqualsAndHashCode(of = {"wallet_id", "verifiable_credential_id"})
+    @Embeddable
+    public static class VerifiableCredentialIntersectionEntityId implements Serializable {
 
-    @Column(nullable = false)
-    private String vaultAccessToken;
+        @ManyToOne
+        @JoinColumn(name = "wallet_id")
+        private WalletEntity wallet;
 
-    @Column(nullable = false)
-    private String referenceKey;
-
-    @Column(nullable = false)
-    private String privateKey;
-
-    @Column(nullable = false)
-    private String publicKey;
-
-    private String keyId;
+        @ManyToOne
+        @JoinColumn(name = "verifiable_credential_id")
+        private VerifiableCredentialEntity verifiableCredential;
+    }
 }

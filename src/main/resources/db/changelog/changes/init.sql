@@ -1,80 +1,105 @@
---liquibase formatted sql
+/*
+ * *******************************************************************************
+ *  Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
+ *
+ *  See the NOTICE file(s) distributed with this work for additional
+ *  information regarding copyright ownership.
+ *
+ *  This program and the accompanying materials are made available under the
+ *  terms of the Apache License, Version 2.0 which is available at
+ *  https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ *  License for the specific language governing permissions and limitations
+ *  under the License.
+ *
+ *  SPDX-License-Identifier: Apache-2.0
+ * ******************************************************************************
+ */
 
---changeset nitin:1
-CREATE TABLE IF NOT EXISTS public.wallet
+/* Wallet */
+CREATE TABLE IF NOT EXISTS wallet
 (
-    id            bigserial    NOT NULL,
-    name          varchar(255) NOT NULL,
-    did           varchar(255) NOT NULL,
-    bpn           varchar(255) NOT NULL,
-    algorithm     varchar(255) NOT NULL DEFAULT 'ED25519'::character varying,
-    did_document  text         NOT NULL,
-    created_at    timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    modified_at   timestamp(6) NULL,
-    modified_from varchar(255) NULL,
-    CONSTRAINT uk_bpn UNIQUE (bpn),
-    CONSTRAINT uk_did UNIQUE (did),
-    CONSTRAINT wallet_pkey PRIMARY KEY (id),
-    CONSTRAINT wallet_fk FOREIGN KEY (modified_from) REFERENCES public.wallet (bpn) ON DELETE SET NULL
+    id          varchar(255) NOT NULL,
+    name        varchar(255) NOT NULL,
+    description varchar(255),
+    created_at  timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id)
 );
-COMMENT ON TABLE public.wallet IS 'This table will store wallets';
 
-CREATE TABLE IF NOT EXISTS public.wallet_key
+CREATE UNIQUE INDEX wallet_name ON wallet (name);
+
+/* Key */
+CREATE TABLE IF NOT EXISTS key_ed25519
 (
-    id                 bigserial     NOT NULL,
-    wallet_id          bigserial     NOT NULL,
-    vault_access_token varchar(1000) NOT NULL,
-    reference_key      varchar(255)  NOT NULL,
-    private_key        text          NOT NULL,
-    public_key         text          NOT NULL,
-    created_at         timestamp(6)  NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    modified_at        timestamp(6)  NULL,
-    modified_from      varchar(255)  NULL,
-    CONSTRAINT wallet_key_pkey PRIMARY KEY (id),
-    CONSTRAINT wallet_fk_2 FOREIGN KEY (wallet_id) REFERENCES public.wallet (id) ON DELETE CASCADE,
-    CONSTRAINT wallet_key_fk FOREIGN KEY (modified_from) REFERENCES public.wallet (bpn) ON DELETE CASCADE
+    id             varchar(255) NOT NULL,
+    did_identifier varchar(255) NOT NULL,
+    description    varchar(255),
+    vault_secret   varchar(255) NOT NULL,
+    wallet_id      varchar(255) NOT NULL,
+    created_at  timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (wallet_id) REFERENCES wallet (id) ON DELETE CASCADE
 );
-COMMENT ON TABLE public.wallet_key IS 'This table will store key pair of wallets';
 
-
-CREATE TABLE IF NOT EXISTS public.issuers_credential
+/* Verifiable Credential */
+CREATE TABLE IF NOT EXISTS verifiable_credential
 (
-    id            bigserial    NOT NULL,
-    holder_did    varchar(255) NOT NULL,
-    issuer_did    varchar(255) NOT NULL,
-    credential_id varchar(255) NOT NULL,
-    credential_data        text         NOT NULL,
-    credential_type        varchar(255) NULL,
-    created_at    timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    modified_at   timestamp(6) NULL,
-    modified_from varchar(255) NULL,
-    CONSTRAINT issuers_credential_pkey PRIMARY KEY (id),
-    CONSTRAINT issuers_credential_fk FOREIGN KEY (modified_from) REFERENCES public.wallet (bpn) ON DELETE SET NULL,
-    CONSTRAINT issuers_credential_holder_wallet_fk FOREIGN KEY (holder_did) REFERENCES public.wallet (did) ON DELETE CASCADE
+    id          varchar(255) NOT NULL,
+    raw         text         NOT NULL,
+    created_at  timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified_at timestamp(6) NULL,
+    PRIMARY KEY (id)
 );
-COMMENT ON TABLE public.issuers_credential IS 'This table will store issuers credentials';
 
-
-CREATE TABLE IF NOT EXISTS public.holders_credential
+/* Verifiable Credential Type */
+CREATE TABLE IF NOT EXISTS verifiable_credential_type
 (
-    id             bigserial    NOT NULL,
-    holder_did     varchar(255) NOT NULL,
-    issuer_did     varchar(255) NOT NULL,
-    credential_id  varchar(255) NOT NULL,
-    credential_data         text         NOT NULL,
-    credential_type         varchar(255) NULL,
-    is_self_issued bool         NOT null default false,
-    is_stored      bool         NOT null default false,
-    created_at     timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    modified_at    timestamp(6) NULL,
-    modified_from  varchar(255) NULL,
-    CONSTRAINT holders_credential_pkey PRIMARY KEY (id),
-    CONSTRAINT holders_credential_fk FOREIGN KEY (modified_from) REFERENCES public.wallet (bpn) ON DELETE SET NULL,
-    CONSTRAINT holders_credential_holder_wallet_fk FOREIGN KEY (holder_did) REFERENCES public.wallet (did) ON DELETE CASCADE
+    type        varchar(255) NOT NULL,
+    created_at  timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified_at timestamp(6) NULL,
+    PRIMARY KEY (type)
 );
-COMMENT ON TABLE public.holders_credential IS 'This table will store holders credentials';
 
-COMMENT ON COLUMN public.holders_credential.is_stored IS 'true is VC is stored using store VC api(Not issued by MIW)';
+/* Verifiable Credential Issuer */
+CREATE TABLE IF NOT EXISTS verifiable_credential_issuer
+(
+    issuer      varchar(255) NOT NULL,
+    created_at  timestamp(6) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    modified_at timestamp(6) NULL,
+    PRIMARY KEY (issuer)
+);
 
---changeset nitin:2
-ALTER TABLE public.wallet_key ADD key_id varchar(255) NULL;
+/* Verifiable Credential Intersection Table */
+CREATE TABLE IF NOT EXISTS verifiable_credential_intersection
+(
+    wallet_id                varchar(255) NOT NULL,
+    verifiable_credential_id varchar(255) NOT NULL,
+    PRIMARY KEY (wallet_id, verifiable_credential_id),
+    FOREIGN KEY (wallet_id) REFERENCES wallet (id) ON DELETE CASCADE,
+    FOREIGN KEY (verifiable_credential_id) REFERENCES verifiable_credential (id) ON DELETE CASCADE
+);
+
+/* Verifiable Credential Type Intersection Table */
+CREATE TABLE IF NOT EXISTS verifiable_credential_type_intersection
+(
+    verifiable_credential_id      varchar(255) NOT NULL,
+    verifiable_credential_type_id varchar(255) NOT NULL,
+    PRIMARY KEY (verifiable_credential_id, verifiable_credential_type_id),
+    FOREIGN KEY (verifiable_credential_id) REFERENCES verifiable_credential (id) ON DELETE CASCADE,
+    FOREIGN KEY (verifiable_credential_type_id) REFERENCES verifiable_credential_type (type) ON DELETE CASCADE
+);
+
+/* Verifiable Credential Issuer Intersection Table */
+CREATE TABLE IF NOT EXISTS verifiable_credential_type_intersection
+(
+    verifiable_credential_id        varchar(255) NOT NULL,
+    verifiable_credential_issuer_id varchar(255) NOT NULL,
+    PRIMARY KEY (verifiable_credential_id, verifiable_credential_issuer_id),
+    FOREIGN KEY (verifiable_credential_id) REFERENCES verifiable_credential (id) ON DELETE CASCADE,
+    FOREIGN KEY (verifiable_credential_issuer_id) REFERENCES verifiable_credential_issuer (issuer) ON DELETE CASCADE
+);

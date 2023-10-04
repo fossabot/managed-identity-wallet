@@ -29,13 +29,13 @@ import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer
 import org.eclipse.tractusx.managedidentitywallets.constant.MIWVerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.constant.RestURI;
 import org.eclipse.tractusx.managedidentitywallets.constant.StringPool;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.HoldersCredential;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.IssuersCredential;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.dao.repository.HoldersCredentialRepository;
-import org.eclipse.tractusx.managedidentitywallets.dao.repository.IssuersCredentialRepository;
-import org.eclipse.tractusx.managedidentitywallets.dao.repository.WalletKeyRepository;
-import org.eclipse.tractusx.managedidentitywallets.dao.repository.WalletRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.HoldersCredential;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.IssuersCredential;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
+import org.eclipse.tractusx.managedidentitywallets.repository.repository.VerifiableCredentialRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.repository.IssuersCredentialRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.repository.Ed25519KeyRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.dto.IssueDismantlerCredentialRequest;
 import org.eclipse.tractusx.managedidentitywallets.dto.IssueMembershipCredentialRequest;
 import org.eclipse.tractusx.managedidentitywallets.utils.AuthenticationUtils;
@@ -60,12 +60,12 @@ import java.util.UUID;
 @ContextConfiguration(initializers = {TestContextInitializer.class})
 class DismantlerHoldersCredentialTest {
     @Autowired
-    private HoldersCredentialRepository holdersCredentialRepository;
+    private VerifiableCredentialRepository holdersCredentialRepository;
     @Autowired
     private WalletRepository walletRepository;
 
     @Autowired
-    private WalletKeyRepository walletKeyRepository;
+    private Ed25519KeyRepository walletKeyRepository;
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -94,7 +94,7 @@ class DismantlerHoldersCredentialTest {
 
     @Test
     void issueDismantlerCredentialToBaseWalletTest201() throws JSONException {
-        Wallet wallet = walletRepository.getByBpn(miwSettings.authorityWalletBpn());
+        WalletEntity wallet = walletRepository.getByBpn(miwSettings.authorityWalletBpn());
         String oldSummaryCredentialId = TestUtils.getSummaryCredentialId(wallet.getDid(), holdersCredentialRepository);
         ResponseEntity<String> response = issueDismantlerCredential(miwSettings.authorityWalletBpn(), miwSettings.authorityWalletBpn());
         Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatusCode().value());
@@ -115,7 +115,7 @@ class DismantlerHoldersCredentialTest {
         String baseBpn = miwSettings.authorityWalletBpn();
 
         //create wallet
-        Wallet wallet = TestUtils.getWalletFromString(TestUtils.createWallet(bpn, bpn, restTemplate,baseBpn).getBody());
+        WalletEntity wallet = TestUtils.getWalletFromString(TestUtils.createWallet(bpn, bpn, restTemplate,baseBpn).getBody());
         String oldSummaryCredentialId = TestUtils.getSummaryCredentialId(wallet.getDid(), holdersCredentialRepository);
 
         ResponseEntity<String> response = issueDismantlerCredential(bpn, did);
@@ -158,7 +158,7 @@ class DismantlerHoldersCredentialTest {
         String did = DidWebFactory.fromHostnameAndPath(miwSettings.host(), bpn).toString();
 
         //create entry
-        Wallet wallet = TestUtils.createWallet(bpn, did, walletRepository);
+        WalletEntity wallet = TestUtils.createWallet(bpn, did, walletRepository);
 
         HttpHeaders headers = AuthenticationUtils.getValidUserHttpHeaders(bpn); //token must contain base wallet BPN
 
@@ -180,7 +180,7 @@ class DismantlerHoldersCredentialTest {
     void issueDismantlerCredentialWithoutAllowedVehicleBrands() {
         String bpn = UUID.randomUUID().toString();
         String did = DidWebFactory.fromHostnameAndPath(miwSettings.host(), bpn).toString();
-        Wallet wallet = TestUtils.createWallet(bpn, did, walletRepository);
+        WalletEntity wallet = TestUtils.createWallet(bpn, did, walletRepository);
 
         HttpHeaders headers = AuthenticationUtils.getValidUserHttpHeaders(miwSettings.authorityWalletBpn()); //token must contain base wallet BPN
 
@@ -204,7 +204,7 @@ class DismantlerHoldersCredentialTest {
         String did = DidWebFactory.fromHostnameAndPath(miwSettings.host(), bpn).toString();
 
         //create entry
-        Wallet wallet = TestUtils.createWallet(bpn, did, walletRepository);
+        WalletEntity wallet = TestUtils.createWallet(bpn, did, walletRepository);
         ResponseEntity<String> response = issueDismantlerCredential(bpn, did);
         Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatusCode().value());
 

@@ -19,44 +19,20 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.exception;
+package org.eclipse.tractusx.managedidentitywallets.repository.repository;
+
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.stereotype.Repository;
+
+import java.util.Optional;
 
 /**
- * The type Wallet not found problem.
+ * The interface Wallet repository.
  */
-public class WalletNotFoundProblem extends RuntimeException {
+@Repository
+interface WalletJpaRepository extends PagingAndSortingRepository<WalletEntity, String> {
+    Optional<WalletEntity> findByName(String name);
 
-    /**
-     * Instantiates a new Wallet not found problem.
-     */
-    public WalletNotFoundProblem() {
-    }
-
-    /**
-     * Instantiates a new Wallet not found problem.
-     *
-     * @param message the message
-     */
-    public WalletNotFoundProblem(String message) {
-        super(message);
-    }
-
-    /**
-     * Instantiates a new Wallet not found problem.
-     *
-     * @param message the message
-     * @param cause   the cause
-     */
-    public WalletNotFoundProblem(String message, Throwable cause) {
-        super(message, cause);
-    }
-
-    /**
-     * Instantiates a new Wallet not found problem.
-     *
-     * @param cause the cause
-     */
-    public WalletNotFoundProblem(Throwable cause) {
-        super(cause);
-    }
+    boolean existsByName();
 }

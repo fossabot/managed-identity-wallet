@@ -55,8 +55,8 @@ public class ExceptionHandling {
      * @param e the e
      * @return the problem detail
      */
-    @ExceptionHandler(WalletNotFoundProblem.class)
-    ProblemDetail handleWalletNotFoundProblem(WalletNotFoundProblem e) {
+    @ExceptionHandler(WalletNotExistsException.class)
+    ProblemDetail handleWalletNotFoundProblem(WalletNotExistsException e) {
         ProblemDetail problemDetail = ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, e.getMessage());
         problemDetail.setTitle(e.getMessage());
         problemDetail.setProperty(TIMESTAMP, System.currentTimeMillis());

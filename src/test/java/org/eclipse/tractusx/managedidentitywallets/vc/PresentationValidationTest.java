@@ -21,17 +21,16 @@
 
 package org.eclipse.tractusx.managedidentitywallets.vc;
 
-import com.nimbusds.jwt.SignedJWT;
 import lombok.*;
 import org.eclipse.tractusx.managedidentitywallets.ManagedIdentityWalletsApplication;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
 import org.eclipse.tractusx.managedidentitywallets.constant.RestURI;
 import org.eclipse.tractusx.managedidentitywallets.constant.StringPool;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
 import org.eclipse.tractusx.managedidentitywallets.dto.CreateWalletRequest;
 import org.eclipse.tractusx.managedidentitywallets.dto.IssueMembershipCredentialRequest;
-import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundProblem;
+import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotExistsException;
 import org.eclipse.tractusx.managedidentitywallets.service.IssuersCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.PresentationService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
@@ -94,13 +93,13 @@ class PresentationValidationTest {
         CreateWalletRequest createWalletRequest = new CreateWalletRequest();
         createWalletRequest.setBpn(bpnTenant_1);
         createWalletRequest.setName("My Test Tenant Wallet");
-        Wallet tenantWallet = walletService.createWallet(createWalletRequest,bpnOperator);
+        WalletEntity tenantWallet = walletService.createWallet(createWalletRequest,bpnOperator);
         tenant_1 = DidParser.parse(tenantWallet.getDid());
 
         CreateWalletRequest createWalletRequest2 = new CreateWalletRequest();
         createWalletRequest2.setBpn(bpnTenant_2);
         createWalletRequest2.setName("My Test Tenant Wallet");
-        Wallet tenantWallet2 = walletService.createWallet(createWalletRequest2,bpnOperator);
+        WalletEntity tenantWallet2 = walletService.createWallet(createWalletRequest2,bpnOperator);
         tenant_2 = DidParser.parse(tenantWallet2.getDid());
 
         IssueMembershipCredentialRequest issueMembershipCredentialRequest = new IssueMembershipCredentialRequest();
@@ -115,15 +114,15 @@ class PresentationValidationTest {
     @AfterEach
     public void cleanUp() {
         try {
-            Wallet tenantWallet = walletService.getWalletByIdentifier(bpnTenant_1, false, bpnOperator);
+            WalletEntity tenantWallet = walletService.getWalletByIdentifier(bpnTenant_1, false, bpnOperator);
             walletService.delete(tenantWallet.getId());
-        } catch (WalletNotFoundProblem e) {
+        } catch (WalletNotExistsException e) {
             // ignore
         }
         try {
-            Wallet tenantWallet = walletService.getWalletByIdentifier(bpnTenant_2, false, bpnOperator);
+            WalletEntity tenantWallet = walletService.getWalletByIdentifier(bpnTenant_2, false, bpnOperator);
             walletService.delete(tenantWallet.getId());
-        } catch (WalletNotFoundProblem e) {
+        } catch (WalletNotExistsException e) {
             // ignore
         }
     }

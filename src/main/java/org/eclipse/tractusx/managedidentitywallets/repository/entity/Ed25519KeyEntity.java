@@ -19,42 +19,29 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.dao.repository;
+package org.eclipse.tractusx.managedidentitywallets.repository.entity;
 
-import com.smartsensesolutions.java.commons.base.repository.BaseRepository;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.Wallet;
-import org.springframework.stereotype.Repository;
+import jakarta.persistence.*;
+import lombok.*;
 
 /**
- * The interface Wallet repository.
+ * The type Wallet key.
  */
-@Repository
-public interface WalletRepository extends BaseRepository<Wallet, Long> {
+@Entity
+@Table(name = "key_ed25519")
+public class Ed25519KeyEntity extends TimedEntity {
 
-    /**
-     * Gets by bpn.
-     *
-     * @param bpn the bpn
-     * @return the by bpn
-     */
-    Wallet getByBpn(String bpn);
+    @Id
+    private String id;
 
-    /**
-     * Exists by bpn boolean.
-     *
-     * @param bpn the bpn
-     * @return the boolean
-     */
-    boolean existsByBpn(String bpn);
+    @Column(nullable = false)
+    private String walletId;
 
-    /**
-     * Gets by did.
-     *
-     * @param did the did
-     * @return the by did
-     */
-    Wallet getByDid(String did);
+    @Column(nullable = false)
+    private String didIdentifier;
 
-    int countByBpn(String bpn);
+    private String description;
 
+    @Column(nullable = false)
+    private String vaultSecret;
 }

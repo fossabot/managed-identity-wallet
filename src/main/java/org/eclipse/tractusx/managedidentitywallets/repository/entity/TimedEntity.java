@@ -19,26 +19,39 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.dao.repository;
+package org.eclipse.tractusx.managedidentitywallets.repository.entity;
 
-import com.smartsensesolutions.java.commons.base.repository.BaseRepository;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.IssuersCredential;
+import jakarta.persistence.*;
+import lombok.Data;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import java.util.List;
+import java.time.OffsetDateTime;
 
-/**
- * The interface Credential repository.
- */
-public interface IssuersCredentialRepository extends BaseRepository<IssuersCredential, Long> {
+@Data
+@MappedSuperclass
+public abstract class TimedEntity {
 
+    // TODO define column names
 
-    /**
-     * Gets by issuer did and holder did and type.
-     *
-     * @param issuerDid the issuer did
-     * @param holderDid the holder did
-     * @param type      the type
-     * @return the by issuer did and holder did and type
-     */
-    List<IssuersCredential> getByIssuerDidAndHolderDidAndType(String issuerDid, String holderDid, String type);
+    @CreationTimestamp
+    @Temporal(value = TemporalType.TIMESTAMP)
+    @Column(nullable = false)
+    private OffsetDateTime createdAt;
+
+    @UpdateTimestamp
+    @Temporal(value = TemporalType.TIMESTAMP)
+    private OffsetDateTime modifiedAt;
+
+    @PrePersist
+    public void prePersist() {
+        this.createdAt = OffsetDateTime.now();
+        this.modifiedAt = this.createdAt;
+    }
+
+    @PreUpdate
+    public void preUpdate() {
+        this.modifiedAt = OffsetDateTime.now();
+    }
 }
+

@@ -25,7 +25,7 @@ import org.eclipse.tractusx.managedidentitywallets.ManagedIdentityWalletsApplica
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
 import org.eclipse.tractusx.managedidentitywallets.constant.RestURI;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
 import org.eclipse.tractusx.managedidentitywallets.dto.CreateWalletRequest;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.junit.jupiter.api.Assertions;
@@ -85,7 +85,7 @@ class DidDocumentsTest {
         Assertions.assertNotNull(response.getBody());
     }
 
-    private Wallet createWallet(String bpn) {
+    private WalletEntity createWallet(String bpn) {
         CreateWalletRequest createWalletRequest = new CreateWalletRequest();
         createWalletRequest.setBpn(bpn);
         createWalletRequest.setName("wallet_" + bpn);

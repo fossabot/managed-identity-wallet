@@ -29,10 +29,10 @@ import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer
 import org.eclipse.tractusx.managedidentitywallets.constant.MIWVerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.constant.RestURI;
 import org.eclipse.tractusx.managedidentitywallets.constant.StringPool;
-import org.eclipse.tractusx.managedidentitywallets.controller.IssuersCredentialController;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.HoldersCredential;
-import org.eclipse.tractusx.managedidentitywallets.dao.repository.HoldersCredentialRepository;
-import org.eclipse.tractusx.managedidentitywallets.dao.repository.WalletRepository;
+import org.eclipse.tractusx.managedidentitywallets.controller.v1.IssuersCredentialController;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.HoldersCredential;
+import org.eclipse.tractusx.managedidentitywallets.repository.repository.VerifiableCredentialRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.dto.CreateWalletRequest;
 import org.eclipse.tractusx.managedidentitywallets.dto.IssueFrameworkCredentialRequest;
 import org.eclipse.tractusx.managedidentitywallets.utils.AuthenticationUtils;
@@ -70,7 +70,7 @@ import java.util.*;
 class HoldersCredentialTest {
 
     @Autowired
-    private HoldersCredentialRepository holdersCredentialRepository;
+    private VerifiableCredentialRepository holdersCredentialRepository;
     @Autowired
     private ObjectMapper objectMapper;
     @Autowired

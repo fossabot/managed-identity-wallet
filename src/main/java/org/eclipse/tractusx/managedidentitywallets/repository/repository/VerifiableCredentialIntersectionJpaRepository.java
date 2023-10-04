@@ -19,22 +19,13 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.dao.repository;
+package org.eclipse.tractusx.managedidentitywallets.repository.repository;
 
-import com.smartsensesolutions.java.commons.base.repository.BaseRepository;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.WalletKey;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialIntersectionEntity;
+import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
-/**
- * The interface Wallet key repository.
- */
 @Repository
-public interface WalletKeyRepository extends BaseRepository<WalletKey, Long> {
-    /**
-     * Gets by wallet id.
-     *
-     * @param id the id
-     * @return the by wallet id
-     */
-    WalletKey getByWalletId(Long id);
+interface VerifiableCredentialIntersectionJpaRepository
+        extends CrudRepository<VerifiableCredentialIntersectionEntity, VerifiableCredentialIntersectionEntity.VerifiableCredentialIntersectionEntityId> {
 }

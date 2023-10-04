@@ -29,12 +29,12 @@ import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer
 import org.eclipse.tractusx.managedidentitywallets.constant.MIWVerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.constant.RestURI;
 import org.eclipse.tractusx.managedidentitywallets.constant.StringPool;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.HoldersCredential;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.IssuersCredential;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.dao.repository.HoldersCredentialRepository;
-import org.eclipse.tractusx.managedidentitywallets.dao.repository.IssuersCredentialRepository;
-import org.eclipse.tractusx.managedidentitywallets.dao.repository.WalletRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.HoldersCredential;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.IssuersCredential;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
+import org.eclipse.tractusx.managedidentitywallets.repository.repository.VerifiableCredentialRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.repository.IssuersCredentialRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.dto.IssueMembershipCredentialRequest;
 import org.eclipse.tractusx.managedidentitywallets.utils.AuthenticationUtils;
 import org.eclipse.tractusx.managedidentitywallets.utils.TestUtils;
@@ -59,7 +59,7 @@ import java.util.UUID;
 @ContextConfiguration(initializers = {TestContextInitializer.class})
 class MembershipHoldersCredentialTest {
     @Autowired
-    private HoldersCredentialRepository holdersCredentialRepository;
+    private VerifiableCredentialRepository holdersCredentialRepository;
     @Autowired
     private WalletRepository walletRepository;
 
@@ -99,7 +99,7 @@ class MembershipHoldersCredentialTest {
         String baseBpn = miwSettings.authorityWalletBpn();
 
         // create wallet, in background bpn and summary credential generated
-        Wallet wallet = TestUtils.getWalletFromString(TestUtils.createWallet(bpn, bpn, restTemplate,baseBpn).getBody());
+        WalletEntity wallet = TestUtils.getWalletFromString(TestUtils.createWallet(bpn, bpn, restTemplate,baseBpn).getBody());
 
         List<HoldersCredential> byHolderDid = holdersCredentialRepository.getByHolderDid(did);
 
@@ -128,7 +128,7 @@ class MembershipHoldersCredentialTest {
         String baseBpn = miwSettings.authorityWalletBpn();
 
         // create wallet, in background bpn and summary credential generated
-        Wallet wallet = TestUtils.getWalletFromString(TestUtils.createWallet(bpn, bpn, restTemplate,baseBpn).getBody());
+        WalletEntity wallet = TestUtils.getWalletFromString(TestUtils.createWallet(bpn, bpn, restTemplate,baseBpn).getBody());
 
 
         String vc = """
@@ -190,7 +190,7 @@ class MembershipHoldersCredentialTest {
         String baseBpn = miwSettings.authorityWalletBpn();
 
         // create wallet, in background bpn and summary credential generated
-        Wallet wallet = TestUtils.getWalletFromString(TestUtils.createWallet(bpn, bpn, restTemplate,baseBpn).getBody());
+        WalletEntity wallet = TestUtils.getWalletFromString(TestUtils.createWallet(bpn, bpn, restTemplate,baseBpn).getBody());
 
         //add 2 subject in VC for testing
         List<IssuersCredential> vcs = issuersCredentialRepository.getByIssuerDidAndHolderDidAndType(miwSettings.authorityWalletDid(), wallet.getDid(), MIWVerifiableCredentialType.SUMMARY_CREDENTIAL);
@@ -248,7 +248,7 @@ class MembershipHoldersCredentialTest {
     @Test
     void issueMembershipCredentialToBaseWalletTest201() throws JsonProcessingException, JSONException {
 
-        Wallet wallet = walletRepository.getByBpn(miwSettings.authorityWalletBpn());
+        WalletEntity wallet = walletRepository.getByBpn(miwSettings.authorityWalletBpn());
         String oldSummaryCredentialId = TestUtils.getSummaryCredentialId(wallet.getDid(), holdersCredentialRepository);
 
         ResponseEntity<String> response = TestUtils.issueMembershipVC(restTemplate, miwSettings.authorityWalletBpn(), miwSettings.authorityWalletBpn());
@@ -283,7 +283,7 @@ class MembershipHoldersCredentialTest {
         String baseBpn = miwSettings.authorityWalletBpn();
 
         //create wallet
-        Wallet wallet = TestUtils.getWalletFromString(TestUtils.createWallet(bpn, bpn, restTemplate,baseBpn).getBody());
+        WalletEntity wallet = TestUtils.getWalletFromString(TestUtils.createWallet(bpn, bpn, restTemplate,baseBpn).getBody());
         String oldSummaryCredentialId = TestUtils.getSummaryCredentialId(wallet.getDid(), holdersCredentialRepository);
 
         ResponseEntity<String> response = TestUtils.issueMembershipVC(restTemplate, bpn, miwSettings.authorityWalletBpn());

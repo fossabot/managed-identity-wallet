@@ -27,12 +27,12 @@ import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.constant.MIWVerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.constant.RestURI;
 import org.eclipse.tractusx.managedidentitywallets.constant.StringPool;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.HoldersCredential;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.IssuersCredential;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.dao.repository.HoldersCredentialRepository;
-import org.eclipse.tractusx.managedidentitywallets.dao.repository.IssuersCredentialRepository;
-import org.eclipse.tractusx.managedidentitywallets.dao.repository.WalletRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.HoldersCredential;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.IssuersCredential;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
+import org.eclipse.tractusx.managedidentitywallets.repository.repository.VerifiableCredentialRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.repository.IssuersCredentialRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.dto.CreateWalletRequest;
 import org.eclipse.tractusx.managedidentitywallets.dto.IssueFrameworkCredentialRequest;
 import org.eclipse.tractusx.managedidentitywallets.dto.IssueMembershipCredentialRequest;
@@ -68,7 +68,7 @@ public class TestUtils {
 
     }
 
-    public static Wallet createWallet(String bpn, String did, WalletRepository walletRepository) {
+    public static WalletEntity createWallet(String bpn, String did, WalletRepository walletRepository) {
         String didDocument = """
                 {
                   "id": "did:web:localhost:bpn123124",
@@ -84,7 +84,7 @@ public class TestUtils {
                 }
                 """;
 
-        Wallet wallet = Wallet.builder()
+        WalletEntity wallet = WalletEntity.builder()
                 .bpn(bpn)
                 .did(did)
                 .didDocument(DidDocument.fromJson(didDocument))
@@ -124,7 +124,7 @@ public class TestUtils {
     }
 
 
-    public static Wallet getWalletFromString(String body) throws JsonProcessingException {
+    public static WalletEntity getWalletFromString(String body) throws JsonProcessingException {
         JSONObject jsonObject = new JSONObject(body);
         //convert DidDocument
         JSONObject didDocument = jsonObject.getJSONObject(StringPool.DID_DOCUMENT);
@@ -137,7 +137,7 @@ public class TestUtils {
         }
 
         ObjectMapper objectMapper = new ObjectMapper();
-        Wallet wallet1 = objectMapper.readValue(jsonObject.toString(), Wallet.class);
+        WalletEntity wallet1 = objectMapper.readValue(jsonObject.toString(), WalletEntity.class);
         wallet1.setDidDocument(DidDocument.fromJson(didDocument.toString()));
 
         //convert VC
@@ -154,13 +154,13 @@ public class TestUtils {
     }
 
 
-    public static String getSummaryCredentialId(String holderDID, HoldersCredentialRepository holdersCredentialRepository) {
+    public static String getSummaryCredentialId(String holderDID, VerifiableCredentialRepository holdersCredentialRepository) {
         List<HoldersCredential> holderVCs = holdersCredentialRepository.getByHolderDidAndType(holderDID, MIWVerifiableCredentialType.SUMMARY_CREDENTIAL);
         Assertions.assertEquals(1, holderVCs.size());
         return holderVCs.get(0).getData().getId().toString();
     }
 
-    public static void checkSummaryCredential(String issuerDID, String holderDID, HoldersCredentialRepository holdersCredentialRepository,
+    public static void checkSummaryCredential(String issuerDID, String holderDID, VerifiableCredentialRepository holdersCredentialRepository,
                                               IssuersCredentialRepository issuersCredentialRepository, String type, String previousSummaryCredentialId) {
 
         //get VC from holder of Summary type

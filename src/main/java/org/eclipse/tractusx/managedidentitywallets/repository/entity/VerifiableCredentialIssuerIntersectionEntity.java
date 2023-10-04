@@ -19,38 +19,37 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.dao.entity;
+package org.eclipse.tractusx.managedidentitywallets.repository.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.MappedSuperclass;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import jakarta.persistence.*;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.eclipse.tractusx.managedidentitywallets.utils.StringToCredentialConverter;
-import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 
-@MappedSuperclass
-@Getter
-@Setter
+import java.io.Serializable;
+
+@Data
 @NoArgsConstructor
-@AllArgsConstructor
-public class BaseCredential extends MIWBaseEntity {
+@EqualsAndHashCode(of = "id")
+@Entity
+@Table(name = "verifiable_credential_issuer_intersection")
+public class VerifiableCredentialIssuerIntersectionEntity {
 
-    @Column(nullable = false)
-    private String holderDid;
+    @EmbeddedId
+    private VerifiableCredentialIssuerIntersectionEntityId id;
 
-    @Column(nullable = false)
-    private String issuerDid;
+    @Data
+    @NoArgsConstructor
+    @EqualsAndHashCode(of = {"wallet_id", "verifiable_credential_id"})
+    @Embeddable
+    public static class VerifiableCredentialIssuerIntersectionEntityId implements Serializable {
 
-    @Column(nullable = false)
-    private String type;
+        @ManyToOne
+        @JoinColumn(name = "verifiable_credential_id")
+        private  VerifiableCredentialEntity verifiableCredential;
 
-    @Column(nullable = false)
-    @Convert(converter = StringToCredentialConverter.class)
-    private VerifiableCredential data;
-
-    @Column(nullable = false)
-    private String credentialId;
+        @ManyToOne
+        @JoinColumn(name = "verifiable_credential_issuer_id")
+        private VerifiableCredentialIssuerEntity verifiableCredentialIssuer;
+    }
 }

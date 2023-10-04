@@ -31,10 +31,10 @@ import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer
 import org.eclipse.tractusx.managedidentitywallets.constant.MIWVerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.constant.RestURI;
 import org.eclipse.tractusx.managedidentitywallets.constant.StringPool;
-import org.eclipse.tractusx.managedidentitywallets.controller.PresentationController;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.HoldersCredential;
-import org.eclipse.tractusx.managedidentitywallets.dao.entity.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.dao.repository.HoldersCredentialRepository;
+import org.eclipse.tractusx.managedidentitywallets.controller.v1.PresentationController;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.HoldersCredential;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
+import org.eclipse.tractusx.managedidentitywallets.repository.repository.VerifiableCredentialRepository;
 import org.eclipse.tractusx.managedidentitywallets.utils.AuthenticationUtils;
 import org.eclipse.tractusx.managedidentitywallets.utils.TestUtils;
 import org.eclipse.tractusx.ssi.lib.did.resolver.DidDocumentResolverRegistry;
@@ -70,7 +70,7 @@ class PresentationTest {
     private TestRestTemplate restTemplate;
 
     @Autowired
-    private HoldersCredentialRepository holdersCredentialRepository;
+    private VerifiableCredentialRepository holdersCredentialRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -248,7 +248,7 @@ class PresentationTest {
         String baseBpn = miwSettings.authorityWalletBpn();
         ResponseEntity<String> response = TestUtils.createWallet(bpn, bpn, restTemplate, baseBpn);
         Assertions.assertEquals(response.getStatusCode().value(), HttpStatus.CREATED.value());
-        Wallet wallet = TestUtils.getWalletFromString(response.getBody());
+        WalletEntity wallet = TestUtils.getWalletFromString(response.getBody());
 
         //get BPN credentials
         List<HoldersCredential> credentials = holdersCredentialRepository.getByHolderDidAndType(wallet.getDid(), MIWVerifiableCredentialType.BPN_CREDENTIAL);
@@ -267,7 +267,7 @@ class PresentationTest {
         String baseBpn = miwSettings.authorityWalletBpn();
         ResponseEntity<String> response = TestUtils.createWallet(bpn, bpn, restTemplate, baseBpn);
         Assertions.assertEquals(response.getStatusCode().value(), HttpStatus.CREATED.value());
-        Wallet wallet = TestUtils.getWalletFromString(response.getBody());
+        WalletEntity wallet = TestUtils.getWalletFromString(response.getBody());
 
         //create VC
         HttpHeaders headers = AuthenticationUtils.getValidUserHttpHeaders(miwSettings.authorityWalletBpn());

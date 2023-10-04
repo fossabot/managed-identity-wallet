@@ -19,45 +19,37 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.dao.entity;
+package org.eclipse.tractusx.managedidentitywallets.repository.entity;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.smartsensesolutions.java.commons.base.entity.BaseEntity;
-import jakarta.persistence.Column;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
+import jakarta.persistence.*;
+import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
-import org.hibernate.annotations.CreationTimestamp;
-import org.hibernate.annotations.UpdateTimestamp;
+import org.checkerframework.common.aliasing.qual.Unique;
 
-import java.util.Date;
+import java.util.List;
+import java.util.Set;
 
 /**
- * The type Base entity.
+ * The type Wallet.
  */
-@MappedSuperclass
-@Getter
-@Setter
+@Entity
+@Data
 @NoArgsConstructor
-@AllArgsConstructor
-public class MIWBaseEntity implements BaseEntity {
+@Table(name = "wallet")
+public class WalletEntity extends TimedEntity {
 
-    @JsonIgnore
-    @CreationTimestamp
-    @Temporal(value = TemporalType.TIMESTAMP)
-    @Column(nullable = false)
-    private Date createdAt;
+    @Id
+    private String id;
 
-    @JsonIgnore
-    @UpdateTimestamp
-    @Temporal(value = TemporalType.TIMESTAMP)
-    private Date modifiedAt;
+    @Unique
+    private String name;
 
-    @JsonIgnore
-    private String modifiedFrom;
+    private String description;
+
+    @OneToMany
+    private List<Ed25519KeyEntity> ed25519Keys;
+
+    @OneToMany(mappedBy = "verifiableCredential", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Set<VerifiableCredentialIntersectionEntity> credentialIntersections;
 
 }
