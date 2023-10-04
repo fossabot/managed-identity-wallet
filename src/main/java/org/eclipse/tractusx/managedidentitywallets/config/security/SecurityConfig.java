@@ -23,8 +23,8 @@ package org.eclipse.tractusx.managedidentitywallets.config.security;
 
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.managedidentitywallets.constant.ApplicationRole;
-import org.eclipse.tractusx.managedidentitywallets.constant.RestURI;
+import org.eclipse.tractusx.managedidentitywallets.v1.constant.ApplicationRole;
+import org.eclipse.tractusx.managedidentitywallets.v1.constant.RestURI;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

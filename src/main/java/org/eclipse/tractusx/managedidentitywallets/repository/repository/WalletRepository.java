@@ -22,7 +22,7 @@
 package org.eclipse.tractusx.managedidentitywallets.repository.repository;
 
 import lombok.RequiredArgsConstructor;
-import org.eclipse.tractusx.managedidentitywallets.entity.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.v2.entity.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
 import org.springframework.stereotype.Component;
 
