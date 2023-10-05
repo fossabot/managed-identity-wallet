@@ -33,6 +33,15 @@ repositories {
     }
 }
 
+sourceSets {
+    main {
+        java {
+            srcDirs 'src/main/java'
+            srcDirs 'build/generated/sources/annotationProcessor/java'
+        }
+    }
+}
+
 ext {
 
 }
@@ -51,6 +60,10 @@ dependencies {
     implementation group: 'com.smartsensesolutions', name: 'commons-dao', version: '0.0.5'
     implementation 'org.liquibase:liquibase-core'
     implementation 'org.eclipse.tractusx.ssi:cx-ssi-lib:0.0.15'
+
+    implementation group: "com.querydsl", name:"querydsl-jpa", classifier: "jakarta"
+    annotationProcessor group: "com.querydsl", name: "querydsl-apt", classifier: "jakarta"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
     //Added explicitly to mitigate CVE 2022-1471
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.0'
@@ -77,6 +90,7 @@ dependencyManagement {
     imports {
         mavenBom "org.springframework.cloud:spring-cloud-dependencies:${springCloudVersion}"
         mavenBom("org.testcontainers:testcontainers-bom:${testContainerVersion}")
+        mavenBom("com.querydsl:querydsl-bom:${queryDslVersion}")
     }
 }
 
