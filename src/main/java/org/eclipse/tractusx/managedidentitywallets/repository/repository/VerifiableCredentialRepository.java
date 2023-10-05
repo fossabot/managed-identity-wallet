@@ -23,6 +23,11 @@ package org.eclipse.tractusx.managedidentitywallets.repository.repository;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.querydsl.jpa.JPQLTemplates;
+import com.querydsl.jpa.impl.JPAQueryFactory;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityManagerFactory;
+import jakarta.persistence.Persistence;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
@@ -99,6 +104,17 @@ public class VerifiableCredentialRepository {
     }
 
     public Optional<VerifiableCredential> findByHolderAndId(String walletOwner, String id) {
+        EntityManagerFactory emf =
+                Persistence.createEntityManagerFactory("com.baeldung.querydsl.intro");
+        EntityManager em = emf.createEntityManager();
+        JPAQueryFactory queryFactory = new JPAQueryFactory(JPQLTemplates.DEFAULT, em);
+
+        QVerifiableCredentialEntity qVerifiableCredentialEntity = QVerifiableCredentialEntity.verifiableCredentialEntity;
+
+        qVerifiableCredentialEntity.
+
+        verifiableCredentialJpaRepository.
+
         return verifiableCredentialJpaRepository
                 .findByIdAndWalletIntersections_Wallet_Id(id, walletOwner)
                 .map(VerifiableCredentialEntity::getJson)
