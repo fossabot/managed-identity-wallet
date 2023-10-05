@@ -169,7 +169,7 @@ public class HoldersCredentialController extends BaseController {
                                                                     "unsorted": false
                                                                 },
                                                                 "offset": 0,
-                                                                "pageNumber": 0,
+          da wird die Variable ACCESS_TOKEN_URL_INT eingesetzt                                                      "pageNumber": 0,
                                                                 "pageSize": 2147483647,
                                                                 "paged": true,
                                                                 "unpaged": false
@@ -197,10 +197,21 @@ public class HoldersCredentialController extends BaseController {
     public ResponseEntity<PageImpl<VerifiableCredential>> getCredentials(@Parameter(name = "credentialId", description = "Credential Id", examples = {@ExampleObject(name = "Credential Id", value = "did:web:localhost:BPNL000000000000#12528899-160a-48bd-ba15-f396c3959ae9")}) @RequestParam(required = false) String credentialId,
                                                                          @Parameter(name = "issuerIdentifier", description = "Issuer identifier(did of BPN)", examples = {@ExampleObject(name = "bpn", value = "BPNL000000000000", description = "bpn"), @ExampleObject(description = "did", name = "did", value = "did:web:localhost:BPNL000000000000")}) @RequestParam(required = false) String issuerIdentifier,
                                                                          @Parameter(name = "type", description = "Type of VC", examples = {@ExampleObject(name = "SummaryCredential", value = "SummaryCredential", description = "SummaryCredential"), @ExampleObject(description = "BpnCredential", name = "BpnCredential", value = "BpnCredential")}) @RequestParam(required = false) List<String> type,
+                                                                         @Parameter(name = "sortColumn", description = "Sort column name",
+                                                                                 examples = {
+                                                                                         @ExampleObject(value = "createdAt", name = "creation date"),
+                                                                                         @ExampleObject(value = "issuerDid", name = "Issuer did"),
+                                                                                         @ExampleObject(value = "type", name = "Credential type"),
+                                                                                         @ExampleObject(value = "credentialId", name = "Credential id"),
+                                                                                         @ExampleObject(value = "selfIssued", name = "Self issued credential"),
+                                                                                         @ExampleObject(value = "stored", name = "Stored credential")
+                                                                                 }
+                                                                         ) @RequestParam(required = false, defaultValue = "createdAt") String sortColumn,
+                                                                         @Parameter(name = "sortTpe", description = "Sort order", examples = {@ExampleObject(value = "desc", name = "Descending order"), @ExampleObject(value = "asc", name = "Ascending order")}) @RequestParam(required = false, defaultValue = "desc") String sortType,
                                                                          @Min(0) @Max(Integer.MAX_VALUE) @Parameter(description = "Page number, Page number start with zero") @RequestParam(required = false, defaultValue = "0") int pageNumber,
                                                                          @Min(0) @Max(Integer.MAX_VALUE) @Parameter(description = "Number of records per page") @RequestParam(required = false, defaultValue = Integer.MAX_VALUE + "") int size,
                                                                          Principal principal) {
-        return ResponseEntity.status(HttpStatus.OK).body(holdersCredentialService.getCredentials(credentialId, issuerIdentifier, type, pageNumber, size, getBPNFromToken(principal)));
+        return ResponseEntity.status(HttpStatus.OK).body(holdersCredentialService.getCredentials(credentialId, issuerIdentifier,sortColumn, sortType, type, pageNumber, size, getBPNFromToken(principal)));
     }
 
 

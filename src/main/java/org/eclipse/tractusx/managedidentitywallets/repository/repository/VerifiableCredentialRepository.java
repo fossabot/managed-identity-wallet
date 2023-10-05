@@ -98,7 +98,6 @@ public class VerifiableCredentialRepository {
         }
     }
 
-
     public Optional<VerifiableCredential> findByHolderAndId(String walletOwner, String id) {
         return verifiableCredentialJpaRepository
                 .findByIdAndWalletIntersections_Wallet_Id(id, walletOwner)

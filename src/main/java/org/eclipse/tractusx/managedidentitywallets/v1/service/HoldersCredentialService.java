@@ -22,16 +22,13 @@
 package org.eclipse.tractusx.managedidentitywallets.v1.service;
 
 import com.smartsensesolutions.java.commons.FilterRequest;
-import com.smartsensesolutions.java.commons.base.repository.BaseRepository;
-import com.smartsensesolutions.java.commons.base.service.BaseService;
 import com.smartsensesolutions.java.commons.criteria.CriteriaOperator;
 import com.smartsensesolutions.java.commons.operator.Operator;
-import com.smartsensesolutions.java.commons.sort.Sort;
 import com.smartsensesolutions.java.commons.sort.SortType;
-import com.smartsensesolutions.java.commons.specification.SpecificationUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringEscapeUtils;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.AbstractEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.repository.VerifiableCredentialRepository;
 import org.eclipse.tractusx.managedidentitywallets.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.v1.entity.HoldersCredential;
@@ -41,10 +38,7 @@ import org.eclipse.tractusx.managedidentitywallets.v1.exception.ForbiddenExcepti
 import org.eclipse.tractusx.managedidentitywallets.v1.utils.CommonUtils;
 import org.eclipse.tractusx.managedidentitywallets.v1.utils.Validate;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageImpl;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 import org.springframework.util.StringUtils;
@@ -79,7 +73,7 @@ public class HoldersCredentialService {
      * @param callerBPN        the caller bpn
      * @return the credentials
      */
-    public PageImpl<VerifiableCredential> getCredentials(String credentialId, String issuerIdentifier, List<String> type, int pageNumber, int size, String callerBPN) {
+    public PageImpl<VerifiableCredential> getCredentials(String credentialId, String issuerIdentifier, String sortColumn, String sortType, List<String> type, int pageNumber, int size, String callerBPN) {
 
         if (credentialId != null) {
             final Optional<VerifiableCredential> credential = verifiableCredentialRepository.findByHolderAndId(callerBPN, credentialId);
@@ -90,7 +84,29 @@ public class HoldersCredentialService {
             }
         }
 
-        Pageable pageable = PageRequest.of(pageNumber, size);
+        Sort sort = Sort.unsorted();
+        if (sortColumn != null) {
+            final Sort.Direction direction = Sort.Direction.fromOptionalString(sortType.toUpperCase())
+                    .orElse(Sort.DEFAULT_DIRECTION);
+
+            switch (sortColumn) {
+                case "createdAt":
+                    sort = Sort.by(direction, AbstractEntity.COLUMN_CREATED_AT);
+                    break;
+                case "credentialId":
+                    sort = Sort.by(direction, VerifiableCredential.ID);
+                    break;
+                case "issuerDid":
+                    sort = Sort.by(direction, VerifiableCredential.ISSUER);
+                    break;
+                case "type":
+                    log.warn("Sorting by type is not supported. A Verifiable Credential my have multiple types.");
+                default:
+                    log.warn("Sorting by {} is not supported.", sortColumn);
+            }
+        }
+
+        Pageable pageable = PageRequest.of(pageNumber, size, sort);
 
 
         FilterRequest filterRequest = new FilterRequest();
