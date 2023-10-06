@@ -52,3 +52,16 @@ _Issue_
 - Issue Use Case Framework Credential for User
 
 
+
+
+- Get All Wallets
+- Create Wallet for User
+- Delete Wallet for User
+- Update Wallet for User
+- Get Verifiable Credentials for User
+- Create Verifiable Credential for User
+- Delete Verifiable Credential for User
+- Issue Verifiable Presentation for User
+- Issue Verifiable Credential for User
+- Get Issued Verifiable Credentials for User
+- Revoke Issued Verifiable Credential for User

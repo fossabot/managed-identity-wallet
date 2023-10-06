@@ -1,0 +1,404 @@
+openapi: 3.0.0
+info:
+  title: Verifiable Credentials API
+  version: 2.0.0
+  description: An API for managing Verifiable Credentials and DID Documents.
+servers:
+  - url: /api/v2
+paths:
+  /did:
+    post:
+      summary: Resolve DID Document by DID
+      description: Retrieves a DID Document by DID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DidRequest'
+      responses:
+        '200':
+          description: Successful response with the DID Document.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/DidResponse'
+
+  /wallet:
+    get:
+      summary: Get Wallet
+      description: Retrieves wallet information.
+      responses:
+        '200':
+          description: Successful response with wallet information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Wallet'
+
+  /verifiable-credentials:
+    get:
+      summary: Get Verifiable Credentials
+      description: Retrieves a list of Verifiable Credentials.
+      responses:
+        '200':
+          description: Successful response with Verifiable Credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifiableCredential'
+
+    post:
+      summary: Create Verifiable Credential
+      description: Creates a new Verifiable Credential.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifiableCredential'
+      responses:
+        '201':
+          description: Verifiable Credential created successfully.
+        '400':
+          description: Bad request.
+
+  /verifiable-credentials/id:
+    delete:
+      summary: Delete Verifiable Credential
+      description: Deletes a Verifiable Credential by ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the Verifiable Credential to delete.
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Verifiable Credential deleted successfully.
+        '404':
+          description: Verifiable Credential not found.
+
+  /verifiable-presentations:
+    post:
+      summary: Issue Verifiable Presentation
+      description: Issues a new Verifiable Presentation.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifiablePresentation'
+      responses:
+        '201':
+          description: Verifiable Presentation issued successfully.
+        '400':
+          description: Bad request.
+
+  /verifiable-credentials/issued:
+    post:
+      summary: Issue Verifiable Credential
+      description: Issues a new Verifiable Credential.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifiableCredential'
+      responses:
+        '201':
+          description: Verifiable Credential issued successfully.
+        '400':
+          description: Bad request.
+
+    get:
+      summary: Get Issued Verifiable Credentials
+      description: Retrieves a list of issued Verifiable Credentials.
+      responses:
+        '200':
+          description: Successful response with issued Verifiable Credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifiableCredential'
+
+  /verifiable-credentials/validate:
+    post:
+      summary: Validate Verifiable Credential
+      description: Validates a Verifiable Credential, checking schema, revocation, and signature.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifiableCredential'
+      responses:
+        '200':
+          description: Verifiable Credential is valid.
+        '400':
+          description: Verifiable Credential is not valid.
+
+  /verifiable-presentations/validate:
+    post:
+      summary: Validate Verifiable Presentation
+      description: Validates a Verifiable Presentation, checking schema, revocation, and signature of VC and VP.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifiablePresentation'
+      responses:
+        '200':
+          description: Verifiable Presentation is valid.
+        '400':
+          description: Verifiable Presentation is not valid.
+
+  /admin/wallets:
+    get:
+      summary: Get All Wallets
+      description: Retrieves a list of all wallets.
+      responses:
+        '200':
+          description: Successful response with a list of wallets.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Wallet'
+
+    post:
+      summary: Create Wallet for User
+      description: Creates a wallet for a user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Wallet'
+      responses:
+        '201':
+          description: Wallet created successfully.
+        '400':
+          description: Bad request.
+
+  /admin/wallets/{userId}:
+    delete:
+      summary: Delete Wallet for User
+      description: Deletes a wallet for a user by user ID.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user for whom the wallet should be deleted.
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Wallet deleted successfully.
+        '404':
+          description: Wallet not found.
+
+    put:
+      summary: Update Wallet for User
+      description: Updates a wallet for a user by user ID.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user for whom the wallet should be updated.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Wallet'
+      responses:
+        '204':
+          description: Wallet updated successfully.
+        '400':
+          description: Bad request.
+
+  /admin/verifiable-credentials/{userId}:
+    get:
+      summary: Get Verifiable Credentials for User
+      description: Retrieves a list of verifiable credentials for a user by user ID.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user for whom verifiable credentials should be retrieved.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response with a list of verifiable credentials.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VerifiableCredential'
+
+    post:
+      summary: Create Verifiable Credential for User
+      description: Creates a verifiable credential for a user.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user for whom the verifiable credential should be created.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifiableCredential'
+      responses:
+        '201':
+          description: Verifiable credential created successfully.
+        '400':
+          description: Bad request.
+
+    delete:
+      summary: Delete Verifiable Credential for User
+      description: Deletes a verifiable credential for a user by user ID.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user for whom the verifiable credential should be deleted.
+          schema:
+            type: string
+      responses:
+        '204':
+          description: Verifiable credential deleted successfully.
+        '404':
+          description: Verifiable credential not found.
+
+  /admin/verifiable-presentations/{userId}:
+    post:
+      summary: Issue Verifiable Presentation for User
+      description: Issues a verifiable presentation for a user.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user for whom the verifiable presentation should be issued.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifiableCredential'
+      responses:
+        '201':
+          description: Verifiable presentation issued successfully.
+        '400':
+          description: Bad request.
+
+  /admin/verifiable-credentials/issued/{userId}:
+    post:
+      summary: Issue Verifiable Credential for User
+      description: Issues a verifiable credential for a user.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user for whom the verifiable credential should be issued.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifiableCredential'
+      responses:
+        '201':
+          description: Verifiable credential issued successfully.
+        '400':
+          description: Bad request.
+
+    get:
+      summary: Get Issued Verifiable Credentials for User
+      description: Retrieves a list of issued verifiable credentials for a user by user ID.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user for whom issued verifiable credentials should be retrieved.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response with a list of issued verifiable credentials.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VerifiableCredential'
+
+  /admin/verifiable-credentials/revoke/{userId}:
+    post:
+      summary: Revoke Issued Verifiable Credential for User
+      description: Revokes an issued verifiable credential for a user by user ID.
+      parameters:
+        - name: userId
+          in: path
+          required: true
+          description: The ID of the user for whom the verifiable credential should be revoked.
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/VerifiableCredential'
+      responses:
+        '204':
+          description: Verifiable credential revoked successfully.
+        '400':
+          description: Bad request.
+
+components:
+  schemas:
+    Wallet:
+      type: object
+    VerifiableCredential:
+      type: object
+    VerifiablePresentation:
+      type: object
+    DidRequest:
+      type: object
+      properties:
+        did:
+          type: string
+    DidResponse:
+      type: object
+      properties:
+        did:
+          type: string
+        did_document:
+          type: object
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://example.com/oauth/authorize
+          tokenUrl: https://example.com/oauth/token
+          scopes:
+            read: Grants read access
+            write: Grants write access
+            admin: Grants access to admin operations

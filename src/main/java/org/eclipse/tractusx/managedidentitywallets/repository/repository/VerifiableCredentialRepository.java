@@ -109,12 +109,6 @@ public class VerifiableCredentialRepository {
         EntityManager em = emf.createEntityManager();
         JPAQueryFactory queryFactory = new JPAQueryFactory(JPQLTemplates.DEFAULT, em);
 
-        QVerifiableCredentialEntity qVerifiableCredentialEntity = QVerifiableCredentialEntity.verifiableCredentialEntity;
-
-        qVerifiableCredentialEntity.
-
-        verifiableCredentialJpaRepository.
-
         return verifiableCredentialJpaRepository
                 .findByIdAndWalletIntersections_Wallet_Id(id, walletOwner)
                 .map(VerifiableCredentialEntity::getJson)

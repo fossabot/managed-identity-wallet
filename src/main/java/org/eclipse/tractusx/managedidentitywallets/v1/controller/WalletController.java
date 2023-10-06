@@ -32,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 import org.eclipse.tractusx.managedidentitywallets.v1.constant.RestURI;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
 import org.eclipse.tractusx.managedidentitywallets.v1.dto.CreateWalletRequest;
+import org.eclipse.tractusx.managedidentitywallets.v1.entity.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.v1.service.WalletService;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
@@ -157,7 +158,7 @@ public class WalletController extends BaseController {
     })
     @Operation(summary = "Create Wallet", description = "Permission: **add_wallets** (The BPN of the base wallet must equal BPN of caller)\n\n Create a wallet and store it")
     @PostMapping(path = RestURI.WALLETS, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<WalletEntity> createWallet(@Valid @RequestBody CreateWalletRequest request, Principal principal) {
+    public ResponseEntity<Wallet> createWallet(@Valid @RequestBody CreateWalletRequest request, Principal principal) {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.createWallet(request,getBPNFromToken(principal)));
     }
 
@@ -437,9 +438,9 @@ public class WalletController extends BaseController {
     })})
     @Operation(summary = "Retrieve wallet by identifier", description = "Permission: **view_wallets** OR **view_wallet** (The BPN of Wallet to retrieve must equal the BPN of caller or Base wallet, authority wallet can see all wallets) \n\n Retrieve single wallet by identifier, with or without its credentials")
     @GetMapping(path = RestURI.API_WALLETS_IDENTIFIER, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<WalletEntity> getWalletByIdentifier(@Parameter(description = "Did or BPN", examples = {@ExampleObject(name = "bpn", value = "BPNL000000000001", description = "bpn"), @ExampleObject(description = "did", name = "did", value = "did:web:localhost:BPNL000000000001")}) @PathVariable(name = "identifier") String identifier,
-                                                              @RequestParam(name = "withCredentials", defaultValue = "false") boolean withCredentials,
-                                                              Principal principal) {
+    public ResponseEntity<Wallet> getWalletByIdentifier(@Parameter(description = "Did or BPN", examples = {@ExampleObject(name = "bpn", value = "BPNL000000000001", description = "bpn"), @ExampleObject(description = "did", name = "did", value = "did:web:localhost:BPNL000000000001")}) @PathVariable(name = "identifier") String identifier,
+                                                        @RequestParam(name = "withCredentials", defaultValue = "false") boolean withCredentials,
+                                                        Principal principal) {
         return ResponseEntity.status(HttpStatus.OK).body(service.getWalletByIdentifier(identifier, withCredentials, getBPNFromToken(principal)));
     }
 
@@ -546,7 +547,7 @@ public class WalletController extends BaseController {
     })
     @Operation(summary = "List of wallets", description = "Permission: **view_wallets** \n\n Retrieve list of registered wallets")
     @GetMapping(path = RestURI.WALLETS, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Page<WalletEntity>> getWallets(@Parameter(name = "pageNumber", description = "Page number, Page number start with zero") @RequestParam(required = false, defaultValue = "0") int pageNumber,
+    public ResponseEntity<Page<Wallet>> getWallets(@Parameter(name = "pageNumber", description = "Page number, Page number start with zero") @RequestParam(required = false, defaultValue = "0") int pageNumber,
                                                          @Parameter(name = "size", description = "Number of records per page") @RequestParam(required = false, defaultValue = Integer.MAX_VALUE + "") int size,
                                                          @Parameter(name = "sortColumn", description = "Sort column name", examples = {
                                                            @ExampleObject(value = "createdAt", name = "Creation date"),
