@@ -19,29 +19,23 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.utils;
+package org.eclipse.tractusx.managedidentitywallets.v2.api;
+
 
 import org.eclipse.tractusx.managedidentitywallets.ManagedIdentityWalletsApplication;
 import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.junit.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {ManagedIdentityWalletsApplication.class})
 @ContextConfiguration(initializers = {TestContextInitializer.class})
-class EncryptionTest {
+public class AdminApiTests {
 
-    @Autowired
-    private EncryptionUtils encryptionUtils;
 
     @Test
-    void encryptionTest() {
-        String originalMassage = "Dummy test message";
-        String encrypt = encryptionUtils.encrypt(originalMassage);
-        String decrypt = encryptionUtils.decrypt(encrypt);
-        Assertions.assertEquals(originalMassage, decrypt);
+    public void testGetCredentials() {
+
     }
 
 }

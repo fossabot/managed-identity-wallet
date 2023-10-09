@@ -21,7 +21,10 @@
 
 package org.eclipse.tractusx.managedidentitywallets.v2.delegate;
 
+import org.eclipse.tractusx.managedidentitywallets.ManagedIdentityWalletsApplication;
 import org.eclipse.tractusx.managedidentitywallets.client.controllers.AdminApiDelegate;
 
+//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {ManagedIdentityWalletsApplication.class})
+//@ContextConfiguration(initializers = {TestContextInitializer.class})
 public class AdminApiDelegateImpl implements AdminApiDelegate {
 }
