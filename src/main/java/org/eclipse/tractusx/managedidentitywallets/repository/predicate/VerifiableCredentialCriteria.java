@@ -26,4 +26,10 @@ import lombok.Value;
 @Value
 public class VerifiableCredentialCriteria {
     SortOrder sortOrder;
+
+
+//    public static Predicate hasType(String type) {
+//        QVerifiableCredential verifiableCredential = QVerifiableCredential.verifiableCredential;
+//        return verifiableCredential.type.containsIgnoreCase(type);
+//    }
 }

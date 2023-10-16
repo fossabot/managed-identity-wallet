@@ -12,7 +12,6 @@ paths:
   /wallets:
     get:
       tags:
-        - V1
         - Wallets
       summary: List of wallets
       description: "Permission: **view_wallets**\n\nRetrieve list of registered wallets"
@@ -54,7 +53,6 @@ paths:
   /wallet:
     post:
       tags:
-        - V1
         - Wallets
       summary: Create wallet
       description: "Permission: **add_wallets**\n\nCreate a wallet and store it "

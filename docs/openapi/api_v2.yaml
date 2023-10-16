@@ -11,6 +11,9 @@ paths:
 
   /did:
     post:
+      tags:
+        - V2
+        - DID
       summary: Resolve DID Document by DID
       description: Retrieves a DID Document by DID.
       requestBody:
@@ -41,6 +44,9 @@ paths:
 
   /verifiable-credentials:
     get:
+      tags:
+        - V2
+        - Verifiable Credentials
       summary: Get Verifiable Credentials
       description: Retrieves a list of Verifiable Credentials.
       responses:
@@ -52,6 +58,9 @@ paths:
                 $ref: '#/components/schemas/VerifiableCredential'
 
     post:
+      tags:
+        - V2
+        - Verifiable Credentials
       summary: Create Verifiable Credential
       description: Creates a new Verifiable Credential.
       requestBody:
@@ -68,6 +77,9 @@ paths:
 
   /verifiable-credentials/id:
     delete:
+      tags:
+        - V2
+        - Verifiable Credentials
       summary: Delete Verifiable Credential
       description: Deletes a Verifiable Credential by ID.
       parameters:
@@ -85,6 +97,9 @@ paths:
 
   /verifiable-presentations:
     post:
+      tags:
+        - V2
+        - Verifiable Presentations
       summary: Issue Verifiable Presentation
       description: Issues a new Verifiable Presentation.
       requestBody:
@@ -101,6 +116,9 @@ paths:
 
   /verifiable-credentials/issued:
     post:
+      tags:
+        - V2
+        - Verifiable Credentials
       summary: Issue Verifiable Credential
       description: Issues a new Verifiable Credential.
       requestBody:
@@ -116,6 +134,9 @@ paths:
           description: Bad request.
 
     get:
+      tags:
+        - V2
+        - Verifiable Credentials
       summary: Get Issued Verifiable Credentials
       description: Retrieves a list of issued Verifiable Credentials.
       responses:
@@ -128,6 +149,9 @@ paths:
 
   /verifiable-credentials/validate:
     post:
+      tags:
+        - V2
+        - Verifiable Credentials
       summary: Validate Verifiable Credential
       description: Validates a Verifiable Credential, checking schema, revocation, and signature.
       requestBody:
@@ -144,6 +168,9 @@ paths:
 
   /verifiable-presentations/validate:
     post:
+      tags:
+        - V2
+        - Verifiable Presentations
       summary: Validate Verifiable Presentation
       description: Validates a Verifiable Presentation, checking schema, revocation, and signature of VC and VP.
       requestBody:
@@ -160,6 +187,10 @@ paths:
 
   /admin/wallets:
     get:
+      tags:
+        - V2
+        - Admin
+        - Wallets
       summary: Get All Wallets
       description: Retrieves a list of all wallets.
       responses:
@@ -173,6 +204,10 @@ paths:
                   $ref: '#/components/schemas/Wallet'
 
     post:
+      tags:
+        - V2
+        - Admin
+        - Wallets
       summary: Create Wallet for User
       description: Creates a wallet for a user.
       requestBody:
@@ -189,6 +224,10 @@ paths:
 
   /admin/wallets/{userId}:
     delete:
+      tags:
+        - V2
+        - Admin
+        - Wallets
       summary: Delete Wallet for User
       description: Deletes a wallet for a user by user ID.
       parameters:
@@ -205,6 +244,10 @@ paths:
           description: Wallet not found.
 
     put:
+      tags:
+        - V2
+        - Admin
+        - Wallets
       summary: Update Wallet for User
       description: Updates a wallet for a user by user ID.
       parameters:
@@ -228,6 +271,10 @@ paths:
 
   /admin/verifiable-credentials/{userId}:
     get:
+      tags:
+        - V2
+        - Admin
+        - Verifiable Credentials
       summary: Get Verifiable Credentials for User
       description: Retrieves a list of verifiable credentials for a user by user ID.
       parameters:
@@ -248,6 +295,10 @@ paths:
                   $ref: '#/components/schemas/VerifiableCredential'
 
     post:
+      tags:
+        - V2
+        - Admin
+        - Verifiable Credentials
       summary: Create Verifiable Credential for User
       description: Creates a verifiable credential for a user.
       parameters:
@@ -270,6 +321,10 @@ paths:
           description: Bad request.
 
     delete:
+      tags:
+        - V2
+        - Admin
+        - Verifiable Credentials
       summary: Delete Verifiable Credential for User
       description: Deletes a verifiable credential for a user by user ID.
       parameters:
@@ -287,6 +342,10 @@ paths:
 
   /admin/verifiable-presentations/{userId}:
     post:
+      tags:
+        - V2
+        - Admin
+        - Verifiable Presentations
       summary: Issue Verifiable Presentation for User
       description: Issues a verifiable presentation for a user.
       parameters:
@@ -310,6 +369,10 @@ paths:
 
   /admin/verifiable-credentials/issued/{userId}:
     post:
+      tags:
+        - V2
+        - Admin
+        - Verifiable Credentials
       summary: Issue Verifiable Credential for User
       description: Issues a verifiable credential for a user.
       parameters:
@@ -332,6 +395,10 @@ paths:
           description: Bad request.
 
     get:
+      tags:
+        - V2
+        - Admin
+        - Verifiable Credentials
       summary: Get Issued Verifiable Credentials for User
       description: Retrieves a list of issued verifiable credentials for a user by user ID.
       parameters:
@@ -353,6 +420,10 @@ paths:
 
   /admin/verifiable-credentials/revoke/{userId}:
     post:
+      tags:
+        - V2
+        - Admin
+        - Verifiable Credentials
       summary: Revoke Issued Verifiable Credential for User
       description: Revokes an issued verifiable credential for a user by user ID.
       parameters:

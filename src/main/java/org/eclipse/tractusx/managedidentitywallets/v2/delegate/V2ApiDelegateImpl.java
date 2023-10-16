@@ -22,7 +22,9 @@
 package org.eclipse.tractusx.managedidentitywallets.v2.delegate;
 
 
-import org.eclipse.tractusx.managedidentitywallets.spring.controllers.VerifiableCredentialsApiDelegate;
+import org.eclipse.tractusx.managedidentitywallets.spring.controllers.v2.V2ApiDelegate;
 
-public class VerifiableCredentialsApiDelegateImpl implements VerifiableCredentialsApiDelegate {
+//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {ManagedIdentityWalletsApplication.class})
+//@ContextConfiguration(initializers = {TestContextInitializer.class})
+public class V2ApiDelegateImpl implements V2ApiDelegate {
 }

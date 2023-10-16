@@ -1,6 +1,7 @@
 import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
 
 plugins {
+    id 'application'
     id 'java'
     id 'org.springframework.boot' version "${springBootVersion}"
     id 'io.spring.dependency-management' version "${springDependencyVersion}"
@@ -12,6 +13,15 @@ plugins {
 group = "${groupName}"
 version = "${applicationVersion}"
 sourceCompatibility = JavaVersion.VERSION_17
+mainClassName = "org.eclipse.tractusx.managedidentitywallets.ManagedIdentityWalletsApplication"
+
+springBoot {
+    mainClass = "${mainClassName}"
+}
+
+application {
+    mainClass = "${mainClassName}"
+}
 
 configurations {
     compileOnly {
@@ -41,6 +51,8 @@ sourceSets {
             srcDirs 'src/main/java'
             srcDirs 'build/generated/sources/annotationProcessor/java'
             srcDirs 'build/generated/openapi/src/main/java'
+            /* Eclipse Generated Applications */
+            exclude 'build/generated/openapi/src/main/**/*Application.java'
         }
     }
 }
@@ -116,11 +128,14 @@ openApiGenerate {
     invokerPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.v2")
     apiPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.controllers.v2")
     modelPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.models.v2")
+    apiNameSuffix.set("V2")
+    modelNameSuffix.set("V2")
     groupId.set("org.eclipse.tractusx.managedidentitywallets")
     generateApiTests.set(false)
     generateModelTests.set(false)
     configOptions.put("delegatePattern", "true")
     configOptions.put("dateLibrary", "java8")
+    additionalProperties.put("useTags", true)
 }
 
 /* create a second open api generate task and attach it to the original task */
@@ -136,10 +151,11 @@ tasks.register("openApiGenerateJavaV2", GenerateTask) {
     openApiGenerateJavaV2.apiPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.v2.controllers")
     openApiGenerateJavaV2.modelPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.v2.models")
     openApiGenerateJavaV2.groupId.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate")
+    openApiGenerateJavaV2.apiNameSuffix.set("V2")
+    openApiGenerateJavaV2.modelNameSuffix.set("V2")
     openApiGenerateJavaV2.generateApiTests.set(false)
     openApiGenerateJavaV2.generateModelTests.set(false)
     openApiGenerateJavaV2.configOptions.put("delegatePattern", "true")
-    openApiGenerateJavaV2.configOptions.put("dateLibrary", "java8")
 }
 
 /* create a second open api generate task and attach it to the original task */
@@ -155,10 +171,13 @@ tasks.register("openApiGenerateJavaV1", GenerateTask) {
     openApiGenerateJavaV1.apiPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.v1.controllers")
     openApiGenerateJavaV1.modelPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.v1.models")
     openApiGenerateJavaV1.groupId.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate")
+    openApiGenerateJavaV1.apiNameSuffix.set("V1")
+    openApiGenerateJavaV1.modelNameSuffix.set("V1")
     openApiGenerateJavaV1.generateApiTests.set(false)
     openApiGenerateJavaV1.generateModelTests.set(false)
     openApiGenerateJavaV1.configOptions.put("delegatePattern", "true")
     openApiGenerateJavaV1.configOptions.put("dateLibrary", "java8")
+    openApiGenerateJavaV1.additionalProperties.put("apiNameSuffix", "V1")
 }
 
 tasks.register("openApiGenerateV1", GenerateTask) {
@@ -172,10 +191,13 @@ tasks.register("openApiGenerateV1", GenerateTask) {
     openApiGenerateV1.apiPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.controllers.v1")
     openApiGenerateV1.modelPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.models.v1")
     openApiGenerateV1.groupId.set("org.eclipse.tractusx.managedidentitywallets")
+    openApiGenerateV1.apiNameSuffix.set("V1")
+    openApiGenerateV1.modelNameSuffix.set("V1")
     openApiGenerateV1.generateApiTests.set(false)
     openApiGenerateV1.generateModelTests.set(false)
     openApiGenerateV1.configOptions.put("delegatePattern", "true")
     openApiGenerateV1.configOptions.put("dateLibrary", "java8")
+    openApiGenerateV1.additionalProperties.put("apiNameSuffix", "V1")
 }
 tasks.openApiGenerate.dependsOn('openApiGenerateJavaV2')
 tasks.openApiGenerate.dependsOn('openApiGenerateJavaV1')
