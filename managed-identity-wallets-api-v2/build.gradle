@@ -1,0 +1,123 @@
+import org.openapitools.generator.gradle.plugin.tasks.GenerateTask
+
+plugins {
+    id 'java'
+    id 'org.springframework.boot' version "${springBootVersion}"
+    id 'io.spring.dependency-management' version "${springDependencyVersion}"
+    id "org.openapi.generator" version "6.6.0"
+}
+
+group = "${groupName}"
+version = "${applicationVersion}"
+sourceCompatibility = JavaVersion.VERSION_17
+
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+sourceSets {
+    main {
+        java {
+            srcDirs 'src/main/java'
+            srcDirs 'build/generated/openapi/src/main/java'
+        }
+    }
+}
+
+ext {
+
+}
+
+dependencies {
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+    implementation 'org.springframework.boot:spring-boot-starter-web'
+    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    implementation 'org.springframework.security:spring-security-oauth2-resource-server'
+    implementation 'org.springframework.security:spring-security-oauth2-jose'
+    implementation 'org.springframework.cloud:spring-cloud-starter-openfeign'
+    implementation "org.springdoc:springdoc-openapi-starter-common:${openApiVersion}"
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${openApiVersion}"
+    implementation group: 'com.smartsensesolutions', name: 'commons-dao', version: '0.0.5'
+    implementation 'org.liquibase:liquibase-core'
+    implementation 'org.eclipse.tractusx.ssi:cx-ssi-lib:0.0.15'
+    implementation 'javax.annotation:javax.annotation-api:1.3.2'
+    implementation 'javax.validation:validation-api:2.0.1.Final'
+    compileOnly 'javax.servlet:servlet-api:2.5'
+    implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
+
+
+    implementation group: "com.querydsl", name: "querydsl-jpa", classifier: "jakarta"
+    annotationProcessor group: "com.querydsl", name: "querydsl-apt", classifier: "jakarta"
+    annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+    //Added explicitly to mitigate CVE 2022-1471
+    implementation group: 'org.yaml', name: 'snakeyaml', version: '2.0'
+
+    //Added explicitly to mitigate CVE 2023-24998
+    implementation group: 'commons-fileupload', name: 'commons-fileupload', version: '1.5'
+
+    testImplementation 'org.projectlombok:lombok:1.18.28'
+    runtimeOnly 'org.postgresql:postgresql'
+    compileOnly 'org.projectlombok:lombok'
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    annotationProcessor 'org.projectlombok:lombok'
+    testAnnotationProcessor 'org.projectlombok:lombok'
+    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation "org.testcontainers:testcontainers"
+    testImplementation 'com.h2database:h2:2.2.220'
+    testImplementation "org.testcontainers:junit-jupiter"
+    testImplementation group: 'com.github.dasniko', name: 'testcontainers-keycloak', version: '2.5.0'
+    testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.2.0'
+    testImplementation group: 'org.json', name: 'json', version: '20230227'
+}
+
+openApiGenerate {
+    generatorName.set("spring")
+    library.set("spring-boot")
+
+    inputSpec.set("$projectDir/openapi.yaml")
+    outputDir.set("$buildDir/generated/openapi")
+
+    invokerPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.v2")
+    apiPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.controllers.v2")
+    modelPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.models.v2")
+    apiNameSuffix.set("V2")
+    modelNameSuffix.set("V2")
+    groupId.set("org.eclipse.tractusx.managedidentitywallets")
+    generateApiTests.set(false)
+    generateModelTests.set(false)
+    configOptions.put("delegatePattern", "true")
+    configOptions.put("dateLibrary", "java8")
+    additionalProperties.put("useTags", true)
+}
+
+/* create a second open api generate task and attach it to the original task */
+tasks.register("openApiGenerateJavaV2", GenerateTask) {
+    openApiGenerateJavaV2.generatorName.set("java")
+    /* for more libraries see https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/java.md */
+    openApiGenerateJavaV2.library.set("resttemplate")
+
+    openApiGenerateJavaV2.inputSpec.set("$projectDir/openapi.yaml")
+    openApiGenerateJavaV2.outputDir.set("$buildDir/generated/openapi")
+
+    openApiGenerateJavaV2.invokerPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.v2.client")
+    openApiGenerateJavaV2.apiPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.v2.controllers")
+    openApiGenerateJavaV2.modelPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.v2.models")
+    openApiGenerateJavaV2.groupId.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate")
+    openApiGenerateJavaV2.apiNameSuffix.set("V2")
+    openApiGenerateJavaV2.modelNameSuffix.set("V2")
+    openApiGenerateJavaV2.generateApiTests.set(false)
+    openApiGenerateJavaV2.generateModelTests.set(false)
+    openApiGenerateJavaV2.configOptions.put("delegatePattern", "true")
+}
+
+tasks.openApiGenerate.dependsOn('openApiGenerateJavaV2')
+
+build {
+    archivesBaseName = "miw"
+    version = "latest"
+}

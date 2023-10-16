@@ -1,1 +1,5 @@
+include ':managed-identity-wallets-api-v1'
+include ':managed-identity-wallets-api-v2'
+include ':managed-identity-wallets-app'
+
 rootProject.name = 'managedidentitywallets'
