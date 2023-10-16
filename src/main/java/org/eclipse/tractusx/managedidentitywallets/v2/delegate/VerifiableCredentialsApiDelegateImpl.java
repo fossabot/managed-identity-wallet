@@ -21,7 +21,8 @@
 
 package org.eclipse.tractusx.managedidentitywallets.v2.delegate;
 
-import org.eclipse.tractusx.managedidentitywallets.client.controllers.VerifiableCredentialsApiDelegate;
+
+import org.eclipse.tractusx.managedidentitywallets.spring.controllers.VerifiableCredentialsApiDelegate;
 
 public class VerifiableCredentialsApiDelegateImpl implements VerifiableCredentialsApiDelegate {
 }

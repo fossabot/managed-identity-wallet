@@ -113,15 +113,14 @@ openApiGenerate {
     inputSpec.set("$rootDir/docs/openapi/v2/client_api_v2.yaml")
     outputDir.set("$buildDir/generated/openapi")
 
-    invokerPackage.set("${groupName}.spring")
-    apiPackage.set("${groupName}.spring.controllers")
-    modelPackage.set("${groupName}.spring.models")
-    groupId.set("$groupName")
+    invokerPackage.set("org.eclipse.tractusx.managedidentitywallets.spring")
+    apiPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.controllers")
+    modelPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.models")
+    groupId.set("org.eclipse.tractusx.managedidentitywallets")
     generateApiTests.set(false)
     generateModelTests.set(false)
     configOptions.put("delegatePattern", "true")
     configOptions.put("dateLibrary", "java8")
-    configOptions.put("additionalModelTypeAnnotations", "@lombok.Builder")
 }
 
 /* create a second open api generate task and attach it to the original task */
@@ -133,15 +132,14 @@ tasks.register("openApiGenerateJava", GenerateTask) {
     openApiGenerateJava.inputSpec.set("$rootDir/docs/openapi/v2/client_api_v2.yaml")
     openApiGenerateJava.outputDir.set("$buildDir/generated/openapi")
 
-    openApiGenerateJava.invokerPackage.set("${groupName}.resttemplate.client")
-    openApiGenerateJava.apiPackage.set("${groupName}.resttemplate.controllers")
-    openApiGenerateJava.modelPackage.set("${groupName}.resttemplate.models")
-    openApiGenerateJava.groupId.set("$groupName")
+    openApiGenerateJava.invokerPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.client")
+    openApiGenerateJava.apiPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.controllers")
+    openApiGenerateJava.modelPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.models")
+    openApiGenerateJava.groupId.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate")
     openApiGenerateJava.generateApiTests.set(false)
     openApiGenerateJava.generateModelTests.set(false)
     openApiGenerateJava.configOptions.put("delegatePattern", "true")
     openApiGenerateJava.configOptions.put("dateLibrary", "java8")
-    openApiGenerateJava.configOptions.put("additionalModelTypeAnnotations", "@lombok.Builder")
 }
 tasks.openApiGenerate.dependsOn('openApiGenerateJava')
 

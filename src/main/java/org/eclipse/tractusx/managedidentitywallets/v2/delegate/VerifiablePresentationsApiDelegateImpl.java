@@ -21,7 +21,7 @@
 
 package org.eclipse.tractusx.managedidentitywallets.v2.delegate;
 
-import org.eclipse.tractusx.managedidentitywallets.client.controllers.VerifiablePresentationsApiDelegate;
+import org.eclipse.tractusx.managedidentitywallets.spring.controllers.VerifiablePresentationsApiDelegate;
 
 public class VerifiablePresentationsApiDelegateImpl implements VerifiablePresentationsApiDelegate {
 }
