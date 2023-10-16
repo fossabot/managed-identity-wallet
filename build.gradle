@@ -110,12 +110,12 @@ openApiGenerate {
     generatorName.set("spring")
     library.set("spring-boot")
 
-    inputSpec.set("$rootDir/docs/openapi/v2/client_api_v2.yaml")
+    inputSpec.set("$rootDir/docs/openapi/api_v2.yaml")
     outputDir.set("$buildDir/generated/openapi")
 
-    invokerPackage.set("org.eclipse.tractusx.managedidentitywallets.spring")
-    apiPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.controllers")
-    modelPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.models")
+    invokerPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.v2")
+    apiPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.controllers.v2")
+    modelPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.models.v2")
     groupId.set("org.eclipse.tractusx.managedidentitywallets")
     generateApiTests.set(false)
     generateModelTests.set(false)
@@ -124,24 +124,62 @@ openApiGenerate {
 }
 
 /* create a second open api generate task and attach it to the original task */
-tasks.register("openApiGenerateJava", GenerateTask) {
-    openApiGenerateJava.generatorName.set("java")
+tasks.register("openApiGenerateJavaV2", GenerateTask) {
+    openApiGenerateJavaV2.generatorName.set("java")
     /* for more libraries see https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/java.md */
-    openApiGenerateJava.library.set("resttemplate")
+    openApiGenerateJavaV2.library.set("resttemplate")
 
-    openApiGenerateJava.inputSpec.set("$rootDir/docs/openapi/v2/client_api_v2.yaml")
-    openApiGenerateJava.outputDir.set("$buildDir/generated/openapi")
+    openApiGenerateJavaV2.inputSpec.set("$rootDir/docs/openapi/api_v2.yaml")
+    openApiGenerateJavaV2.outputDir.set("$buildDir/generated/openapi")
 
-    openApiGenerateJava.invokerPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.client")
-    openApiGenerateJava.apiPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.controllers")
-    openApiGenerateJava.modelPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.models")
-    openApiGenerateJava.groupId.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate")
-    openApiGenerateJava.generateApiTests.set(false)
-    openApiGenerateJava.generateModelTests.set(false)
-    openApiGenerateJava.configOptions.put("delegatePattern", "true")
-    openApiGenerateJava.configOptions.put("dateLibrary", "java8")
+    openApiGenerateJavaV2.invokerPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.v2.client")
+    openApiGenerateJavaV2.apiPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.v2.controllers")
+    openApiGenerateJavaV2.modelPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.v2.models")
+    openApiGenerateJavaV2.groupId.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate")
+    openApiGenerateJavaV2.generateApiTests.set(false)
+    openApiGenerateJavaV2.generateModelTests.set(false)
+    openApiGenerateJavaV2.configOptions.put("delegatePattern", "true")
+    openApiGenerateJavaV2.configOptions.put("dateLibrary", "java8")
 }
-tasks.openApiGenerate.dependsOn('openApiGenerateJava')
+
+/* create a second open api generate task and attach it to the original task */
+tasks.register("openApiGenerateJavaV1", GenerateTask) {
+    openApiGenerateJavaV1.generatorName.set("java")
+    /* for more libraries see https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/java.md */
+    openApiGenerateJavaV1.library.set("resttemplate")
+
+    openApiGenerateJavaV1.inputSpec.set("$rootDir/docs/openapi/api_v1.yaml")
+    openApiGenerateJavaV1.outputDir.set("$buildDir/generated/openapi")
+
+    openApiGenerateJavaV1.invokerPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.v1.client")
+    openApiGenerateJavaV1.apiPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.v1.controllers")
+    openApiGenerateJavaV1.modelPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.v1.models")
+    openApiGenerateJavaV1.groupId.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate")
+    openApiGenerateJavaV1.generateApiTests.set(false)
+    openApiGenerateJavaV1.generateModelTests.set(false)
+    openApiGenerateJavaV1.configOptions.put("delegatePattern", "true")
+    openApiGenerateJavaV1.configOptions.put("dateLibrary", "java8")
+}
+
+tasks.register("openApiGenerateV1", GenerateTask) {
+    openApiGenerateV1.generatorName.set("spring")
+    openApiGenerateV1.library.set("spring-boot")
+
+    openApiGenerateV1.inputSpec.set("$rootDir/docs/openapi/api_v1.yaml")
+    openApiGenerateV1.outputDir.set("$buildDir/generated/openapi")
+
+    openApiGenerateV1.invokerPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.v1")
+    openApiGenerateV1.apiPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.controllers.v1")
+    openApiGenerateV1.modelPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.models.v1")
+    openApiGenerateV1.groupId.set("org.eclipse.tractusx.managedidentitywallets")
+    openApiGenerateV1.generateApiTests.set(false)
+    openApiGenerateV1.generateModelTests.set(false)
+    openApiGenerateV1.configOptions.put("delegatePattern", "true")
+    openApiGenerateV1.configOptions.put("dateLibrary", "java8")
+}
+tasks.openApiGenerate.dependsOn('openApiGenerateJavaV2')
+tasks.openApiGenerate.dependsOn('openApiGenerateJavaV1')
+tasks.openApiGenerate.dependsOn('openApiGenerateV1')
 
 build {
     archivesBaseName = "miw"
