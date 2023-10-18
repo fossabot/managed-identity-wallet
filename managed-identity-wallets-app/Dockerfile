@@ -27,7 +27,7 @@ RUN apk add curl
 
 USER miw
 
-COPY /build/libs/miw-latest.jar /app/
+COPY /build/libs/miw-*.jar /app/
 
 WORKDIR /app
 

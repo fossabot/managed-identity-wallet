@@ -117,7 +117,7 @@ tasks.named('test') {
 
 build {
     archivesBaseName = "miw"
-    version = "latest"
+    version = "${applicationVersion}"
 }
 
 test {
