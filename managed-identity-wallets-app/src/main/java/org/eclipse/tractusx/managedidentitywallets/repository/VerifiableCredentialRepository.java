@@ -19,29 +19,28 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository.repository;
+package org.eclipse.tractusx.managedidentitywallets.repository;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.querydsl.jpa.JPQLTemplates;
-import com.querydsl.jpa.impl.JPAQueryFactory;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.Persistence;
+import com.querydsl.core.types.Predicate;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
-import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.exceptions.WalletDoesNotExistException;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.*;
+import org.eclipse.tractusx.managedidentitywallets.repository.map.VerifiableCredentialEntityMap;
+import org.eclipse.tractusx.managedidentitywallets.repository.predicate.WalletPredicate;
+import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
+import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
+import org.eclipse.tractusx.managedidentitywallets.repository.predicate.VerifiableCredentialPredicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Component
@@ -49,18 +48,20 @@ import java.util.UUID;
 @RequiredArgsConstructor
 public class VerifiableCredentialRepository {
 
-    private static final ObjectMapper MAPPER = new ObjectMapper();
-
     private final WalletJpaRepository walletJpaRepository;
     private final VerifiableCredentialJpaRepository verifiableCredentialJpaRepository;
     private final VerifiableCredentialIntersectionJpaRepository verifiableCredentialIntersectionJpaRepository;
     private final VerifiableCredentialIssuerIntersectionJpaRepository verifiableCredentialIssuerIntersectionJpaRepository;
     private final VerifiableCredentialTypeIntersectionJpaRepository verifiableCredentialTypeIntersectionJpaRepository;
 
+    private final VerifiableCredentialEntityMap verifiableCredentialEntityMap;
+
     @Transactional
-    public void save(VerifiableCredential vc, String walletName) {
-        final WalletEntity walletEntity = walletJpaRepository.findByName(walletName)
-                .orElseThrow(() -> new RuntimeException()); // TODO
+    public void save(@NonNull VerifiableCredential vc, @NonNull WalletId walletId) throws WalletDoesNotExistException {
+        final WalletQuery query = WalletQuery.builder().walletId(walletId).build();
+        final Predicate predicate = WalletPredicate.fromQuery(query);
+        final WalletEntity walletEntity = walletJpaRepository.findOne(predicate)
+                .orElseThrow(() -> new WalletDoesNotExistException(walletId));
 
         // Verifiable Credential
         final VerifiableCredentialEntity verifiableCredentialEntity = new VerifiableCredentialEntity();
@@ -103,28 +104,21 @@ public class VerifiableCredentialRepository {
         }
     }
 
-    public Optional<VerifiableCredential> findByHolderAndId(String walletOwner, String id) {
-        EntityManagerFactory emf =
-                Persistence.createEntityManagerFactory("com.baeldung.querydsl.intro");
-        EntityManager em = emf.createEntityManager();
-        JPAQueryFactory queryFactory = new JPAQueryFactory(JPQLTemplates.DEFAULT, em);
-
-        return verifiableCredentialJpaRepository
-                .findByIdAndWalletIntersections_Wallet_Id(id, walletOwner)
-                .map(VerifiableCredentialEntity::getJson)
-                .map(json -> {
-                    try {
-                        return MAPPER.readValue(json, Map.class);
-                    } catch (JsonProcessingException e) {
-                        log.error("Could not deserialize VerifiableCredential JSON", e);
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .map(VerifiableCredential::new);
+    public List<VerifiableCredential> findAll(@NonNull VerifiableCredentialQuery query) {
+        final List<VerifiableCredential> credentials = new ArrayList<>();
+        final Predicate predicate = VerifiableCredentialPredicate.fromQuery(query);
+        verifiableCredentialJpaRepository.findAll(predicate)
+                .iterator().forEachRemaining(
+                        c -> credentials.add(verifiableCredentialEntityMap.map(c)));
+        return credentials;
     }
 
-    public Page<VerifiableCredential> findByIssuer(String issuer, Pageable p) {
-        return null; // TODO
+    public Page<VerifiableCredential> findAll(@NonNull VerifiableCredentialQuery query, @NonNull Pageable p) {
+        final Predicate predicate = VerifiableCredentialPredicate.fromQuery(query);
+        if (log.isTraceEnabled()) {
+            log.trace("findAll: predicate={}", predicate);
+        }
+        return verifiableCredentialJpaRepository.findAll(predicate, p)
+                .map(verifiableCredentialEntityMap::map);
     }
 }

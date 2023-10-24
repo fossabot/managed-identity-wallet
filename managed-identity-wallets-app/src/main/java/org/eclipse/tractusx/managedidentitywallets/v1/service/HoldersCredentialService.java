@@ -21,27 +21,12 @@
 
 package org.eclipse.tractusx.managedidentitywallets.v1.service;
 
-import com.smartsensesolutions.java.commons.FilterRequest;
-import com.smartsensesolutions.java.commons.criteria.CriteriaOperator;
-import com.smartsensesolutions.java.commons.operator.Operator;
-import com.smartsensesolutions.java.commons.sort.SortType;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.text.StringEscapeUtils;
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.AbstractEntity;
-import org.eclipse.tractusx.managedidentitywallets.repository.repository.VerifiableCredentialRepository;
-import org.eclipse.tractusx.managedidentitywallets.v1.constant.StringPool;
-import org.eclipse.tractusx.managedidentitywallets.v1.entity.HoldersCredential;
-import org.eclipse.tractusx.managedidentitywallets.v1.entity.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.v1.exception.CredentialNotFoundProblem;
-import org.eclipse.tractusx.managedidentitywallets.v1.exception.ForbiddenException;
-import org.eclipse.tractusx.managedidentitywallets.v1.utils.CommonUtils;
-import org.eclipse.tractusx.managedidentitywallets.v1.utils.Validate;
+import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
-import org.springframework.util.CollectionUtils;
-import org.springframework.util.StringUtils;
 
 import java.util.*;
 

@@ -19,14 +19,18 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository.repository;
+package org.eclipse.tractusx.managedidentitywallets.exceptions;
 
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialIntersectionEntity;
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialIssuerIntersectionEntity;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import lombok.Getter;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 
-@Repository
-interface VerifiableCredentialIssuerIntersectionJpaRepository
-        extends CrudRepository<VerifiableCredentialIssuerIntersectionEntity, VerifiableCredentialIssuerIntersectionEntity.VerifiableCredentialIssuerIntersectionEntityId> {
+@Getter
+public class WalletDoesNotExistException extends Exception {
+
+    private final WalletId WalletId;
+
+    public WalletDoesNotExistException(org.eclipse.tractusx.managedidentitywallets.models.WalletId walletId) {
+        super("Wallet does not exist. " + walletId);
+        WalletId = walletId;
+    }
 }

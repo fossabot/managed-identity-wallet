@@ -19,15 +19,14 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.v2.entity;
+package org.eclipse.tractusx.managedidentitywallets.repository;
 
-import lombok.Value;
-import org.eclipse.tractusx.ssi.lib.crypt.ed25519.Ed25519Key;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.Ed25519KeyEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-@Value
-public class Wallet {
-    String id;
-    String name;
-    String description;
-    Ed25519Key ed25519_keys;
+@Repository
+public interface Ed25519KeyJpaRepository extends CrudRepository<Ed25519KeyEntity, String>,
+        JpaRepository<Ed25519KeyEntity, String> {
 }

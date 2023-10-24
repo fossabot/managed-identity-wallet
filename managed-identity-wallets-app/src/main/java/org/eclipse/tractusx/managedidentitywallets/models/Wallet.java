@@ -19,20 +19,27 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository.repository;
+package org.eclipse.tractusx.managedidentitywallets.models;
 
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
-import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.stereotype.Repository;
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.Value;
 
-import java.util.Optional;
+import java.util.List;
 
-/**
- * The interface Wallet repository.
- */
-@Repository
-interface WalletJpaRepository extends PagingAndSortingRepository<WalletEntity, String> {
-    Optional<WalletEntity> findByName(String name);
+@Value
+@Builder
+public class Wallet {
 
-    boolean existsByName();
+    @NonNull
+    WalletId walletId;
+
+    @NonNull
+    WalletDescription walletDescription;
+
+    @NonNull
+    WalletName walletName;
+
+    @NonNull
+    List<Ed25519Key> ed25519Keys;
 }

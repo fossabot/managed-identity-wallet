@@ -19,32 +19,15 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository.repository;
+package org.eclipse.tractusx.managedidentitywallets.models;
 
-import lombok.RequiredArgsConstructor;
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
-import org.springframework.stereotype.Component;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import lombok.Value;
 
-import java.util.Optional;
-
-@Component
-@RequiredArgsConstructor
-public class WalletRepository {
-
-    private final WalletJpaRepository walletJpaRepository;
-
-    public boolean existsById(String id) {
-        return false;
-    }
-
-    public Optional<WalletEntity> getById(String id) {
-        return null;
-    }
-
-    public Optional<WalletEntity> getByName(String walletName) {
-
-        final Optional<WalletEntity> entityOptional = walletJpaRepository.findByName(walletName);
-
-        return entityOptional;
-    }
+@Value
+@EqualsAndHashCode
+@ToString
+public class VerifiableCredentialId {
+    String text;
 }

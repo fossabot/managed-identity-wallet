@@ -19,19 +19,20 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository.predicate;
+package org.eclipse.tractusx.managedidentitywallets.models;
 
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Value;
 
-import java.util.function.Predicate;
+import java.time.Instant;
 
 @Value
-public class VerifiableCredentialCriteria {
-    SortOrder sortOrder;
-
-
-//    public static Predicate hasType(String type) {
-//        QVerifiableCredential verifiableCredential = QVerifiableCredential.verifiableCredential;
-//        return verifiableCredential.type.containsIgnoreCase(type);
-//    }
+@AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
+@Builder
+public class Ed25519Key {
+    String didIdentifier;
+    String vaultSecret;
+    Instant createdAt;
+    String description;
 }

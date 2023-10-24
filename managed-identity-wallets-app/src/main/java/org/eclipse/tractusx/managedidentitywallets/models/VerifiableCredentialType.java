@@ -19,18 +19,15 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository.repository;
+package org.eclipse.tractusx.managedidentitywallets.models;
 
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialIntersectionEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
+import lombok.Value;
 
-import java.util.Optional;
-
-@Repository
-interface VerifiableCredentialIntersectionJpaRepository
-        extends CrudRepository<VerifiableCredentialIntersectionEntity, VerifiableCredentialIntersectionEntity.VerifiableCredentialIntersectionEntityId>,
-        JpaRepository<VerifiableCredentialIntersectionEntity, VerifiableCredentialIntersectionEntity.VerifiableCredentialIntersectionEntityId> {
-
+@Value
+@EqualsAndHashCode
+@ToString
+public class VerifiableCredentialType {
+    String text;
 }

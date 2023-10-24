@@ -1,4 +1,3 @@
-
 plugins {
     id 'java'
     id 'org.springframework.boot' version "${springBootVersion}"
@@ -28,6 +27,9 @@ sourceSets {
         java {
             srcDirs 'src/main/java'
             srcDirs 'build/generated/openapi/src/main/java'
+            exclude {
+                it.file.name == 'OpenApiGeneratorApplication.java'
+            }
         }
     }
 }
@@ -62,7 +64,7 @@ openApiGenerate {
     generatorName.set("spring")
     library.set("spring-boot")
 
-    inputSpec.set("$rootDir/docs/openapi/v2/openapi.yaml")
+    inputSpec.set("$rootDir/docs/openapi/v2/openapi_v2.yaml")
     outputDir.set("$buildDir/generated/openapi")
 
     invokerPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.v2")

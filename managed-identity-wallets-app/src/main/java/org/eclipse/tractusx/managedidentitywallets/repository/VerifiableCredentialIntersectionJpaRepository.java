@@ -19,27 +19,16 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository.repository;
+package org.eclipse.tractusx.managedidentitywallets.repository;
 
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialEntity;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.querydsl.binding.QuerydslBinderCustomizer;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialIntersectionEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
-import java.time.OffsetDateTime;
-import java.util.Optional;
-
 @Repository
-interface VerifiableCredentialJpaRepository
-        extends PagingAndSortingRepository<VerifiableCredentialEntity, String>,
-        CrudRepository<VerifiableCredentialEntity, String>,
-        QuerydslPredicateExecutor<VerifiableCredentialEntity> {
+interface VerifiableCredentialIntersectionJpaRepository
+        extends CrudRepository<VerifiableCredentialIntersectionEntity, VerifiableCredentialIntersectionEntity.VerifiableCredentialIntersectionEntityId>,
+        JpaRepository<VerifiableCredentialIntersectionEntity, VerifiableCredentialIntersectionEntity.VerifiableCredentialIntersectionEntityId> {
 
-    Optional<VerifiableCredentialEntity> findByIdAndWalletIntersections_Wallet_Id(String id, String walletId);
-
-    Page<VerifiableCredentialEntity> findByCredentialIssuerIntersections_Issuer(String issuerId);
 }

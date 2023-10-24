@@ -24,8 +24,11 @@ package org.eclipse.tractusx.managedidentitywallets.v1.service;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
-import org.eclipse.tractusx.managedidentitywallets.repository.repository.WalletRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
 import org.eclipse.tractusx.managedidentitywallets.v1.exception.WalletNotFoundProblem;
 import org.eclipse.tractusx.managedidentitywallets.v2.service.VaultService;
 import org.eclipse.tractusx.ssi.lib.crypt.ed25519.Ed25519Key;
@@ -62,8 +65,10 @@ public class WalletKeyService {
     @SneakyThrows
 
     public Ed25519Key getPrivateKeyByWalletIdentifier(String walletId) {
-
-        final WalletEntity walletEntity = walletRepository.getById(walletId)
+        final WalletQuery walletQuery = WalletQuery.builder()
+                .walletId(new WalletId(walletId))
+                .build();
+        final Wallet walletEntity = walletRepository.find(walletQuery)
                 .orElseThrow(() -> new WalletNotFoundProblem(walletId));
 
         var latestKey = walletEntity.getEd25519Keys().stream()

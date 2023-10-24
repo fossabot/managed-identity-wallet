@@ -21,36 +21,18 @@
 
 package org.eclipse.tractusx.managedidentitywallets.v1.service;
 
-import com.smartsensesolutions.java.commons.FilterRequest;
-import com.smartsensesolutions.java.commons.sort.Sort;
-import com.smartsensesolutions.java.commons.sort.SortType;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.text.StringEscapeUtils;
 import org.bouncycastle.util.io.pem.PemObject;
 import org.bouncycastle.util.io.pem.PemWriter;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
-import org.eclipse.tractusx.managedidentitywallets.repository.repository.WalletRepository;
-import org.eclipse.tractusx.managedidentitywallets.v1.constant.StringPool;
+import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.v1.dto.CreateWalletRequest;
-import org.eclipse.tractusx.managedidentitywallets.v1.entity.HoldersCredential;
 import org.eclipse.tractusx.managedidentitywallets.v1.entity.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.v1.exception.BadDataException;
-import org.eclipse.tractusx.managedidentitywallets.v1.exception.DuplicateWalletProblem;
 import org.eclipse.tractusx.managedidentitywallets.v1.exception.ForbiddenException;
 import org.eclipse.tractusx.managedidentitywallets.v1.utils.Validate;
-import org.eclipse.tractusx.ssi.lib.crypt.IKeyGenerator;
-import org.eclipse.tractusx.ssi.lib.crypt.KeyPair;
-import org.eclipse.tractusx.ssi.lib.crypt.jwk.JsonWebKey;
-import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559Generator;
-import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559PrivateKey;
-import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559PublicKey;
-import org.eclipse.tractusx.ssi.lib.did.web.DidWebFactory;
-import org.eclipse.tractusx.ssi.lib.model.did.*;
-import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
-import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialType;
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -58,11 +40,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.io.StringWriter;
-import java.net.URI;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * The type Wallet service.

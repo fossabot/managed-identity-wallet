@@ -26,8 +26,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
-import org.eclipse.tractusx.managedidentitywallets.repository.repository.WalletRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
+import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
 import org.eclipse.tractusx.managedidentitywallets.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.v1.entity.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.v1.exception.WalletNotFoundProblem;
@@ -58,6 +62,8 @@ public class CommonService {
     private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final WalletRepository walletRepository;
+    private final VerifiableCredentialRepository verifiableCredentialRepository;
+
     private final VaultService vaultService;
     private final MIWSettings miwSettings;
 
@@ -72,30 +78,25 @@ public class CommonService {
     }
 
     public Wallet getWalletByBpn(String bpn) {
-        final WalletEntity walletEntity = walletRepository.getByName(bpn)
-                .orElseThrow(() -> new WalletNotFoundProblem("Error while parsing did " + bpn));
+        final WalletId walletId = new WalletId(bpn);
+        final WalletQuery walletQuery = WalletQuery.builder()
+                .walletId(walletId)
+                .build();
+        final org.eclipse.tractusx.managedidentitywallets.models.Wallet wallet = walletRepository.find(walletQuery)
+                .orElseThrow(() -> new RuntimeException("Wallet not found: " + bpn));
+
+        final VerifiableCredentialQuery vcQuery = VerifiableCredentialQuery.builder()
+                .holderWalletId(walletId)
+                .build();
+        final List<VerifiableCredential> verifiableCredentials = verifiableCredentialRepository.findAll(vcQuery);
 
         final Did did = getDidByBpn(bpn);
-        final DidDocument didDocument = getDidDocument(walletEntity);
-        final List<VerifiableCredential> verifiableCredentials = walletEntity.getCredentialIntersections()
-                .stream()
-                .map(credentialIntersectionEntity -> credentialIntersectionEntity.getId().getVerifiableCredential())
-                .map(credential -> {
-                    try {
-                        return MAPPER.readValue(credential.getJson(), Map.class);
-                    } catch (Exception e) {
-                        log.error("Error while parsing credential", e);
-                        return null;
-                    }
-                })
-                .filter(Objects::nonNull)
-                .map(VerifiableCredential::new)
-                .toList();
+        final DidDocument didDocument = getDidDocument(wallet);
 
         return Wallet.builder()
-                .bpn(walletEntity.getId())
+                .bpn(bpn)
                 .did(did.toString())
-                .name(walletEntity.getName())
+                .name(wallet.getWalletName().getText())
                 .algorithm(StringPool.ED_25519)
                 .didDocument(didDocument)
                 .verifiableCredentials(verifiableCredentials)
@@ -111,13 +112,13 @@ public class CommonService {
     }
 
     @SneakyThrows
-    public DidDocument getDidDocument(WalletEntity walletEntity) {
+    public DidDocument getDidDocument(org.eclipse.tractusx.managedidentitywallets.models.Wallet wallet) {
 
-        Did did = getDidByBpn(walletEntity.getId());
+        Did did = getDidByBpn(wallet.getWalletId().getText());
         DidDocumentBuilder didDocumentBuilder = new DidDocumentBuilder();
         didDocumentBuilder.id(did.toUri());
 
-        for (var key : walletEntity.getEd25519Keys()) {
+        for (var key : wallet.getEd25519Keys()) {
 
             final byte[] privateKey = vaultService.resolvePrivateKey(key.getVaultSecret());
             IPrivateKey x21559PrivateKey = new x21559PrivateKey(privateKey);
