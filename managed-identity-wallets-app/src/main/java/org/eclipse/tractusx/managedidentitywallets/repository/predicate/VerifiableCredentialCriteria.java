@@ -23,6 +23,8 @@ package org.eclipse.tractusx.managedidentitywallets.repository.predicate;
 
 import lombok.Value;
 
+import java.util.function.Predicate;
+
 @Value
 public class VerifiableCredentialCriteria {
     SortOrder sortOrder;

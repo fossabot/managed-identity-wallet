@@ -10,18 +10,17 @@ group = "${groupName}"
 version = "${applicationVersion}"
 sourceCompatibility = JavaVersion.VERSION_17
 
+bootJar {
+    enabled = false
+}
+
+jar {
+    enabled = true
+}
+
 repositories {
     mavenLocal()
     mavenCentral()
-}
-
-sourceSets {
-    main {
-        java {
-            srcDirs 'src/main/java'
-            srcDirs 'build/generated/openapi/src/main/java'
-        }
-    }
 }
 
 ext {
@@ -29,11 +28,11 @@ ext {
 }
 
 dependencies {
-    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-    implementation 'org.springframework.boot:spring-boot-starter-security'
+//    implementation 'org.springframework.boot:spring-boot-starter-actuator'
+//    implementation 'org.springframework.boot:spring-boot-starter-validation'
+//    implementation 'org.springframework.boot:spring-boot-starter-web'
+//    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+//    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.security:spring-security-oauth2-resource-server'
     implementation 'org.springframework.security:spring-security-oauth2-jose'
     implementation "org.springdoc:springdoc-openapi-starter-common:${openApiVersion}"
@@ -47,6 +46,8 @@ dependencies {
     implementation 'com.google.code.gson:gson:2.10.1'
     implementation 'javax.ws.rs:javax.ws.rs-api:2.1.1'
     implementation 'io.geewit.oltu.oauth2:gw-oltu-oauth2-client:1.0.6'
+
+    implementation 'org.apache.oltu.oauth2:org.apache.oltu.oauth2.client:1.0.2'
 
     implementation 'javax.annotation:javax.annotation-api:1.3.2'
 
@@ -69,10 +70,10 @@ openApiGenerate {
     inputSpec.set("$rootDir/docs/openapi/v2/openapi.yaml")
     outputDir.set("$buildDir/generated/openapi")
 
-    invokerPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.v2.client")
-    apiPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.v2.controllers")
-    modelPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.v2.models")
-    groupId.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate")
+    invokerPackage.set("org.eclipse.tractusx.managedidentitywallets.okhttp3.v2.client")
+    apiPackage.set("org.eclipse.tractusx.managedidentitywallets.okhttp3.v2.controllers")
+    modelPackage.set("org.eclipse.tractusx.managedidentitywallets.okhttp3.v2.models")
+    groupId.set("org.eclipse.tractusx.managedidentitywallets.okhttp3")
     apiNameSuffix.set("V2")
     modelNameSuffix.set("V2")
     generateApiTests.set(false)

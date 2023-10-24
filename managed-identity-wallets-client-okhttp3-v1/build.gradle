@@ -59,7 +59,6 @@ dependencies {
 
     implementation 'com.google.code.findbugs:jsr305:3.0.2'
 
-
     compileOnly 'javax.servlet:servlet-api:2.5'
     implementation 'org.openapitools:jackson-databind-nullable:0.2.6'
 
