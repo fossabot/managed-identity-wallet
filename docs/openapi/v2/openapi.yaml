@@ -76,6 +76,26 @@ paths:
           description: Bad request.
 
   /verifiable-credentials/id:
+    get:
+      summary: Get Verifiable Credential by ID
+      description: Retrieves a verifiable credential by ID.
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: The ID of the verifiable credential to retrieve.
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response with the requested verifiable credential.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifiableCredential'
+        '404':
+          description: Verifiable credential not found.
+
     delete:
       tags:
         - V2
