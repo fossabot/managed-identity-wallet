@@ -26,7 +26,6 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
 import org.eclipse.tractusx.managedidentitywallets.v1.exception.WalletNotFoundProblem;
@@ -68,7 +67,7 @@ public class WalletKeyService {
         final WalletQuery walletQuery = WalletQuery.builder()
                 .walletId(new WalletId(walletId))
                 .build();
-        final Wallet walletEntity = walletRepository.find(walletQuery)
+        final Wallet walletEntity = walletRepository.findOne(walletQuery)
                 .orElseThrow(() -> new WalletNotFoundProblem(walletId));
 
         var latestKey = walletEntity.getEd25519Keys().stream()

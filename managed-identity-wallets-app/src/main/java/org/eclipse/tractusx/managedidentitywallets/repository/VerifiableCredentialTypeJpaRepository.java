@@ -19,23 +19,19 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.v2.api;
+package org.eclipse.tractusx.managedidentitywallets.repository;
 
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialIssuerEntity;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialTypeEntity;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.stereotype.Repository;
 
-import org.eclipse.tractusx.managedidentitywallets.ManagedIdentityWalletsApplication;
-import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
-import org.junit.Test;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.test.context.ContextConfiguration;
-
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {ManagedIdentityWalletsApplication.class})
-@ContextConfiguration(initializers = {TestContextInitializer.class})
-public class AdminApiTests {
-
-
-    @Test
-    public void testGetCredentials() {
-
-    }
-
+@Repository
+public interface VerifiableCredentialTypeJpaRepository
+        extends PagingAndSortingRepository<VerifiableCredentialTypeEntity, String>,
+        CrudRepository<VerifiableCredentialTypeEntity, String>,
+        QuerydslPredicateExecutor<VerifiableCredentialTypeEntity> {
 }

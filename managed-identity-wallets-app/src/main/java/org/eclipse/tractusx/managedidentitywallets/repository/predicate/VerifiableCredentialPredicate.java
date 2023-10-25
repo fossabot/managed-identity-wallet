@@ -25,39 +25,53 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.QVerifiableCredentialEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
 
-import java.util.Objects;
+import java.util.Optional;
+
 
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public class VerifiableCredentialPredicate {
 
-    public static Predicate fromQuery(VerifiableCredentialQuery query) {
-        final BooleanBuilder predicate = new BooleanBuilder();
+    public static Predicate fromQuery(@NonNull VerifiableCredentialQuery query) {
+        final BooleanBuilder predicate = new BooleanBuilder(notNull());
 
-        final String id = query.getVerifiableCredentialId().getText();
-        final String type = query.getVerifiableCredentialType().getText();
-        final String walletId = query.getHolderWalletId().getText();
-        final String issuer = query.getVerifiableCredentialIssuer().getText();
+        /* By Verifiable Credential Id */
+        Optional.ofNullable(query.getVerifiableCredentialId())
+                .map(VerifiableCredentialId::getText)
+                .map(VerifiableCredentialPredicate::hasId)
+                .ifPresent(predicate::and);
 
-        if (Objects.nonNull(id)) {
-            predicate.and(hasId(id));
-        }
+        /* By Verifiable Credential Type */
+        Optional.ofNullable(query.getVerifiableCredentialType())
+                .map(VerifiableCredentialType::getText)
+                .map(VerifiableCredentialPredicate::hasType)
+                .ifPresent(predicate::and);
 
-        if (Objects.nonNull(walletId)) {
-            predicate.and(hasWallet(walletId));
-        }
+        /* By Wallet Id */
+        Optional.ofNullable(query.getHolderWalletId())
+                .map(WalletId::getText)
+                .map(VerifiableCredentialPredicate::hasWallet)
+                .ifPresent(predicate::and);
 
-        if (Objects.nonNull(type)) {
-            predicate.and(hasType(type));
-        }
-
-        if (Objects.nonNull(issuer)) {
-            predicate.and(hasIssuer(issuer));
-        }
+        /* By Issuer Id */
+        Optional.ofNullable(query.getVerifiableCredentialIssuer())
+                .map(VerifiableCredentialIssuer::getText)
+                .map(VerifiableCredentialPredicate::hasIssuer)
+                .ifPresent(predicate::and);
 
         return predicate;
+    }
+
+    private static BooleanExpression notNull() {
+        return QVerifiableCredentialEntity.verifiableCredentialEntity
+                .id.isNotNull();
     }
 
     private static BooleanExpression hasId(String id) {
@@ -85,5 +99,4 @@ public class VerifiableCredentialPredicate {
                 .id.verifiableCredentialIssuer
                 .issuer.eq(walletId);
     }
-
 }

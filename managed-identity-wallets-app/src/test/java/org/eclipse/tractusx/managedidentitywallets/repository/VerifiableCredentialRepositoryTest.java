@@ -21,8 +21,108 @@
 
 package org.eclipse.tractusx.managedidentitywallets.repository;
 
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import lombok.SneakyThrows;
+import org.eclipse.tractusx.managedidentitywallets.ManagedIdentityWalletsApplication;
+import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
+import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ContextConfiguration;
 
-@DataJpaTest
-public class VerifiableCredentialRepositoryTest {
+import java.util.Optional;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {ManagedIdentityWalletsApplication.class})
+@ContextConfiguration(initializers = {TestContextInitializer.class})
+public class VerifiableCredentialRepositoryTest extends AbstractRepositoryTest {
+
+    @Autowired
+    private VerifiableCredentialRepository verifiableCredentialRepository;
+
+    @Test
+    public void testCreate() {
+        final Wallet wallet = createRandomWallet();
+        final VerifiableCredential verifiableCredential = createRandomVerifiableCredential(wallet.getWalletId());
+
+        final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
+                .verifiableCredentialId(new VerifiableCredentialId(verifiableCredential.getId().toString()))
+                .build();
+        final Optional<VerifiableCredential> result = verifiableCredentialRepository.findOne(query);
+
+        Assertions.assertTrue(result.isPresent(), "VerifiableCredential not found");
+    }
+
+    @Test
+    @SneakyThrows
+    public void testDelete() {
+        final Wallet wallet = createRandomWallet();
+        final VerifiableCredential verifiableCredential = createRandomVerifiableCredential(wallet.getWalletId());
+
+        final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
+                .verifiableCredentialId(new VerifiableCredentialId(verifiableCredential.getId().toString()))
+                .build();
+
+        verifiableCredentialRepository.delete(verifiableCredential, wallet.getWalletId());
+        final Optional<VerifiableCredential> result = verifiableCredentialRepository.findOne(query);
+
+        Assertions.assertTrue(result.isPresent(), "VerifiableCredential not found");
+    }
+
+    @Test
+    @SneakyThrows
+    public void testFindByIssuer() {
+        final Wallet wallet = createRandomWallet();
+        final VerifiableCredential verifiableCredential = createRandomVerifiableCredential(wallet.getWalletId());
+        createRandomVerifiableCredential(wallet.getWalletId());
+        createRandomVerifiableCredential(wallet.getWalletId());
+
+        final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
+                .verifiableCredentialIssuer(new VerifiableCredentialIssuer(verifiableCredential.getIssuer().toString()))
+                .build();
+        final Page<VerifiableCredential> result = verifiableCredentialRepository.findAll(query, Pageable.unpaged());
+
+        Assertions.assertEquals(1, result.getTotalElements());
+        Assertions.assertEquals(verifiableCredential.getId(), result.getContent().get(0).getId());
+    }
+
+    @Test
+    @SneakyThrows
+    public void testFindByHolder() {
+        final Wallet wallet = createRandomWallet();
+        createRandomVerifiableCredential(wallet.getWalletId());
+        createRandomVerifiableCredential(wallet.getWalletId());
+        createRandomVerifiableCredential(wallet.getWalletId());
+
+        final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
+                .holderWalletId(wallet.getWalletId())
+                .build();
+        final Page<VerifiableCredential> result = verifiableCredentialRepository.findAll(query, Pageable.unpaged());
+
+        Assertions.assertEquals(3, result.getTotalElements());
+    }
+
+    @Test
+    @SneakyThrows
+    public void testFindByType() {
+        final Wallet wallet = createRandomWallet();
+
+        createRandomVerifiableCredential(wallet.getWalletId());
+        createRandomVerifiableCredential(wallet.getWalletId());
+        createRandomVerifiableCredential(wallet.getWalletId());
+
+        final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
+                .verifiableCredentialType(new VerifiableCredentialType("VerifiableCredential"))
+                .build();
+        final Page<VerifiableCredential> result = verifiableCredentialRepository.findAll(query, Pageable.unpaged());
+
+        Assertions.assertEquals(3, result.getTotalElements());
+    }
 }

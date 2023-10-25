@@ -22,10 +22,11 @@
 package org.eclipse.tractusx.managedidentitywallets.repository;
 
 import com.querydsl.core.types.Predicate;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.exceptions.WalletAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.exceptions.WalletDoesNotExistException;
-import org.eclipse.tractusx.managedidentitywallets.models.Ed25519Key;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.Ed25519KeyEntity;
@@ -33,24 +34,27 @@ import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntit
 import org.eclipse.tractusx.managedidentitywallets.repository.map.WalletMap;
 import org.eclipse.tractusx.managedidentitywallets.repository.predicate.WalletPredicate;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
+@Slf4j
 public class WalletRepository {
 
     private final WalletJpaRepository walletJpaRepository;
+    private final VerifiableCredentialWalletIntersectionJpaRepository verifiableCredentialWalletIntersectionJpaRepository;
     private final Ed25519KeyJpaRepository ed25519KeyJpaRepository;
     private final WalletMap walletMap;
 
     @Transactional
-    public void create(Wallet wallet) throws WalletAlreadyExistsException {
+    public void create(@NonNull Wallet wallet) throws WalletAlreadyExistsException {
 
         /* Create New Wallet */
         final String walletId = wallet.getWalletId().getText();
@@ -79,13 +83,15 @@ public class WalletRepository {
         }
 
         /* Write to DB */
+        if (log.isTraceEnabled()) {
+            log.trace("create: wallet={}", wallet);
+        }
         walletJpaRepository.save(walletEntity);
         ed25519KeyJpaRepository.saveAll(ed25519KeyEntities);
     }
 
-
     @Transactional
-    public void update(Wallet wallet) throws WalletDoesNotExistException {
+    public void update(@NonNull Wallet wallet) throws WalletDoesNotExistException {
 
         /* Assert Wallet Exists*/
         WalletQuery walletQuery = WalletQuery.builder()
@@ -116,17 +122,46 @@ public class WalletRepository {
         walletEntity.getEd25519Keys().addAll(ed25519KeyEntities);
 
         /* Write to DB */
+        if (log.isTraceEnabled()) {
+            log.trace("update: wallet={}", wallet);
+        }
         walletJpaRepository.save(walletEntity);
         ed25519KeyJpaRepository.saveAll(ed25519KeyEntities);
     }
 
-    public void delete(WalletId walletId) {
+    @Transactional
+    public void deleteAll() {
+        if (log.isTraceEnabled()) {
+            log.trace("delete all");
+        }
+        verifiableCredentialWalletIntersectionJpaRepository.deleteAll();
+        ed25519KeyJpaRepository.deleteAll();
+        walletJpaRepository.deleteAll();
+    }
+
+    public void delete(@NonNull WalletId walletId) {
+        if (log.isTraceEnabled()) {
+            log.trace("delete: wallet={}", walletId);
+        }
         walletJpaRepository.deleteById(walletId.getText());
     }
 
-    public Optional<Wallet> find(WalletQuery query) {
+    public Optional<Wallet> findOne(@NonNull WalletQuery query) {
         final Predicate predicate = WalletPredicate.fromQuery(query);
+        if (log.isTraceEnabled()) {
+            log.trace("findOne: predicate={}", predicate);
+        }
         return walletJpaRepository.findOne(predicate)
+                .map(walletMap::map);
+
+    }
+
+    public Page<Wallet> findAll(@NonNull WalletQuery query, @NonNull Pageable pageable) {
+        final Predicate predicate = WalletPredicate.fromQuery(query);
+        if (log.isTraceEnabled()) {
+            log.trace("findAll: predicate={}", predicate);
+        }
+        return walletJpaRepository.findAll(predicate, pageable)
                 .map(walletMap::map);
     }
 }

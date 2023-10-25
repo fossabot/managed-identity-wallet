@@ -22,26 +22,26 @@
 /* Wallet */
 CREATE TABLE IF NOT EXISTS wallet
 (
-    id          varchar(255)             NOT NULL,
-    version     char(8)                  DEFAULT 'v1',
-    name        varchar(255)             NOT NULL,
+    id          varchar(255) NOT NULL,
+    version     varchar(8)               DEFAULT 'v1',
+    name        varchar(255) NOT NULL,
     description varchar(255),
     created_at  timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     modified_at timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
 );
 
-CREATE UNIQUE INDEX wallet_name ON wallet (name);
+CREATE INDEX wallet_name ON wallet (name);
 
 /* Key */
 CREATE TABLE IF NOT EXISTS key_ed25519
 (
-    id             varchar(255)             NOT NULL,
-    version        char(8)                  DEFAULT 'v1',
-    did_identifier varchar(255)             NOT NULL,
+    id             varchar(255) NOT NULL,
+    version        varchar(8)               DEFAULT 'v1',
+    did_identifier varchar(255) NOT NULL,
     description    varchar(255),
-    vault_secret   varchar(255)             NOT NULL,
-    wallet_id      varchar(255)             NOT NULL,
+    vault_secret   varchar(255) NOT NULL,
+    wallet_id      varchar(255) NOT NULL,
     created_at     timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     modified_at    timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
@@ -52,7 +52,7 @@ CREATE TABLE IF NOT EXISTS key_ed25519
 CREATE TABLE IF NOT EXISTS verifiable_credential
 (
     id          varchar(255) NOT NULL,
-    version     char(8)      DEFAULT 'v1',
+    version     varchar(8)   DEFAULT 'v1',
     raw         text         NOT NULL,
     created_at  timestamp(6) DEFAULT CURRENT_TIMESTAMP,
     modified_at timestamp(6) NULL,
@@ -63,7 +63,7 @@ CREATE TABLE IF NOT EXISTS verifiable_credential
 CREATE TABLE IF NOT EXISTS verifiable_credential_type
 (
     type        varchar(255) NOT NULL,
-    version     char(8)      DEFAULT 'v1',
+    version     varchar(8)   DEFAULT 'v1',
     created_at  timestamp(6) DEFAULT CURRENT_TIMESTAMP,
     modified_at timestamp(6) NULL,
     PRIMARY KEY (type)
@@ -73,18 +73,18 @@ CREATE TABLE IF NOT EXISTS verifiable_credential_type
 CREATE TABLE IF NOT EXISTS verifiable_credential_issuer
 (
     issuer      varchar(255) NOT NULL,
-    version     char(8)      DEFAULT 'v1',
+    version     varchar(8)   DEFAULT 'v1',
     created_at  timestamp(6) DEFAULT CURRENT_TIMESTAMP,
     modified_at timestamp(6) NULL,
     PRIMARY KEY (issuer)
 );
 
 /* Verifiable Credential Intersection Table */
-CREATE TABLE IF NOT EXISTS verifiable_credential_intersection
+CREATE TABLE IF NOT EXISTS verifiable_credential_wallet_intersection
 (
     wallet_id                varchar(255) NOT NULL,
     verifiable_credential_id varchar(255) NOT NULL,
-    version                  char(8)      DEFAULT 'v1',
+    version                  varchar(8)   DEFAULT 'v1',
     created_at               timestamp(6) DEFAULT CURRENT_TIMESTAMP,
     modified_at              timestamp(6) NULL,
     PRIMARY KEY (wallet_id, verifiable_credential_id),
@@ -97,7 +97,7 @@ CREATE TABLE IF NOT EXISTS verifiable_credential_type_intersection
 (
     verifiable_credential_id      varchar(255) NOT NULL,
     verifiable_credential_type_id varchar(255) NOT NULL,
-    version                       char(8)      DEFAULT 'v1',
+    version                       varchar(8)   DEFAULT 'v1',
     created_at                    timestamp(6) DEFAULT CURRENT_TIMESTAMP,
     modified_at                   timestamp(6) NULL,
     PRIMARY KEY (verifiable_credential_id, verifiable_credential_type_id),
@@ -106,11 +106,11 @@ CREATE TABLE IF NOT EXISTS verifiable_credential_type_intersection
 );
 
 /* Verifiable Credential Issuer Intersection Table */
-CREATE TABLE IF NOT EXISTS verifiable_credential_type_intersection
+CREATE TABLE IF NOT EXISTS verifiable_credential_issuer_intersection
 (
     verifiable_credential_id        varchar(255) NOT NULL,
     verifiable_credential_issuer_id varchar(255) NOT NULL,
-    version                         char(8)      DEFAULT 'v1',
+    version                         varchar(8)   DEFAULT 'v1',
     created_at                      timestamp(6) DEFAULT CURRENT_TIMESTAMP,
     modified_at                     timestamp(6) NULL,
     PRIMARY KEY (verifiable_credential_id, verifiable_credential_issuer_id),

@@ -26,10 +26,13 @@ import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.NoArgsConstructor;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.QWalletEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public class WalletPredicate {
@@ -38,10 +41,15 @@ public class WalletPredicate {
 
         Predicate predicate = notNull();
 
-        final String id = query.getWalletId().getText();
+        final String id = Optional.ofNullable(query.getWalletId()).map(WalletId::getText).orElse(null);
+        final String name = Optional.ofNullable(query.getName()).map(WalletName::getText).orElse(null);
 
         if (Objects.nonNull(id)) {
             predicate = ExpressionUtils.and(predicate, hasId(id));
+        }
+
+        if (Objects.nonNull(name)) {
+            predicate = ExpressionUtils.and(predicate, hasName(name));
         }
 
         return predicate;
@@ -50,6 +58,11 @@ public class WalletPredicate {
     private static BooleanExpression hasId(String id) {
         return QWalletEntity.walletEntity
                 .id.eq(id);
+    }
+
+    private static BooleanExpression hasName(String name) {
+        return QWalletEntity.walletEntity
+                .name.eq(name);
     }
 
     private static BooleanExpression notNull() {

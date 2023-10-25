@@ -56,5 +56,5 @@ public class WalletEntity extends AbstractEntity {
     private List<Ed25519KeyEntity> ed25519Keys;
 
     @OneToMany(mappedBy = "id.wallet", cascade = CascadeType.ALL, orphanRemoval = true)
-    private Set<VerifiableCredentialIntersectionEntity> credentialIntersections;
+    private Set<VerifiableCredentialWalletIntersectionEntity> credentialIntersections;
 }

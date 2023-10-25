@@ -21,14 +21,14 @@
 
 package org.eclipse.tractusx.managedidentitywallets.repository;
 
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialIntersectionEntity;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialWalletIntersectionEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-interface VerifiableCredentialIntersectionJpaRepository
-        extends CrudRepository<VerifiableCredentialIntersectionEntity, VerifiableCredentialIntersectionEntity.VerifiableCredentialIntersectionEntityId>,
-        JpaRepository<VerifiableCredentialIntersectionEntity, VerifiableCredentialIntersectionEntity.VerifiableCredentialIntersectionEntityId> {
+interface VerifiableCredentialWalletIntersectionJpaRepository
+        extends CrudRepository<VerifiableCredentialWalletIntersectionEntity, VerifiableCredentialWalletIntersectionEntity.VerifiableCredentialIntersectionEntityId>,
+        JpaRepository<VerifiableCredentialWalletIntersectionEntity, VerifiableCredentialWalletIntersectionEntity.VerifiableCredentialIntersectionEntityId> {
 
 }

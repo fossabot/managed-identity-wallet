@@ -33,6 +33,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
@@ -40,7 +42,7 @@ import java.util.Optional;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {ManagedIdentityWalletsApplication.class})
 @ContextConfiguration(initializers = {TestContextInitializer.class})
-public class WalletRepositoryTest {
+public class WalletRepositoryTest extends AbstractRepositoryTest {
 
     @Autowired
     private WalletRepository walletRepository;
@@ -48,25 +50,14 @@ public class WalletRepositoryTest {
     @Test
     @SneakyThrows
     public void testWalletCreation() {
-
-        final WalletId walletId = new WalletId("foo");
-        final WalletName walletName = new WalletName("bar");
-        final WalletDescription walletDescription = new WalletDescription("baz");
-
-        final Wallet wallet = Wallet.builder()
-                .walletId(walletId)
-                .walletName(walletName)
-                .walletDescription(walletDescription)
-                .ed25519Keys(List.of())
-                .build();
-
-        walletRepository.create(wallet);
+        final Wallet wallet = createRandomWallet();
+        final WalletId walletId = wallet.getWalletId();
 
         final WalletQuery query = WalletQuery.builder()
                 .walletId(walletId)
                 .build();
 
-        final Optional<Wallet> result = walletRepository.find(query);
+        final Optional<Wallet> result = walletRepository.findOne(query);
 
         Assertions.assertTrue(result.isPresent(), "Wallet not found");
     }
@@ -96,7 +87,7 @@ public class WalletRepositoryTest {
                 .walletId(walletId)
                 .build();
 
-        final Optional<Wallet> result = walletRepository.find(query);
+        final Optional<Wallet> result = walletRepository.findOne(query);
 
         Assertions.assertTrue(result.isPresent(), "Wallet not found");
         Assertions.assertEquals(newWalletName, result.get().getWalletName(), "Wallet name not updated");
@@ -125,8 +116,36 @@ public class WalletRepositoryTest {
                 .walletId(walletId)
                 .build();
 
-        final Optional<Wallet> result = walletRepository.find(query);
+        final Optional<Wallet> result = walletRepository.findOne(query);
         Assertions.assertTrue(result.isEmpty(), "Wallet found, but should have been deleted");
     }
 
+    @Test
+    public void testFindById() {
+        final Wallet wallet = createRandomWallet();
+        createRandomWallet();
+        createRandomWallet();
+
+        final WalletQuery query = WalletQuery.builder()
+                .walletId(wallet.getWalletId())
+                .build();
+        final Page<Wallet> result = walletRepository.findAll(query, Pageable.unpaged());
+        Assertions.assertEquals(1, result.getTotalElements(), "Must be only one wallet");
+    }
+
+    @Test
+    public void testFindByName() {
+        final String name = "foo";
+        createWallet(null, name, null);
+        createWallet(null, name, null);
+        createRandomWallet();
+        createRandomWallet();
+
+        final WalletQuery query = WalletQuery.builder()
+                .name(new WalletName(name))
+                .build();
+        final Page<Wallet> result = walletRepository.findAll(query, Pageable.ofSize(1));
+        Assertions.assertEquals(2, result.getTotalElements(), "Must be two wallets");
+        Assertions.assertEquals(2, result.getTotalPages(), "Must be two pages");
+    }
 }

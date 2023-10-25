@@ -28,13 +28,11 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
 import org.eclipse.tractusx.managedidentitywallets.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.v1.entity.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.v1.exception.WalletNotFoundProblem;
 import org.eclipse.tractusx.managedidentitywallets.v2.service.VaultService;
 import org.eclipse.tractusx.ssi.lib.crypt.IPrivateKey;
 import org.eclipse.tractusx.ssi.lib.crypt.IPublicKey;
@@ -45,6 +43,8 @@ import org.eclipse.tractusx.ssi.lib.did.web.DidWebFactory;
 import org.eclipse.tractusx.ssi.lib.exception.DidParseException;
 import org.eclipse.tractusx.ssi.lib.model.did.*;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
@@ -52,7 +52,6 @@ import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 
 @Service
 @Slf4j
@@ -82,13 +81,13 @@ public class CommonService {
         final WalletQuery walletQuery = WalletQuery.builder()
                 .walletId(walletId)
                 .build();
-        final org.eclipse.tractusx.managedidentitywallets.models.Wallet wallet = walletRepository.find(walletQuery)
+        final org.eclipse.tractusx.managedidentitywallets.models.Wallet wallet = walletRepository.findOne(walletQuery)
                 .orElseThrow(() -> new RuntimeException("Wallet not found: " + bpn));
 
         final VerifiableCredentialQuery vcQuery = VerifiableCredentialQuery.builder()
                 .holderWalletId(walletId)
                 .build();
-        final List<VerifiableCredential> verifiableCredentials = verifiableCredentialRepository.findAll(vcQuery);
+        final Page<VerifiableCredential> verifiableCredentials = verifiableCredentialRepository.findAll(vcQuery, Pageable.unpaged());
 
         final Did did = getDidByBpn(bpn);
         final DidDocument didDocument = getDidDocument(wallet);
@@ -99,7 +98,7 @@ public class CommonService {
                 .name(wallet.getWalletName().getText())
                 .algorithm(StringPool.ED_25519)
                 .didDocument(didDocument)
-                .verifiableCredentials(verifiableCredentials)
+                .verifiableCredentials(verifiableCredentials.stream().toList())
                 .build();
     }
 

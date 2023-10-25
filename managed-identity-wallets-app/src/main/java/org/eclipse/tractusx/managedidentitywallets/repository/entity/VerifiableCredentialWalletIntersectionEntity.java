@@ -31,11 +31,11 @@ import java.io.Serializable;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id", callSuper = false)
-@Entity(name = VerifiableCredentialIntersectionEntity.TABLE_NAME)
-@Table(name = VerifiableCredentialIntersectionEntity.TABLE_NAME)
-public class VerifiableCredentialIntersectionEntity extends AbstractEntity {
+@Entity(name = VerifiableCredentialWalletIntersectionEntity.TABLE_NAME)
+@Table(name = VerifiableCredentialWalletIntersectionEntity.TABLE_NAME)
+public class VerifiableCredentialWalletIntersectionEntity extends AbstractEntity {
 
-    public static final String TABLE_NAME = "verifiable_credential_intersection";
+    public static final String TABLE_NAME = "verifiable_credential_wallet_intersection";
 
     public static final String COLUMN_WALLET_ID = "wallet_id";
     public static final String COLUMN_VERIFIABLE_CREDENTIAL_ID = "verifiable_credential_id";
