@@ -34,7 +34,7 @@ import java.util.Base64;
 
 public class TestContextInitializer implements ApplicationContextInitializer<ConfigurableApplicationContext> {
 
-    private static final int port = findFreePort();
+    public static final int PORT = findFreePort();
     private static final KeycloakContainer KEYCLOAK_CONTAINER = new KeycloakContainer().withRealmImportFile("miw-test-realm.json");
 
     @SneakyThrows
@@ -44,7 +44,7 @@ public class TestContextInitializer implements ApplicationContextInitializer<Con
         String authServerUrl = KEYCLOAK_CONTAINER.getAuthServerUrl();
         SecretKey secretKey = KeyGenerator.getInstance("AES").generateKey();
         TestPropertyValues.of(
-                "server.port=" + port,
+                "server.port=" + PORT,
                 "miw.host: localhost:${server.port}",
                 "miw.enforceHttps=false",
                 "miw.encryptionKey="+ Base64.getEncoder().encodeToString(secretKey.getEncoded()),

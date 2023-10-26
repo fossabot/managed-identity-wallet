@@ -29,7 +29,7 @@ import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
 import org.eclipse.tractusx.managedidentitywallets.v1.exception.WalletNotFoundProblem;
-import org.eclipse.tractusx.managedidentitywallets.v2.service.VaultService;
+import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
 import org.eclipse.tractusx.ssi.lib.crypt.ed25519.Ed25519Key;
 import org.springframework.stereotype.Service;
 

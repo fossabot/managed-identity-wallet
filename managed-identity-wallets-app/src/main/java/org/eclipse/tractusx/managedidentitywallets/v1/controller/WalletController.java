@@ -30,10 +30,9 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.tractusx.managedidentitywallets.v1.constant.RestURI;
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
 import org.eclipse.tractusx.managedidentitywallets.v1.dto.CreateWalletRequest;
 import org.eclipse.tractusx.managedidentitywallets.v1.entity.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.v1.service.WalletService;
+import org.eclipse.tractusx.managedidentitywallets.v1.service.WalletServiceV1;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -51,7 +50,7 @@ import java.util.Map;
 @Tag(name = "Wallets")
 public class WalletController extends BaseController {
 
-    private final WalletService service;
+    private final WalletServiceV1 service;
 
     /**
      * Create wallet response entity.

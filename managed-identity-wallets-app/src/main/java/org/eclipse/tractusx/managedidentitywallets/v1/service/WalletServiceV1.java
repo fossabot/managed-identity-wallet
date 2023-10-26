@@ -48,7 +48,7 @@ import java.util.Map;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class WalletService {
+public class WalletServiceV1 {
 
 
     /**

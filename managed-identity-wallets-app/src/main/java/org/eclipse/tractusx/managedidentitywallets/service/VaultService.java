@@ -19,7 +19,7 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.v2.service;
+package org.eclipse.tractusx.managedidentitywallets.service;
 
 import org.springframework.stereotype.Service;
 

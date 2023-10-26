@@ -19,16 +19,19 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository;
+package org.eclipse.tractusx.managedidentitywallets.config;
 
+import io.restassured.RestAssured;
 import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
+import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialBuilder;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialSubject;
 import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.BeforeAll;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.test.annotation.DirtiesContext;
 
 import java.net.URI;
 import java.time.Instant;
@@ -38,7 +41,13 @@ import java.util.UUID;
 
 import static org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialType.*;
 
-public abstract class AbstractRepositoryTest {
+public abstract class MiwIntegrationTest {
+
+    @BeforeAll
+    public static void setupAll() {
+        RestAssured.baseURI = "http://localhost";
+        RestAssured.port = TestContextInitializer.PORT;
+    }
 
     @AfterEach
     public void tearDown() {

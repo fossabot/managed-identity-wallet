@@ -19,37 +19,26 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.v2.delegate;
-
+package org.eclipse.tractusx.managedidentitywallets.v2.map;
 
 import lombok.RequiredArgsConstructor;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
-import org.eclipse.tractusx.managedidentitywallets.spring.controllers.v2.V2ApiDelegate;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.WalletResponseV2;
-import org.eclipse.tractusx.managedidentitywallets.v2.map.WalletResponseMap;
 import org.springframework.data.domain.Page;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
-
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {ManagedIdentityWalletsApplication.class})
-//@ContextConfiguration(initializers = {TestContextInitializer.class})
 @Component
 @RequiredArgsConstructor
-public class V2ApiDelegateImpl implements V2ApiDelegate {
+public class WalletResponseMap {
 
-    private final WalletService walletService;
-    private final WalletResponseMap walletResponseMap;
+    private final WalletObjectMap walletObjectMap;
 
-    @Override
-    public ResponseEntity<WalletResponseV2> adminWalletsGet(Integer page, Integer perPage) {
-        final Page<Wallet> wallets = walletService.findAll(page, perPage);
-        final WalletResponseV2 response = walletResponseMap.map(wallets);
-        return ResponseEntity.ok(response);
+    public WalletResponseV2 map(Page<Wallet> walletPage) {
+        final WalletResponseV2 response = new WalletResponseV2();
+        response.setSize(walletPage.getNumber());
+        response.setPage(walletPage.getNumber());
+        response.setTotalElements(walletPage.getTotalElements());
+        response.setItems(walletObjectMap.map(walletPage));
+        return response;
     }
 }

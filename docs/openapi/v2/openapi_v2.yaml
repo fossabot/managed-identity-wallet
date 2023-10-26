@@ -13,7 +13,8 @@ paths:
     post:
       tags:
         - V2
-        - DID
+        - DIDs
+        - Client
       summary: Resolve DID Document by DID
       description: Retrieves a DID Document by DID.
       requestBody:
@@ -32,6 +33,10 @@ paths:
 
   /wallet:
     get:
+      tags:
+        - V2
+        - Wallets
+        - Client
       summary: Get Wallet
       description: Retrieves wallet information.
       responses:
@@ -47,6 +52,7 @@ paths:
       tags:
         - V2
         - Verifiable Credentials
+        - Client
       summary: Get Verifiable Credentials
       description: Retrieves a list of Verifiable Credentials.
       responses:
@@ -61,6 +67,7 @@ paths:
       tags:
         - V2
         - Verifiable Credentials
+        - Client
       summary: Create Verifiable Credential
       description: Creates a new Verifiable Credential.
       requestBody:
@@ -77,6 +84,10 @@ paths:
 
   /verifiable-credentials/id:
     get:
+      tags:
+        - V2
+        - Verifiable Credentials
+        - Client
       summary: Get Verifiable Credential by ID
       description: Retrieves a verifiable credential by ID.
       parameters:
@@ -100,6 +111,7 @@ paths:
       tags:
         - V2
         - Verifiable Credentials
+        - Client
       summary: Delete Verifiable Credential
       description: Deletes a Verifiable Credential by ID.
       parameters:
@@ -120,6 +132,7 @@ paths:
       tags:
         - V2
         - Verifiable Presentations
+        - Client
       summary: Issue Verifiable Presentation
       description: Issues a new Verifiable Presentation.
       requestBody:
@@ -139,6 +152,7 @@ paths:
       tags:
         - V2
         - Verifiable Credentials
+        - Client
       summary: Issue Verifiable Credential
       description: Issues a new Verifiable Credential.
       requestBody:
@@ -172,6 +186,7 @@ paths:
       tags:
         - V2
         - Verifiable Credentials
+        - Client
       summary: Validate Verifiable Credential
       description: Validates a Verifiable Credential, checking schema, revocation, and signature.
       requestBody:
@@ -191,6 +206,7 @@ paths:
       tags:
         - V2
         - Verifiable Presentations
+        - Client
       summary: Validate Verifiable Presentation
       description: Validates a Verifiable Presentation, checking schema, revocation, and signature of VC and VP.
       requestBody:
@@ -212,16 +228,17 @@ paths:
         - Admin
         - Wallets
       summary: Get All Wallets
-      description: Retrieves a list of all wallets.
+      parameters:
+        - $ref: '#/components/parameters/Page'
+        - $ref: '#/components/parameters/Per_Page'
+      description: Retrieves a list of wallets.
       responses:
         '200':
           description: Successful response with a list of wallets.
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/Wallet'
+                $ref: '#/components/schemas/WalletResponse'
 
     post:
       tags:
@@ -466,9 +483,60 @@ paths:
           description: Bad request.
 
 components:
+  parameters:
+    Page:
+      name: page
+      in: query
+      required: false
+      description: The page to return
+      schema:
+        type: integer
+    Per_Page:
+      name: per_page
+      in: query
+      required: false
+      description: The maximum number of items to return per page
+      schema:
+        type: integer
   schemas:
+    Page:
+      type: object
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          description: The current page number.
+        size:
+          type: integer
+          minimum: 0
+          description: The number of items in the current page.
+        totalElements:
+          type: integer
+          format: int64
+          minimum: 0
+          description: The total number of items.
+    WalletResponse:
+      allOf:
+        - $ref: '#/components/schemas/Page'
+        - type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/Wallet'
     Wallet:
       type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the wallet.
+        name:
+          type: string
+          description: The name of the wallet.
+        description:
+          type: string
+          description: The description of the wallet.
+
     VerifiableCredential:
       type: object
     VerifiablePresentation:
