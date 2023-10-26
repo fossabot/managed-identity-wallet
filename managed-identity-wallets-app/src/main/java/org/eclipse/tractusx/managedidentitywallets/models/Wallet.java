@@ -21,14 +21,17 @@
 
 package org.eclipse.tractusx.managedidentitywallets.models;
 
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.NonNull;
 import lombok.Value;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Value
 @Builder
+@AllArgsConstructor
 public class Wallet {
 
     @NonNull
@@ -40,6 +43,6 @@ public class Wallet {
     @NonNull
     WalletName walletName;
 
-    @NonNull
-    List<Ed25519Key> ed25519Keys;
+    @Builder.Default
+    List<Ed25519Key> ed25519Keys = new ArrayList<>();
 }

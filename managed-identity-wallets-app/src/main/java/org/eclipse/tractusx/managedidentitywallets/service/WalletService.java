@@ -21,19 +21,40 @@
 
 package org.eclipse.tractusx.managedidentitywallets.service;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.event.*;
+import org.eclipse.tractusx.managedidentitywallets.exceptions.WalletAlreadyExistsException;
+import org.eclipse.tractusx.managedidentitywallets.exceptions.WalletDoesNotExistException;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationUtils;
+
+import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class WalletService {
 
     private final WalletRepository walletRepository;
+    private final ApplicationEventPublisher applicationEventPublisher;
+
+    public Optional<Wallet> findById(@NonNull WalletId id) {
+        final WalletQuery query = WalletQuery.builder()
+                .walletId(id)
+                .build();
+        return walletRepository.findOne(query);
+    }
 
     public Page<Wallet> findAll(int page, int size) {
         final WalletQuery query = WalletQuery.builder().build();
@@ -41,4 +62,31 @@ public class WalletService {
         return walletRepository.findAll(query, pageable);
     }
 
+    public void create(@NonNull Wallet wallet) throws WalletAlreadyExistsException {
+        applicationEventPublisher.publishEvent(new WalletCreatingEvent(wallet));
+        walletRepository.create(wallet);
+        afterCommit(() -> applicationEventPublisher.publishEvent(new WalletCreatedEvent(wallet)));
+    }
+
+    public void update(@NonNull Wallet wallet) throws WalletDoesNotExistException {
+        applicationEventPublisher.publishEvent(new WalletUpdatingEvent(wallet));
+        walletRepository.update(wallet);
+        afterCommit(() -> applicationEventPublisher.publishEvent(new WalletUpdatedEvent(wallet)));
+    }
+
+    public void delete(@NonNull Wallet wallet) {
+        applicationEventPublisher.publishEvent(new WalletDeletingEvent(wallet));
+        walletRepository.delete(wallet.getWalletId());
+        afterCommit(() -> applicationEventPublisher.publishEvent(new WalletDeletedEvent(wallet)));
+    }
+
+    private static void afterCommit(Runnable runnable) {
+        TransactionSynchronizationUtils.invokeAfterCommit(List.of(
+                new TransactionSynchronization() {
+                    @Override
+                    public void afterCommit() {
+                        runnable.run();
+                    }
+                }));
+    }
 }

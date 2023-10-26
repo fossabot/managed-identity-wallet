@@ -19,30 +19,18 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.v2.map;
+package org.eclipse.tractusx.managedidentitywallets.event;
 
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.WalletResponseV2;
-import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.WalletV2;
-import org.hibernate.annotations.Comment;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Component;
 
-import java.util.List;
-import java.util.stream.Collectors;
+@RequiredArgsConstructor
+@Getter
+public class WalletCreatedEvent {
 
-@Component
-public class WalletObjectMap {
-    public List<WalletV2> map(Page<Wallet> walletPage) {
+    @NonNull
+    private final Wallet wallet;
 
-        return walletPage.stream()
-                .map(w -> {
-                    var wallet = new WalletV2();
-                    wallet.id(w.getWalletId().getText());
-                    wallet.name(w.getWalletName().getText());
-                    wallet.description(w.getWalletDescription().getText());
-                    return wallet;
-                })
-                .collect(Collectors.toList());
-    }
 }

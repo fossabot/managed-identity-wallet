@@ -22,9 +22,13 @@
 package org.eclipse.tractusx.managedidentitywallets.v2.api;
 
 import org.eclipse.tractusx.managedidentitywallets.ManagedIdentityWalletsApplication;
-import org.eclipse.tractusx.managedidentitywallets.config.MiwIntegrationTest;
+import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
+import org.eclipse.tractusx.managedidentitywallets.util.MiwIntegrationTest;
 import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
+import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
@@ -35,8 +39,11 @@ import static org.hamcrest.Matchers.equalTo;
 @ContextConfiguration(initializers = {TestContextInitializer.class})
 public class AdminApiTest extends MiwIntegrationTest {
 
+    @Autowired
+    private WalletRepository walletRepository;
+
     @Test
-    public void testAdminApiWalletRequest() {
+    public void testAdminApiWalletGetRequest() {
 
         createRandomWallet();
         createRandomWallet();
@@ -49,5 +56,24 @@ public class AdminApiTest extends MiwIntegrationTest {
                 .body("size", equalTo(1))
                 .body("items.size()", equalTo(1))
                 .body("totalElements", equalTo(2));
+    }
+
+    @Test
+    public void testAdminApiWalletDeleteRequest() {
+
+        final Wallet wallet = createRandomWallet();
+        createRandomWallet();
+
+        when()
+                .delete("/api/v2/admin/wallets/" + wallet.getWalletId().getText())
+                .then()
+                .statusCode(204);
+
+        when()
+                .delete("/api/v2/admin/wallets/foo")
+                .then()
+                .statusCode(204);
+
+        Assertions.assertEquals(1, walletRepository.count(), "Wallet should have been deleted");
     }
 }

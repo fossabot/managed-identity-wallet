@@ -19,17 +19,17 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.models;
+package org.eclipse.tractusx.managedidentitywallets.event;
 
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.ToString;
-import lombok.Value;
+import lombok.RequiredArgsConstructor;
+import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 
-@Value
-@EqualsAndHashCode
-@ToString
-public class WalletId {
+@RequiredArgsConstructor
+@Getter
+public class WalletUpdatingEvent {
+
     @NonNull
-    String text;
+    private final Wallet wallet;
 }

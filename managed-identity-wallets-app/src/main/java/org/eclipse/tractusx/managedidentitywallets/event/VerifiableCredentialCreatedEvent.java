@@ -19,17 +19,16 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.models;
+package org.eclipse.tractusx.managedidentitywallets.event;
 
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.ToString;
-import lombok.Value;
+import lombok.RequiredArgsConstructor;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 
-@Value
-@EqualsAndHashCode
-@ToString
-public class WalletId {
+@RequiredArgsConstructor
+@Getter
+public class VerifiableCredentialCreatedEvent {
     @NonNull
-    String text;
+    private final VerifiableCredential verifiableCredential;
 }

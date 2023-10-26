@@ -22,34 +22,72 @@
 package org.eclipse.tractusx.managedidentitywallets.v2.delegate;
 
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.managedidentitywallets.spring.controllers.v2.V2ApiDelegate;
-import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.WalletResponseV2;
-import org.eclipse.tractusx.managedidentitywallets.v2.map.WalletResponseMap;
+import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.*;
+import org.eclipse.tractusx.managedidentitywallets.v2.map.WalletsApiMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.servlet.http.HttpServletResponse;
-import java.util.List;
+import java.util.Optional;
 
-//@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {ManagedIdentityWalletsApplication.class})
-//@ContextConfiguration(initializers = {TestContextInitializer.class})
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class V2ApiDelegateImpl implements V2ApiDelegate {
 
     private final WalletService walletService;
-    private final WalletResponseMap walletResponseMap;
+    private final WalletsApiMapper walletsApiMapper;
 
     @Override
-    public ResponseEntity<WalletResponseV2> adminWalletsGet(Integer page, Integer perPage) {
+    public ResponseEntity<Void> createWallet(@NonNull CreateWalletResponsePayloadV2 createWalletResponsePayloadV2) {
+        return V2ApiDelegate.super.createWallet(createWalletResponsePayloadV2);
+    }
+
+    @Override
+    public ResponseEntity<Void> deleteWalletById(@NonNull String walletId) {
+        if (log.isDebugEnabled()) {
+            log.debug("deleteWalletById(walletId={})", walletId);
+        }
+
+        walletService.findById(new WalletId(walletId)).ifPresent(walletService::delete);
+        return ResponseEntity.noContent().build();
+    }
+
+    @Override
+    public ResponseEntity<WalletResponsePayloadV2> getWalletById(@NonNull String walletId) {
+        return V2ApiDelegate.super.getWalletById(walletId);
+    }
+
+    @Override
+    public ResponseEntity<ListWalletsResponsePayloadV2> getWallets(Integer page, Integer perPage) {
+        if (log.isDebugEnabled()) {
+            log.debug("getWallets(page={}, perPage={})", page, perPage);
+        }
+
+        // TODO Make page size configurable
+        page = Optional.ofNullable(page).orElse(0);
+        perPage = Optional.ofNullable(perPage).orElse(10);
+
         final Page<Wallet> wallets = walletService.findAll(page, perPage);
-        final WalletResponseV2 response = walletResponseMap.map(wallets);
+        final ListWalletsResponsePayloadV2 response = walletsApiMapper.map(wallets);
         return ResponseEntity.ok(response);
     }
+
+    @Override
+    public ResponseEntity<UpdateWalletResponsePayloadV2> updateWalletById(@NonNull String walletId, @NonNull UpdateWalletRequestPayloadV2 updateWalletRequestPayloadV2) {
+        return V2ApiDelegate.super.updateWalletById(walletId, updateWalletRequestPayloadV2);
+    }
+
+    @Override
+    public ResponseEntity<WalletV2> walletGet() {
+        return V2ApiDelegate.super.walletGet();
+    }
+
 }

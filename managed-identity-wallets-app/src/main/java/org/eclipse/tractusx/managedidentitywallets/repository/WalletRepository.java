@@ -146,6 +146,18 @@ public class WalletRepository {
         walletJpaRepository.deleteById(walletId.getText());
     }
 
+    public long count() {
+        return count(WalletQuery.builder().build());
+    }
+
+    public long count(@NonNull WalletQuery query) {
+        final Predicate predicate = WalletPredicate.fromQuery(query);
+        if (log.isTraceEnabled()) {
+            log.trace("count: predicate={}", predicate);
+        }
+        return walletJpaRepository.count(predicate);
+    }
+
     public Optional<Wallet> findOne(@NonNull WalletQuery query) {
         final Predicate predicate = WalletPredicate.fromQuery(query);
         if (log.isTraceEnabled()) {

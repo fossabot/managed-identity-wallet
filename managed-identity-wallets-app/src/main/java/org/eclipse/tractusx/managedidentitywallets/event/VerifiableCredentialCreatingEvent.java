@@ -19,26 +19,16 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.v2.map;
+package org.eclipse.tractusx.managedidentitywallets.event;
 
+import lombok.Getter;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.WalletResponseV2;
-import org.springframework.data.domain.Page;
-import org.springframework.stereotype.Component;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 
-@Component
 @RequiredArgsConstructor
-public class WalletResponseMap {
-
-    private final WalletObjectMap walletObjectMap;
-
-    public WalletResponseV2 map(Page<Wallet> walletPage) {
-        final WalletResponseV2 response = new WalletResponseV2();
-        response.setSize(walletPage.getNumber());
-        response.setPage(walletPage.getNumber());
-        response.setTotalElements(walletPage.getTotalElements());
-        response.setItems(walletObjectMap.map(walletPage));
-        return response;
-    }
+@Getter
+public class VerifiableCredentialCreatingEvent {
+    @NonNull
+    private final VerifiableCredential verifiableCredential;
 }

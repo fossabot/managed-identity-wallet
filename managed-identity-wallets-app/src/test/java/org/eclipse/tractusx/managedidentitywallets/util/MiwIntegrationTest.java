@@ -19,10 +19,14 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.config;
+package org.eclipse.tractusx.managedidentitywallets.util;
 
 import io.restassured.RestAssured;
+import lombok.NonNull;
 import lombok.SneakyThrows;
+import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
+import org.eclipse.tractusx.managedidentitywallets.event.WalletCreatedEvent;
+import org.eclipse.tractusx.managedidentitywallets.event.WalletCreatingEvent;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
@@ -31,10 +35,13 @@ import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCreden
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialSubject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
+import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.event.EventListener;
 
 import java.net.URI;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -89,18 +96,22 @@ public abstract class MiwIntegrationTest {
 
     @SneakyThrows
     protected Wallet createWallet(String id, String name, String description) {
+        final Wallet wallet = newWalletObject(id, name, description);
+
+        walletRepository.create(wallet);
+        return wallet;
+    }
+
+    protected Wallet newWalletObject(String id, String name, String description) {
         final WalletId walletId = new WalletId(id == null ? UUID.randomUUID().toString() : id);
         final WalletName walletName = new WalletName(name == null ? UUID.randomUUID().toString() : name);
         final WalletDescription walletDescription = new WalletDescription(description == null ? UUID.randomUUID().toString() : description);
 
-        final Wallet wallet = Wallet.builder()
+        return Wallet.builder()
                 .walletId(walletId)
                 .walletName(walletName)
                 .walletDescription(walletDescription)
                 .ed25519Keys(List.of())
                 .build();
-
-        walletRepository.create(wallet);
-        return wallet;
     }
 }
