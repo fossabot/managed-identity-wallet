@@ -45,7 +45,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {ManagedIdentityWalletsApplication.class})
 @ContextConfiguration(initializers = {TestContextInitializer.class})
-public class V2ApiDelegateImplTest extends MiwIntegrationTest {
+public class AdministratorApiDelegateImplTest extends MiwIntegrationTest {
 
     @Autowired
     private WalletRepository walletRepository;

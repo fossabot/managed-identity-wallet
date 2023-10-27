@@ -34,7 +34,7 @@ import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
-import org.eclipse.tractusx.managedidentitywallets.spring.controllers.v2.V2ApiDelegate;
+import org.eclipse.tractusx.managedidentitywallets.spring.controllers.v2.AdministratorApiDelegate;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.*;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.data.domain.Page;
@@ -43,14 +43,13 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
 @Component
 @RequiredArgsConstructor
-public class V2ApiDelegateImpl implements V2ApiDelegate {
+public class AdministratorApiDelegateImpl implements AdministratorApiDelegate {
 
     private final MIWSettings miwSettings;
 
