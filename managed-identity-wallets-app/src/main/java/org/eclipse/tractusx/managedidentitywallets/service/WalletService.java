@@ -58,6 +58,10 @@ public class WalletService {
 
     public Page<Wallet> findAll(int page, int size) {
         final WalletQuery query = WalletQuery.builder().build();
+        return findAll(query, page, size);
+    }
+
+    public Page<Wallet> findAll(@NonNull WalletQuery query, int page, int size) {
         final Pageable pageable = Pageable.ofSize(size).withPage(page);
         return walletRepository.findAll(query, pageable);
     }
