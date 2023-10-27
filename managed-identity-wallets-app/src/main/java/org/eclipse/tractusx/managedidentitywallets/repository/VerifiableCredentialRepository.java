@@ -26,8 +26,8 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialAlreadyExistsException;
-import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialDoesNotExistException;
-import org.eclipse.tractusx.managedidentitywallets.exception.WalletDoesNotExistException;
+import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialNotFoundException;
+import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.HolderWalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.*;
@@ -60,8 +60,7 @@ public class VerifiableCredentialRepository {
     private final VerifiableCredentialEntityMap verifiableCredentialEntityMap;
 
     @Transactional
-    public void createWalletIntersection(@NonNull VerifiableCredentialId verifiableCredentialId, @NonNull HolderWalletId walletId)
-            throws WalletDoesNotExistException, VerifiableCredentialDoesNotExistException {
+    public void createWalletIntersection(@NonNull VerifiableCredentialId verifiableCredentialId, @NonNull HolderWalletId walletId) {
         if (log.isTraceEnabled()) {
             log.trace("createWalletIntersection: wallet={}, credential={}", walletId, verifiableCredentialId);
         }
@@ -69,14 +68,14 @@ public class VerifiableCredentialRepository {
         final WalletQuery walletQuery = WalletQuery.builder().walletId(walletId).build();
         final Predicate predicate = WalletPredicate.fromQuery(walletQuery);
         final WalletEntity walletEntity = walletJpaRepository.findOne(predicate)
-                .orElseThrow(() -> new WalletDoesNotExistException(walletId));
+                .orElseThrow(() -> new WalletNotFoundException(walletId));
 
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
                 .verifiableCredentialId(verifiableCredentialId)
                 .build();
         final Predicate vcPredicate = VerifiableCredentialPredicate.fromQuery(verifiableCredentialQuery);
         final VerifiableCredentialEntity verifiableCredentialEntity = verifiableCredentialJpaRepository.findOne(vcPredicate)
-                .orElseThrow(() -> new VerifiableCredentialDoesNotExistException(verifiableCredentialId));
+                .orElseThrow(() -> new VerifiableCredentialNotFoundException(verifiableCredentialId));
 
         // Verifiable Credential - Wallet Intersection
         final VerifiableCredentialWalletIntersectionEntity.VerifiableCredentialIntersectionEntityId verifiableCredentialIntersectionEntityId = new VerifiableCredentialWalletIntersectionEntity.VerifiableCredentialIntersectionEntityId();
@@ -89,7 +88,7 @@ public class VerifiableCredentialRepository {
     }
 
     @Transactional
-    public void create(@NonNull VerifiableCredential vc) throws VerifiableCredentialAlreadyExistsException {
+    public void create(@NonNull VerifiableCredential vc) {
         if (log.isTraceEnabled()) {
             log.trace("create: credential={}", vc);
         }
@@ -153,7 +152,7 @@ public class VerifiableCredentialRepository {
     }
 
     @Transactional
-    public void deleteWalletIntersection(@NonNull VerifiableCredentialId verifiableCredentialId, @NonNull HolderWalletId walletId) throws WalletDoesNotExistException, VerifiableCredentialDoesNotExistException {
+    public void deleteWalletIntersection(@NonNull VerifiableCredentialId verifiableCredentialId, @NonNull HolderWalletId walletId) throws WalletNotFoundException, VerifiableCredentialNotFoundException {
         if (log.isTraceEnabled()) {
             log.trace("deleteWalletIntersection: walletId={}, credentialId={}", walletId, verifiableCredentialId);
         }
@@ -161,14 +160,14 @@ public class VerifiableCredentialRepository {
         final WalletQuery walletQuery = WalletQuery.builder().walletId(walletId).build();
         final Predicate predicate = WalletPredicate.fromQuery(walletQuery);
         final WalletEntity walletEntity = walletJpaRepository.findOne(predicate)
-                .orElseThrow(() -> new WalletDoesNotExistException(walletId));
+                .orElseThrow(() -> new WalletNotFoundException(walletId));
 
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
                 .verifiableCredentialId(verifiableCredentialId)
                 .build();
         final Predicate vcPredicate = VerifiableCredentialPredicate.fromQuery(verifiableCredentialQuery);
         final VerifiableCredentialEntity verifiableCredentialEntity = verifiableCredentialJpaRepository.findOne(vcPredicate)
-                .orElseThrow(() -> new VerifiableCredentialDoesNotExistException(verifiableCredentialId));
+                .orElseThrow(() -> new VerifiableCredentialNotFoundException(verifiableCredentialId));
 
         // Verifiable Credential - Wallet Intersection
         final VerifiableCredentialWalletIntersectionEntity.VerifiableCredentialIntersectionEntityId verifiableCredentialIntersectionEntityId = new VerifiableCredentialWalletIntersectionEntity.VerifiableCredentialIntersectionEntityId();

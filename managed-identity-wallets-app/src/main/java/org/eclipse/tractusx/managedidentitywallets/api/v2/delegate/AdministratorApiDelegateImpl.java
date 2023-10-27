@@ -28,8 +28,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.map.VerifiableCredentialsMapper;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.map.WalletsApiMapper;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
-import org.eclipse.tractusx.managedidentitywallets.exception.WalletAlreadyExistsException;
-import org.eclipse.tractusx.managedidentitywallets.exception.WalletDoesNotExistException;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
@@ -67,24 +65,19 @@ public class AdministratorApiDelegateImpl implements AdministratorApiDelegate {
 
         final Wallet wallet = apiMapper.mapCreateWalletResponsePayloadV2(createWalletResponsePayloadV2);
 
-        try {
-            walletService.create(wallet);
-            final Optional<Wallet> createdWallet = walletService.findById(wallet.getWalletId());
-            if (createdWallet.isPresent()) {
-                final CreateWalletResponsePayloadV2 response = apiMapper.mapCreateWalletResponsePayloadV2(createdWallet.get());
-                final URI location = ServletUriComponentsBuilder
-                        .fromCurrentRequest()
-                        .path("/{id}")
-                        .buildAndExpand(wallet.getWalletId().getText())
-                        .toUri();
-                return ResponseEntity.created(location).body(response);
-            } else {
-                log.error("Wallet {} was not created", wallet.getWalletId());
-                return ResponseEntity.internalServerError().build();
-            }
-
-        } catch (WalletAlreadyExistsException e) {
-            return ResponseEntity.status(409).build();
+        walletService.create(wallet);
+        final Optional<Wallet> createdWallet = walletService.findById(wallet.getWalletId());
+        if (createdWallet.isPresent()) {
+            final CreateWalletResponsePayloadV2 response = apiMapper.mapCreateWalletResponsePayloadV2(createdWallet.get());
+            final URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(wallet.getWalletId().getText())
+                    .toUri();
+            return ResponseEntity.created(location).body(response);
+        } else {
+            log.error("Wallet {} was not created", wallet.getWalletId());
+            return ResponseEntity.internalServerError().build();
         }
     }
 
@@ -131,20 +124,15 @@ public class AdministratorApiDelegateImpl implements AdministratorApiDelegate {
         if (log.isDebugEnabled()) {
             log.debug("updateWalletById(updateWalletRequestPayloadV2={})", updateWalletRequestPayloadV2);
         }
-        try {
-            final Wallet wallet = apiMapper.mapUpdateWalletRequestPayloadV2(updateWalletRequestPayloadV2);
-            walletService.update(wallet);
-            final Optional<Wallet> updatedWallet = walletService.findById(wallet.getWalletId());
-            if (updatedWallet.isPresent()) {
-                final UpdateWalletResponsePayloadV2 response = apiMapper.mapUpdateWalletResponsePayloadV2(updatedWallet.get());
-                return ResponseEntity.status(202).body(response);
-            } else {
-                log.error("Wallet {} was not updated", wallet.getWalletId());
-                return ResponseEntity.internalServerError().build();
-            }
-
-        } catch (WalletDoesNotExistException e) {
-            return ResponseEntity.notFound().build();
+        final Wallet wallet = apiMapper.mapUpdateWalletRequestPayloadV2(updateWalletRequestPayloadV2);
+        walletService.update(wallet);
+        final Optional<Wallet> updatedWallet = walletService.findById(wallet.getWalletId());
+        if (updatedWallet.isPresent()) {
+            final UpdateWalletResponsePayloadV2 response = apiMapper.mapUpdateWalletResponsePayloadV2(updatedWallet.get());
+            return ResponseEntity.status(202).body(response);
+        } else {
+            log.error("Wallet {} was not updated", wallet.getWalletId());
+            return ResponseEntity.internalServerError().build();
         }
     }
 

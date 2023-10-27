@@ -21,8 +21,10 @@
 
 package org.eclipse.tractusx.managedidentitywallets.exception;
 
+import lombok.Getter;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 
+@Getter
 public class VerifiableCredentialAlreadyExistsException extends RuntimeException {
 
     private final VerifiableCredentialId verifiableCredentialId;

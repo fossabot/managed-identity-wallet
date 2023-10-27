@@ -24,8 +24,9 @@ package org.eclipse.tractusx.managedidentitywallets.api;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialAlreadyExistsException;
+import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletAlreadyExistsException;
-import org.eclipse.tractusx.managedidentitywallets.exception.WalletDoesNotExistException;
+import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -36,24 +37,31 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 @ControllerAdvice
 public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
-    @ExceptionHandler(value = {WalletDoesNotExistException.class})
+    @ExceptionHandler(value = {WalletNotFoundException.class})
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     @ResponseBody
-    public ResponseEntity<String> handleValidationFailure(WalletDoesNotExistException ex) {
-        return ResponseEntity.badRequest().body(ex.getMessage());
+    public ResponseEntity<String> handleWalletDoesNotExistException(WalletNotFoundException ex) {
+        return ResponseEntity.status(404).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(value = {VerifiableCredentialNotFoundException.class})
+    @ResponseStatus(value = HttpStatus.NOT_FOUND)
+    @ResponseBody
+    public ResponseEntity<String> handleVerifiableCredentialDoesNotExistException(VerifiableCredentialNotFoundException ex) {
+        return ResponseEntity.status(404).body(ex.getMessage());
     }
 
     @ExceptionHandler(value = {VerifiableCredentialAlreadyExistsException.class})
     @ResponseStatus(value = HttpStatus.CONFLICT)
     @ResponseBody
-    public ResponseEntity<String> handleValidationFailure(VerifiableCredentialAlreadyExistsException ex) {
+    public ResponseEntity<String> handleVerifiableCredentialAlreadyExistsException(VerifiableCredentialAlreadyExistsException ex) {
         return ResponseEntity.status(409).body(ex.getMessage());
     }
 
     @ExceptionHandler(value = {WalletAlreadyExistsException.class})
     @ResponseStatus(value = HttpStatus.CONFLICT)
     @ResponseBody
-    public ResponseEntity<String> handleValidationFailure(WalletAlreadyExistsException ex) {
+    public ResponseEntity<String> handleWalletAlreadyExistsException(WalletAlreadyExistsException ex) {
         return ResponseEntity.status(409).body(ex.getMessage());
     }
 

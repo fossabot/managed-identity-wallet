@@ -26,7 +26,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletAlreadyExistsException;
-import org.eclipse.tractusx.managedidentitywallets.exception.WalletDoesNotExistException;
+import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.HolderWalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.Ed25519KeyEntity;
@@ -54,7 +54,7 @@ public class WalletRepository {
     private final WalletMap walletMap;
 
     @Transactional
-    public void create(@NonNull Wallet wallet) throws WalletAlreadyExistsException {
+    public void create(@NonNull Wallet wallet) {
 
         /* Create New Wallet */
         final String walletId = wallet.getWalletId().getText();
@@ -91,7 +91,7 @@ public class WalletRepository {
     }
 
     @Transactional
-    public void update(@NonNull Wallet wallet) throws WalletDoesNotExistException {
+    public void update(@NonNull Wallet wallet) {
 
         /* Assert Wallet Exists*/
         WalletQuery walletQuery = WalletQuery.builder()
@@ -99,7 +99,7 @@ public class WalletRepository {
                 .build();
         final Predicate predicate = WalletPredicate.fromQuery(walletQuery);
         WalletEntity walletEntity = walletJpaRepository.findOne(predicate)
-                .orElseThrow(() -> new WalletDoesNotExistException(wallet.getWalletId()));
+                .orElseThrow(() -> new WalletNotFoundException(wallet.getWalletId()));
 
         /* Update Wallet */
         final String walletName = wallet.getWalletName().getText();

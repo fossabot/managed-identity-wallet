@@ -25,11 +25,11 @@ import lombok.Getter;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 
 @Getter
-public class VerifiableCredentialDoesNotExistException extends Exception {
+public class VerifiableCredentialNotFoundException extends RuntimeException {
 
     private final VerifiableCredentialId verifiableCredentialId;
 
-    public VerifiableCredentialDoesNotExistException(VerifiableCredentialId verifiableCredentialId) {
+    public VerifiableCredentialNotFoundException(VerifiableCredentialId verifiableCredentialId) {
         super("VerifiableCredential does not exist. " + verifiableCredentialId);
         this.verifiableCredentialId = verifiableCredentialId;
     }

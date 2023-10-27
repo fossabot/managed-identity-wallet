@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.event.*;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletAlreadyExistsException;
-import org.eclipse.tractusx.managedidentitywallets.exception.WalletDoesNotExistException;
+import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.HolderWalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
@@ -66,13 +66,13 @@ public class WalletService {
         return walletRepository.findAll(query, pageable);
     }
 
-    public void create(@NonNull Wallet wallet) throws WalletAlreadyExistsException {
+    public void create(@NonNull Wallet wallet) {
         applicationEventPublisher.publishEvent(new WalletCreatingEvent(wallet));
         walletRepository.create(wallet);
         afterCommit(() -> applicationEventPublisher.publishEvent(new WalletCreatedEvent(wallet)));
     }
 
-    public void update(@NonNull Wallet wallet) throws WalletDoesNotExistException {
+    public void update(@NonNull Wallet wallet) {
         applicationEventPublisher.publishEvent(new WalletUpdatingEvent(wallet));
         walletRepository.update(wallet);
         afterCommit(() -> applicationEventPublisher.publishEvent(new WalletUpdatedEvent(wallet)));
