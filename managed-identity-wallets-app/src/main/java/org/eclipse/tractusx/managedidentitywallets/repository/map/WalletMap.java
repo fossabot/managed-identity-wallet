@@ -36,7 +36,7 @@ public class WalletMap extends AbstractMap<Wallet, WalletEntity> {
     @Override
     public Wallet map(@NonNull WalletEntity entity) throws MappingException {
 
-        final WalletId walletId = new WalletId(entity.getId());
+        final HolderWalletId walletId = new HolderWalletId(entity.getId());
         final WalletName walletName = new WalletName(entity.getName());
         final WalletDescription walletDescription = new WalletDescription(entity.getDescription());
 

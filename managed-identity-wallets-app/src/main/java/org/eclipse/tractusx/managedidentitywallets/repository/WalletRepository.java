@@ -27,8 +27,8 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletDoesNotExistException;
+import org.eclipse.tractusx.managedidentitywallets.models.HolderWalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.Ed25519KeyEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.map.WalletMap;
@@ -140,7 +140,7 @@ public class WalletRepository {
     }
 
     @Transactional
-    public void delete(@NonNull WalletId walletId) {
+    public void delete(@NonNull HolderWalletId walletId) {
         if (log.isTraceEnabled()) {
             log.trace("delete: wallet={}", walletId);
         }

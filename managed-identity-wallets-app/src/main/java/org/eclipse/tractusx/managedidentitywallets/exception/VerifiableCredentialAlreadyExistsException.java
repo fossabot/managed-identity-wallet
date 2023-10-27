@@ -23,7 +23,7 @@ package org.eclipse.tractusx.managedidentitywallets.exception;
 
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 
-public class VerifiableCredentialAlreadyExistsException extends Exception {
+public class VerifiableCredentialAlreadyExistsException extends RuntimeException {
 
     private final VerifiableCredentialId verifiableCredentialId;
 

@@ -23,6 +23,7 @@ package org.eclipse.tractusx.managedidentitywallets.api.v2.map;
 
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.*;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.domain.Page;
@@ -70,4 +71,10 @@ public interface WalletsApiMapper {
     @Mapping(target = "totalElements", source = "totalElements")
     @Mapping(target = "items", source = "content")
     ListWalletsResponsePayloadV2 mapListWalletsResponsePayloadV2(Page<Wallet> wallets);
+
+    @Mapping(target = "size", source = "numberOfElements")
+    @Mapping(target = "page", source = "number")
+    @Mapping(target = "totalElements", source = "totalElements")
+    @Mapping(target = "items", source = "content")
+    VerifiableCredentialListResponsePayloadV2 mapVerifiableCredentialListResponsePayloadV2(Page<VerifiableCredential> verifiableCredentials);
 }

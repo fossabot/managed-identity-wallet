@@ -26,7 +26,7 @@ import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletDescription;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.models.HolderWalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
 import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
@@ -93,7 +93,7 @@ public abstract class MiwIntegrationTest {
     }
 
     protected Wallet newWalletObject(String id, String name, String description) {
-        final WalletId walletId = new WalletId(id == null ? UUID.randomUUID().toString() : id);
+        final HolderWalletId walletId = new HolderWalletId(id == null ? UUID.randomUUID().toString() : id);
         final WalletName walletName = new WalletName(name == null ? UUID.randomUUID().toString() : name);
         final WalletDescription walletDescription = new WalletDescription(description == null ? UUID.randomUUID().toString() : description);
 

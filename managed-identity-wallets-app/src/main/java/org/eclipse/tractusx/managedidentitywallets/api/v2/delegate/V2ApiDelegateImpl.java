@@ -30,11 +30,13 @@ import org.eclipse.tractusx.managedidentitywallets.api.v2.map.WalletsApiMapper;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletDoesNotExistException;
-import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.models.*;
+import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
+import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.managedidentitywallets.spring.controllers.v2.V2ApiDelegate;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.*;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -50,9 +52,12 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class V2ApiDelegateImpl implements V2ApiDelegate {
 
-    private final WalletService walletService;
-    private final WalletsApiMapper walletsApiMapper;
     private final MIWSettings miwSettings;
+
+    private final WalletService walletService;
+    private final WalletsApiMapper apiMapper;
+
+    private final VerifiableCredentialService verifiableCredentialService;
     private final VerifiableCredentialsMapper verifiableCredentialsMapper;
 
     @Override
@@ -61,13 +66,13 @@ public class V2ApiDelegateImpl implements V2ApiDelegate {
             log.debug("createWallet(wallet={})", createWalletResponsePayloadV2);
         }
 
-        final Wallet wallet = walletsApiMapper.mapCreateWalletResponsePayloadV2(createWalletResponsePayloadV2);
+        final Wallet wallet = apiMapper.mapCreateWalletResponsePayloadV2(createWalletResponsePayloadV2);
 
         try {
             walletService.create(wallet);
             final Optional<Wallet> createdWallet = walletService.findById(wallet.getWalletId());
             if (createdWallet.isPresent()) {
-                final CreateWalletResponsePayloadV2 response = walletsApiMapper.mapCreateWalletResponsePayloadV2(createdWallet.get());
+                final CreateWalletResponsePayloadV2 response = apiMapper.mapCreateWalletResponsePayloadV2(createdWallet.get());
                 final URI location = ServletUriComponentsBuilder
                         .fromCurrentRequest()
                         .path("/{id}")
@@ -90,7 +95,7 @@ public class V2ApiDelegateImpl implements V2ApiDelegate {
             log.debug("deleteWalletById(walletId={})", walletId);
         }
 
-        walletService.findById(new WalletId(walletId)).ifPresent(walletService::delete);
+        walletService.findById(new HolderWalletId(walletId)).ifPresent(walletService::delete);
         return ResponseEntity.noContent().build();
     }
 
@@ -100,9 +105,9 @@ public class V2ApiDelegateImpl implements V2ApiDelegate {
             log.debug("getWalletById(walletId={})", walletId);
         }
 
-        final Optional<Wallet> wallet = walletService.findById(new WalletId(walletId));
+        final Optional<Wallet> wallet = walletService.findById(new HolderWalletId(walletId));
         if (wallet.isPresent()) {
-            final WalletResponsePayloadV2 payloadV2 = walletsApiMapper.mapWalletResponsePayloadV2(wallet.get());
+            final WalletResponsePayloadV2 payloadV2 = apiMapper.mapWalletResponsePayloadV2(wallet.get());
             return ResponseEntity.ok(payloadV2);
         }
         return ResponseEntity.notFound().build();
@@ -118,7 +123,7 @@ public class V2ApiDelegateImpl implements V2ApiDelegate {
         perPage = Optional.ofNullable(perPage).orElse(miwSettings.apiDefaultPageSize());
 
         final Page<Wallet> wallets = walletService.findAll(page, perPage);
-        final ListWalletsResponsePayloadV2 response = walletsApiMapper.mapListWalletsResponsePayloadV2(wallets);
+        final ListWalletsResponsePayloadV2 response = apiMapper.mapListWalletsResponsePayloadV2(wallets);
         return ResponseEntity.ok(response);
     }
 
@@ -128,11 +133,11 @@ public class V2ApiDelegateImpl implements V2ApiDelegate {
             log.debug("updateWalletById(updateWalletRequestPayloadV2={})", updateWalletRequestPayloadV2);
         }
         try {
-            final Wallet wallet = walletsApiMapper.mapUpdateWalletRequestPayloadV2(updateWalletRequestPayloadV2);
+            final Wallet wallet = apiMapper.mapUpdateWalletRequestPayloadV2(updateWalletRequestPayloadV2);
             walletService.update(wallet);
             final Optional<Wallet> updatedWallet = walletService.findById(wallet.getWalletId());
             if (updatedWallet.isPresent()) {
-                final UpdateWalletResponsePayloadV2 response = walletsApiMapper.mapUpdateWalletResponsePayloadV2(updatedWallet.get());
+                final UpdateWalletResponsePayloadV2 response = apiMapper.mapUpdateWalletResponsePayloadV2(updatedWallet.get());
                 return ResponseEntity.status(202).body(response);
             } else {
                 log.error("Wallet {} was not updated", wallet.getWalletId());
@@ -154,23 +159,67 @@ public class V2ApiDelegateImpl implements V2ApiDelegate {
             return ResponseEntity.badRequest().build();
         }
 
-        final Map<String, Object> vc = verifiableCredentialsMapper.map(requestBody);
+        final VerifiableCredential verifiableCredential = verifiableCredentialsMapper.map(requestBody);
+        verifiableCredentialService.create(verifiableCredential);
 
-        return V2ApiDelegate.super.adminCreateVerifiableCredential(requestBody);
+        final VerifiableCredentialId verifiableCredentialId = new VerifiableCredentialId(verifiableCredential.getId().toString());
+        final Optional<VerifiableCredential> createdVerifiableCredential = verifiableCredentialService.findById(verifiableCredentialId);
+        if (createdVerifiableCredential.isPresent()) {
+            final URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(verifiableCredentialId.getText())
+                    .toUri();
+            return ResponseEntity.created(location).body(createdVerifiableCredential.get());
+        } else {
+            log.error("Verifiable Credential {} was not created", verifiableCredential.getId());
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+    @Override
+    public ResponseEntity<Map<String, Object>> adminGetVerifiableCredentialById(String verifiableCredentialId) {
+        if (log.isDebugEnabled()) {
+            log.debug("deleteVerifiableCredentialById(verifiableCredentialId={})", verifiableCredentialId);
+        }
+
+        final Optional<VerifiableCredential> wallet = verifiableCredentialService.findById(new VerifiableCredentialId(verifiableCredentialId));
+        return wallet
+                .<ResponseEntity<Map<String, Object>>>map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @Override
     public ResponseEntity<Void> adminDeleteVerifiableCredentialById(String verifiableCredentialId) {
-        return V2ApiDelegate.super.adminDeleteVerifiableCredentialById(verifiableCredentialId);
+        if (log.isDebugEnabled()) {
+            log.debug("deleteVerifiableCredentialById(verifiableCredentialId={})", verifiableCredentialId);
+        }
+
+        verifiableCredentialService.findById(new VerifiableCredentialId(verifiableCredentialId)).ifPresent(verifiableCredentialService::delete);
+        return ResponseEntity.noContent().build();
     }
 
     @Override
-    public ResponseEntity<List<Map<String, Object>>> adminGetVerifiableCredentialById(String verifiableCredentialId) {
-        return V2ApiDelegate.super.adminGetVerifiableCredentialById(verifiableCredentialId);
-    }
+    public ResponseEntity<VerifiableCredentialListResponsePayloadV2> adminGetVerifiableCredentials
+            (Integer page, Integer perPage, String id, String type, String issuer, String holder) {
 
-    @Override
-    public ResponseEntity<List<Map<String, Object>>> adminGetVerifiableCredentials(Integer page, Integer perPage, String id, String type, String issuer, String holder) {
-        return V2ApiDelegate.super.adminGetVerifiableCredentials(page, perPage, id, type, issuer, holder);
+        if (log.isDebugEnabled()) {
+            log.debug("getWallets(page={}, perPage={})", page, perPage);
+        }
+
+        page = Optional.ofNullable(page).orElse(0);
+        perPage = Optional.ofNullable(perPage).orElse(miwSettings.apiDefaultPageSize());
+
+        final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
+                .verifiableCredentialIssuer(Optional.ofNullable(issuer).map(VerifiableCredentialIssuer::new).orElse(null))
+                .verifiableCredentialId(Optional.ofNullable(id).map(VerifiableCredentialId::new).orElse(null))
+                .verifiableCredentialType(Optional.ofNullable(type).map(VerifiableCredentialType::new).orElse(null))
+                .holderWalletId(Optional.ofNullable(holder).map(HolderWalletId::new).orElse(null))
+                .build();
+
+        final Page<VerifiableCredential> verifiableCredentials = verifiableCredentialService.findAll(verifiableCredentialQuery, page, perPage);
+        final VerifiableCredentialListResponsePayloadV2 payload = apiMapper.mapVerifiableCredentialListResponsePayloadV2(verifiableCredentials);
+
+        return ResponseEntity.ok(payload);
     }
 }

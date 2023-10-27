@@ -22,18 +22,15 @@
 package org.eclipse.tractusx.managedidentitywallets.repository.predicate;
 
 import com.querydsl.core.BooleanBuilder;
-import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.models.HolderWalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.QWalletEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
 
-import java.util.Objects;
 import java.util.Optional;
 
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
@@ -45,7 +42,7 @@ public class WalletPredicate {
 
         /* By Wallet Id */
         Optional.ofNullable(query.getWalletId())
-                .map(WalletId::getText)
+                .map(HolderWalletId::getText)
                 .map(WalletPredicate::hasId)
                 .ifPresent(predicate::and);
 

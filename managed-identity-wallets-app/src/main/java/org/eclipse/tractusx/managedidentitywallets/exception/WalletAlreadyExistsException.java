@@ -21,14 +21,16 @@
 
 package org.eclipse.tractusx.managedidentitywallets.exception;
 
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import lombok.Getter;
+import org.eclipse.tractusx.managedidentitywallets.models.HolderWalletId;
 
-public class WalletAlreadyExistsException extends Exception {
+@Getter
+public class WalletAlreadyExistsException extends RuntimeException {
 
-    private final WalletId walletId;
+    private final HolderWalletId walletId;
 
-    public WalletAlreadyExistsException(org.eclipse.tractusx.managedidentitywallets.models.WalletId walletId) {
-        super("Wallet already exists. " + walletId);
+    public WalletAlreadyExistsException(HolderWalletId walletId) {
+        super(String.format("Wallet %s already exists.", walletId));
         this.walletId = walletId;
     }
 }

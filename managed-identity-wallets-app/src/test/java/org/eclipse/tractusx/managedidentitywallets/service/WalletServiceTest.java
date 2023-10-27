@@ -29,7 +29,7 @@ import org.eclipse.tractusx.managedidentitywallets.event.*;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletDescription;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.models.HolderWalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
@@ -95,7 +95,7 @@ public class WalletServiceTest extends MiwIntegrationTest {
     public void testWalletUpdate() {
         final Wallet originalWallet = createRandomWallet();
 
-        final WalletId originalId = originalWallet.getWalletId();
+        final HolderWalletId originalId = originalWallet.getWalletId();
         final WalletName newName = new WalletName("updatedName");
         final WalletDescription newDescription = new WalletDescription("updatedDescription");
         final Wallet modifiedWallet = Wallet.builder()
@@ -143,7 +143,7 @@ public class WalletServiceTest extends MiwIntegrationTest {
         createWallet("2", "name", "2");
         createWallet("3", "name", "3");
 
-        final Optional<Wallet> wallet = walletService.findById(new WalletId("1"));
+        final Optional<Wallet> wallet = walletService.findById(new HolderWalletId("1"));
 
         Assertions.assertTrue(wallet.isPresent(), "Wallet should be present");
     }

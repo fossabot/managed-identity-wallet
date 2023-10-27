@@ -29,7 +29,7 @@ import lombok.NonNull;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.models.HolderWalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.QVerifiableCredentialEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
 
@@ -56,7 +56,7 @@ public class VerifiableCredentialPredicate {
 
         /* By Holder Wallet Id */
         Optional.ofNullable(query.getHolderWalletId())
-                .map(WalletId::getText)
+                .map(HolderWalletId::getText)
                 .map(VerifiableCredentialPredicate::hasWallet)
                 .ifPresent(predicate::and);
 

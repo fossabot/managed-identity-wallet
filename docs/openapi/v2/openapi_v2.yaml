@@ -348,9 +348,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/VerifiableCredentialResponsePayload'
+                $ref: '#/components/schemas/VerifiableCredentialListResponsePayload'
 
     post:
       operationId: adminCreateVerifiableCredential
@@ -392,9 +390,7 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/VerifiableCredentialResponsePayload'
+                $ref: '#/components/schemas/VerifiableCredentialResponsePayload'
         '404':
           description: Verifiable credential not found.
 
@@ -530,6 +526,29 @@ components:
       description: key value map
       type: object
       additionalProperties: true
+    VerifiableCredentialListResponsePayload:
+      description: key value map
+      type: object
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          description: The current page number.
+        size:
+          type: integer
+          minimum: 0
+          description: The number of items in the current page.
+        totalElements:
+          type: integer
+          format: int64
+          minimum: 0
+          description: The total number of items.
+        items:
+          type: array
+          items:
+            description: key value map
+            type: object
+            additionalProperties: true
     VerifiableCredentialResponsePayload:
       description: key value map
       type: object

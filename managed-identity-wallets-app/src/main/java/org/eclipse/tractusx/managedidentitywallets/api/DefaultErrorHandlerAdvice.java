@@ -23,6 +23,8 @@ package org.eclipse.tractusx.managedidentitywallets.api;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialAlreadyExistsException;
+import org.eclipse.tractusx.managedidentitywallets.exception.WalletAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletDoesNotExistException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -39,6 +41,20 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
     @ResponseBody
     public ResponseEntity<String> handleValidationFailure(WalletDoesNotExistException ex) {
         return ResponseEntity.badRequest().body(ex.getMessage());
+    }
+
+    @ExceptionHandler(value = {VerifiableCredentialAlreadyExistsException.class})
+    @ResponseStatus(value = HttpStatus.CONFLICT)
+    @ResponseBody
+    public ResponseEntity<String> handleValidationFailure(VerifiableCredentialAlreadyExistsException ex) {
+        return ResponseEntity.status(409).body(ex.getMessage());
+    }
+
+    @ExceptionHandler(value = {WalletAlreadyExistsException.class})
+    @ResponseStatus(value = HttpStatus.CONFLICT)
+    @ResponseBody
+    public ResponseEntity<String> handleValidationFailure(WalletAlreadyExistsException ex) {
+        return ResponseEntity.status(409).body(ex.getMessage());
     }
 
     @ExceptionHandler(value = {ConstraintViolationException.class})

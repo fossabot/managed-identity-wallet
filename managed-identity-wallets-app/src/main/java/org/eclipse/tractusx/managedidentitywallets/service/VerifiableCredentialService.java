@@ -72,8 +72,7 @@ public class VerifiableCredentialService {
         return verifiableCredentialRepository.findAll(query, pageable);
     }
 
-    public void create(@NonNull @IsJsonLdValid VerifiableCredential verifiableCredential)
-            throws VerifiableCredentialAlreadyExistsException {
+    public void create(@NonNull @IsJsonLdValid VerifiableCredential verifiableCredential) {
         applicationEventPublisher.publishEvent(new VerifiableCredentialCreatingEvent(verifiableCredential));
         verifiableCredentialRepository.create(verifiableCredential);
         afterCommit(() -> applicationEventPublisher.publishEvent(new VerifiableCredentialCreatedEvent(verifiableCredential)));

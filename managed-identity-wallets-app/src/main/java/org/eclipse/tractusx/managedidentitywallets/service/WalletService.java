@@ -27,8 +27,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.event.*;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletDoesNotExistException;
+import org.eclipse.tractusx.managedidentitywallets.models.HolderWalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
 import org.springframework.context.ApplicationEventPublisher;
@@ -49,7 +49,7 @@ public class WalletService {
     private final WalletRepository walletRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public Optional<Wallet> findById(@NonNull WalletId id) {
+    public Optional<Wallet> findById(@NonNull HolderWalletId id) {
         final WalletQuery query = WalletQuery.builder()
                 .walletId(id)
                 .build();

@@ -19,16 +19,18 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.v2.api;
+package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate;
 
 import org.eclipse.tractusx.managedidentitywallets.ManagedIdentityWalletsApplication;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.CreateWalletRequestPayloadV2;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.UpdateWalletRequestPayloadV2;
 import org.eclipse.tractusx.managedidentitywallets.util.MiwIntegrationTest;
 import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,10 +45,13 @@ import static org.hamcrest.Matchers.equalTo;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {ManagedIdentityWalletsApplication.class})
 @ContextConfiguration(initializers = {TestContextInitializer.class})
-public class AdminApiTest extends MiwIntegrationTest {
+public class V2ApiDelegateImplTest extends MiwIntegrationTest {
 
     @Autowired
     private WalletRepository walletRepository;
+
+    @Autowired
+    private VerifiableCredentialRepository verifiableCredentialRepository;
 
     @Test
     public void testAdminApiCreateWalletRequest() {
@@ -136,10 +141,10 @@ public class AdminApiTest extends MiwIntegrationTest {
         createRandomWallet();
 
         when()
-                .get("/api/v2/admin/wallets?page=1&per_page=1")
+                .get("/api/v2/admin/wallets?page=0&per_page=1")
                 .then()
                 .statusCode(200)
-                .body("page", equalTo(1))
+                .body("page", equalTo(0))
                 .body("size", equalTo(1))
                 .body("items.size()", equalTo(1))
                 .body("totalElements", equalTo(2));
@@ -162,5 +167,85 @@ public class AdminApiTest extends MiwIntegrationTest {
                 .statusCode(204);
 
         Assertions.assertEquals(1, walletRepository.count(), "Wallet should have been deleted");
+    }
+
+    @Test
+    public void testAdminApiVerifiableCredentialsGetRequest() {
+
+        final int MAX_CREDENTIALS = 10;
+        for (var i = 0; i < MAX_CREDENTIALS; i++) {
+            createRandomVerifiableCredential();
+        }
+
+        final String issuer = "did:test:foo";
+        createVerifiableCredential("did:test:foo#1", issuer);
+
+        when()
+                .get("/api/v2/admin/verifiable-credentials?page=0&per_page=10&issuer=" + issuer)
+                .then()
+                .statusCode(200)
+                .body("page", equalTo(0))
+                .body("size", equalTo(1))
+                .body("items.size()", equalTo(1))
+                .body("totalElements", equalTo(1));
+    }
+
+    @Test
+    public void testAdminApiVerifiableCredentialCreateRequest() {
+
+        final VerifiableCredential verifiableCredential = newVerifiableCredential("did:test:foo#1", "did:test:foo");
+
+        given()
+                .contentType("application/json")
+                .body(verifiableCredential)
+                .when()
+                .post("/api/v2/admin/verifiable-credentials")
+                .then()
+                .statusCode(201);
+
+        given()
+                .contentType("application/json")
+                .body(verifiableCredential)
+                .when()
+                .post("/api/v2/admin/verifiable-credentials")
+                .then()
+                .statusCode(409);
+
+        Assertions.assertEquals(1, verifiableCredentialRepository.count(), "Verifiable Credential should have been created");
+    }
+
+    @Test
+    public void testAdminApiVerifiableCredentialGetByIdRequest() {
+
+        final VerifiableCredential verifiableCredential = createRandomVerifiableCredential();
+
+        when()
+                .get("/api/v2/admin/verifiable-credentials/" + verifiableCredential.getId())
+                .then()
+                .statusCode(200);
+
+        when()
+                .get("/api/v2/admin/verifiable-credentials/foo")
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
+    public void testAdminApiVerifiableCredentialDeleteRequest() {
+
+        final VerifiableCredential verifiableCredential = createRandomVerifiableCredential();
+        createRandomVerifiableCredential();
+
+        when()
+                .delete("/api/v2/admin/verifiable-credentials/" + verifiableCredential.getId())
+                .then()
+                .statusCode(204);
+
+        when()
+                .delete("/api/v2/admin/verifiable-credentials/foo")
+                .then()
+                .statusCode(204);
+
+        Assertions.assertEquals(1, verifiableCredentialRepository.count(), "Verifiable Credential should have been deleted");
     }
 }

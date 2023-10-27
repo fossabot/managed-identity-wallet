@@ -28,8 +28,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialDoesNotExistException;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletDoesNotExistException;
+import org.eclipse.tractusx.managedidentitywallets.models.HolderWalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.*;
 import org.eclipse.tractusx.managedidentitywallets.repository.map.VerifiableCredentialEntityMap;
 import org.eclipse.tractusx.managedidentitywallets.repository.predicate.WalletPredicate;
@@ -60,7 +60,7 @@ public class VerifiableCredentialRepository {
     private final VerifiableCredentialEntityMap verifiableCredentialEntityMap;
 
     @Transactional
-    public void createWalletIntersection(@NonNull VerifiableCredentialId verifiableCredentialId, @NonNull WalletId walletId)
+    public void createWalletIntersection(@NonNull VerifiableCredentialId verifiableCredentialId, @NonNull HolderWalletId walletId)
             throws WalletDoesNotExistException, VerifiableCredentialDoesNotExistException {
         if (log.isTraceEnabled()) {
             log.trace("createWalletIntersection: wallet={}, credential={}", walletId, verifiableCredentialId);
@@ -153,7 +153,7 @@ public class VerifiableCredentialRepository {
     }
 
     @Transactional
-    public void deleteWalletIntersection(@NonNull VerifiableCredentialId verifiableCredentialId, @NonNull WalletId walletId) throws WalletDoesNotExistException, VerifiableCredentialDoesNotExistException {
+    public void deleteWalletIntersection(@NonNull VerifiableCredentialId verifiableCredentialId, @NonNull HolderWalletId walletId) throws WalletDoesNotExistException, VerifiableCredentialDoesNotExistException {
         if (log.isTraceEnabled()) {
             log.trace("deleteWalletIntersection: walletId={}, credentialId={}", walletId, verifiableCredentialId);
         }

@@ -19,13 +19,11 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.v2.map;
+package org.eclipse.tractusx.managedidentitywallets.api.v2.map;
 
-import org.eclipse.tractusx.managedidentitywallets.api.v2.map.WalletsApiMapper;
-import org.eclipse.tractusx.managedidentitywallets.api.v2.map.WalletsApiMapperImpl;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletDescription;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.models.HolderWalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -36,7 +34,7 @@ public class WalletsApiMapperTest {
 
     @Test
     public void testMapper() {
-        final WalletId walletId = new WalletId("foo");
+        final HolderWalletId walletId = new HolderWalletId("foo");
         final WalletName walletName = new WalletName("bar");
         final WalletDescription walletDescription = new WalletDescription("baz");
         final Wallet originalWallet = Wallet.builder()

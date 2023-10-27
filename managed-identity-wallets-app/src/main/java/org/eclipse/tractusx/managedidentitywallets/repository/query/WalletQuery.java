@@ -23,14 +23,12 @@ package org.eclipse.tractusx.managedidentitywallets.repository.query;
 
 import lombok.Builder;
 import lombok.Value;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.models.HolderWalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
-
-import javax.validation.constraints.NotNull;
 
 @Value
 @Builder
 public class WalletQuery {
-    WalletId walletId;
+    HolderWalletId walletId;
     WalletName name;
 }
