@@ -94,7 +94,6 @@ public class WalletRepositoryTest extends MiwIntegrationTest {
         Assertions.assertEquals(newWalletName, result.get().getWalletName(), "Wallet name not updated");
     }
 
-
     @Test
     @SneakyThrows
     public void testWalletDeletion() {

@@ -22,9 +22,7 @@
 package org.eclipse.tractusx.managedidentitywallets.v2.map;
 
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.ListWalletsResponsePayloadV2;
-import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.WalletResponsePayloadV2;
-import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.WalletV2;
+import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.*;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 import org.springframework.data.domain.Page;
@@ -46,6 +44,16 @@ public interface WalletsApiMapper {
     @Mapping(target = "description", source = "walletDescription.text")
     @Mapping(target = "name", source = "walletName.text")
     WalletResponsePayloadV2 mapWalletResponsePayloadV2(Wallet wallet);
+
+    @Mapping(target = "id", source = "walletId.text")
+    @Mapping(target = "description", source = "walletDescription.text")
+    @Mapping(target = "name", source = "walletName.text")
+    CreateWalletResponsePayloadV2 mapCreateWalletResponsePayloadV2(Wallet wallet);
+
+    @Mapping(target = "walletId.text", source = "id")
+    @Mapping(target = "walletDescription.text", source = "description")
+    @Mapping(target = "walletName.text", source = "name")
+    Wallet mapCreateWalletResponsePayloadV2(CreateWalletRequestPayloadV2 wallet);
 
     @Mapping(target = "size", source = "numberOfElements")
     @Mapping(target = "page", source = "number")

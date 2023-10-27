@@ -26,6 +26,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
+import org.eclipse.tractusx.managedidentitywallets.exceptions.WalletAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
@@ -35,7 +36,9 @@ import org.eclipse.tractusx.managedidentitywallets.v2.map.WalletsApiMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.net.URI;
 import java.util.Optional;
 
 @Slf4j
@@ -48,8 +51,32 @@ public class V2ApiDelegateImpl implements V2ApiDelegate {
     private final MIWSettings miwSettings;
 
     @Override
-    public ResponseEntity<Void> createWallet(@NonNull CreateWalletResponsePayloadV2 createWalletResponsePayloadV2) {
-        return V2ApiDelegate.super.createWallet(createWalletResponsePayloadV2);
+    public ResponseEntity<CreateWalletResponsePayloadV2> createWallet(@NonNull CreateWalletRequestPayloadV2 createWalletResponsePayloadV2) {
+        if (log.isDebugEnabled()) {
+            log.debug("createWallet(wallet={})", createWalletResponsePayloadV2);
+        }
+
+        final Wallet wallet = walletsApiMapper.mapCreateWalletResponsePayloadV2(createWalletResponsePayloadV2);
+
+        try {
+            walletService.create(wallet);
+            final Optional<Wallet> createdWallet = walletService.findById(wallet.getWalletId());
+            if (createdWallet.isPresent()) {
+                final CreateWalletResponsePayloadV2 response = walletsApiMapper.mapCreateWalletResponsePayloadV2(createdWallet.get());
+                final URI location = ServletUriComponentsBuilder
+                        .fromCurrentRequest()
+                        .path("/{id}")
+                        .buildAndExpand(wallet.getWalletId().getText())
+                        .toUri();
+                return ResponseEntity.created(location).body(response);
+            } else {
+                log.error("Wallet {} was not created", wallet.getWalletId());
+                return ResponseEntity.internalServerError().build();
+            }
+
+        } catch (WalletAlreadyExistsException e) {
+            return ResponseEntity.status(409).build();
+        }
     }
 
     @Override
@@ -93,11 +120,6 @@ public class V2ApiDelegateImpl implements V2ApiDelegate {
     @Override
     public ResponseEntity<UpdateWalletResponsePayloadV2> updateWalletById(@NonNull String walletId, @NonNull UpdateWalletRequestPayloadV2 updateWalletRequestPayloadV2) {
         return V2ApiDelegate.super.updateWalletById(walletId, updateWalletRequestPayloadV2);
-    }
-
-    @Override
-    public ResponseEntity<WalletV2> walletGet() {
-        return V2ApiDelegate.super.walletGet();
     }
 
 }

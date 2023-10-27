@@ -24,6 +24,7 @@ package org.eclipse.tractusx.managedidentitywallets.v2.api;
 import org.eclipse.tractusx.managedidentitywallets.ManagedIdentityWalletsApplication;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
+import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.CreateWalletRequestPayloadV2;
 import org.eclipse.tractusx.managedidentitywallets.util.MiwIntegrationTest;
 import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
 import org.junit.jupiter.api.Assertions;
@@ -32,6 +33,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.util.UUID;
+
+import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -41,6 +45,35 @@ public class AdminApiTest extends MiwIntegrationTest {
 
     @Autowired
     private WalletRepository walletRepository;
+
+    @Test
+    public void testAdminApiCreateWalletRequest() {
+
+        final CreateWalletRequestPayloadV2 payload = new CreateWalletRequestPayloadV2();
+        payload.id(UUID.randomUUID().toString());
+        payload.name("foo");
+        payload.description("bar");
+
+        given()
+                .contentType("application/json")
+                .body(payload)
+                .when()
+                .post("/api/v2/admin/wallets")
+                .then()
+                .log().all()
+                .statusCode(201);
+
+        given()
+                .contentType("application/json")
+                .body(payload)
+                .when()
+                .post("/api/v2/admin/wallets")
+                .then()
+                .log().all()
+                .statusCode(409);
+
+        Assertions.assertEquals(1, walletRepository.count(), "Wallet should have been created");
+    }
 
     @Test
     public void testAdminApiWalletGetByIdRequest() {

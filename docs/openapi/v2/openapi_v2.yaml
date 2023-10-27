@@ -254,10 +254,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/CreateWalletResponsePayload'
+              $ref: '#/components/schemas/CreateWalletRequestPayload'
       responses:
         '201':
           description: Wallet created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWalletResponsePayload'
         '409':
           description: Wallet already exists.
         '400':
@@ -555,6 +559,9 @@ components:
       allOf:
         - $ref: '#/components/schemas/Wallet'
     CreateWalletResponsePayload:
+      allOf:
+        - $ref: '#/components/schemas/Wallet'
+    CreateWalletRequestPayload:
       allOf:
         - $ref: '#/components/schemas/Wallet'
     UpdateWalletRequestPayload:
