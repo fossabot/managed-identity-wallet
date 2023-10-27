@@ -43,7 +43,23 @@ public class AdminApiTest extends MiwIntegrationTest {
     private WalletRepository walletRepository;
 
     @Test
-    public void testAdminApiWalletGetRequest() {
+    public void testAdminApiWalletGetByIdRequest() {
+
+        final Wallet wallet = createRandomWallet();
+
+        when()
+                .get("/api/v2/admin/wallets/" + wallet.getWalletId().getText())
+                .then()
+                .statusCode(200);
+
+        when()
+                .get("/api/v2/admin/wallets/foo")
+                .then()
+                .statusCode(404);
+    }
+
+    @Test
+    public void testAdminApiWalletsGetRequest() {
 
         createRandomWallet();
         createRandomWallet();

@@ -25,6 +25,7 @@ package org.eclipse.tractusx.managedidentitywallets.v2.delegate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
@@ -44,6 +45,7 @@ public class V2ApiDelegateImpl implements V2ApiDelegate {
 
     private final WalletService walletService;
     private final WalletsApiMapper walletsApiMapper;
+    private final MIWSettings miwSettings;
 
     @Override
     public ResponseEntity<Void> createWallet(@NonNull CreateWalletResponsePayloadV2 createWalletResponsePayloadV2) {
@@ -62,7 +64,16 @@ public class V2ApiDelegateImpl implements V2ApiDelegate {
 
     @Override
     public ResponseEntity<WalletResponsePayloadV2> getWalletById(@NonNull String walletId) {
-        return V2ApiDelegate.super.getWalletById(walletId);
+        if (log.isDebugEnabled()) {
+            log.debug("getWalletById(walletId={})", walletId);
+        }
+
+        final Optional<Wallet> wallet = walletService.findById(new WalletId(walletId));
+        if (wallet.isPresent()) {
+            final WalletResponsePayloadV2 payloadV2 = walletsApiMapper.mapWalletResponsePayloadV2(wallet.get());
+            return ResponseEntity.ok(payloadV2);
+        }
+        return ResponseEntity.notFound().build();
     }
 
     @Override
@@ -71,12 +82,11 @@ public class V2ApiDelegateImpl implements V2ApiDelegate {
             log.debug("getWallets(page={}, perPage={})", page, perPage);
         }
 
-        // TODO Make page size configurable
         page = Optional.ofNullable(page).orElse(0);
-        perPage = Optional.ofNullable(perPage).orElse(10);
+        perPage = Optional.ofNullable(perPage).orElse(miwSettings.apiDefaultPageSize());
 
         final Page<Wallet> wallets = walletService.findAll(page, perPage);
-        final ListWalletsResponsePayloadV2 response = walletsApiMapper.map(wallets);
+        final ListWalletsResponsePayloadV2 response = walletsApiMapper.mapListWalletsResponsePayloadV2(wallets);
         return ResponseEntity.ok(response);
     }
 

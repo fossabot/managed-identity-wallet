@@ -23,6 +23,7 @@ package org.eclipse.tractusx.managedidentitywallets.v2.map;
 
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.ListWalletsResponsePayloadV2;
+import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.WalletResponsePayloadV2;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.WalletV2;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -34,16 +35,21 @@ public interface WalletsApiMapper {
     @Mapping(target = "walletId.text", source = "id")
     @Mapping(target = "walletName.text", source = "name")
     @Mapping(target = "walletDescription.text", source = "description")
-    Wallet map(WalletV2 walletV2);
+    Wallet mapWallet(WalletV2 walletV2);
 
     @Mapping(target = "id", source = "walletId.text")
     @Mapping(target = "description", source = "walletDescription.text")
     @Mapping(target = "name", source = "walletName.text")
-    WalletV2 map(Wallet wallet);
+    WalletV2 mapWalletV2(Wallet wallet);
+
+    @Mapping(target = "id", source = "walletId.text")
+    @Mapping(target = "description", source = "walletDescription.text")
+    @Mapping(target = "name", source = "walletName.text")
+    WalletResponsePayloadV2 mapWalletResponsePayloadV2(Wallet wallet);
 
     @Mapping(target = "size", source = "numberOfElements")
     @Mapping(target = "page", source = "number")
     @Mapping(target = "totalElements", source = "totalElements")
     @Mapping(target = "items", source = "content")
-    ListWalletsResponsePayloadV2 map(Page<Wallet> wallets);
+    ListWalletsResponsePayloadV2 mapListWalletsResponsePayloadV2(Page<Wallet> wallets);
 }

@@ -43,7 +43,7 @@ public class WalletsApiMapperTest {
                 .walletDescription(walletDescription)
                 .build();
 
-        final Wallet mappedWallet = walletsApiMapper.map(walletsApiMapper.map(originalWallet));
+        final Wallet mappedWallet = walletsApiMapper.mapWallet(walletsApiMapper.mapWalletV2(originalWallet));
 
         Assertions.assertEquals(mappedWallet.getWalletId(), walletId, "WalletId should be the same");
         Assertions.assertEquals(mappedWallet.getWalletName(), walletName, "WalletName should be the same");
