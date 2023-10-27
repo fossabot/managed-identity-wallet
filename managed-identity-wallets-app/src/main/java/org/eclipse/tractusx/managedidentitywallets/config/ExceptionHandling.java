@@ -24,7 +24,7 @@ package org.eclipse.tractusx.managedidentitywallets.config;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.managedidentitywallets.v1.exception.*;
+import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.validation.FieldError;

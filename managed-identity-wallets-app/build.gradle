@@ -81,6 +81,9 @@ dependencies {
     annotationProcessor group: "com.querydsl", name: "querydsl-apt", classifier: "jakarta"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
+    // https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator
+    implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
+
     //Added explicitly to mitigate CVE 2022-1471
     implementation group: 'org.yaml', name: 'snakeyaml', version: '2.0'
 

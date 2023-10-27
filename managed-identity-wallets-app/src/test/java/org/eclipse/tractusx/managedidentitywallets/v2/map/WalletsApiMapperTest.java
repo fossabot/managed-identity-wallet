@@ -21,6 +21,8 @@
 
 package org.eclipse.tractusx.managedidentitywallets.v2.map;
 
+import org.eclipse.tractusx.managedidentitywallets.api.v2.map.WalletsApiMapper;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.map.WalletsApiMapperImpl;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletDescription;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;

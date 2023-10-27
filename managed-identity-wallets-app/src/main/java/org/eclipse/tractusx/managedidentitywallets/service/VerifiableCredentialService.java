@@ -24,6 +24,7 @@ package org.eclipse.tractusx.managedidentitywallets.service;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.annotations.IsJsonLdValid;
 import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialCreatedEvent;
 import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialCreatingEvent;
 import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialDeletedEvent;
@@ -39,13 +40,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationUtils;
+import org.springframework.validation.annotation.Validated;
 
+import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class VerifiableCredentialService {
 
     private final VerifiableCredentialRepository verifiableCredentialRepository;
@@ -68,7 +72,7 @@ public class VerifiableCredentialService {
         return verifiableCredentialRepository.findAll(query, pageable);
     }
 
-    public void create(@NonNull VerifiableCredential verifiableCredential)
+    public void create(@NonNull @IsJsonLdValid VerifiableCredential verifiableCredential)
             throws VerifiableCredentialAlreadyExistsException {
         applicationEventPublisher.publishEvent(new VerifiableCredentialCreatingEvent(verifiableCredential));
         verifiableCredentialRepository.create(verifiableCredential);

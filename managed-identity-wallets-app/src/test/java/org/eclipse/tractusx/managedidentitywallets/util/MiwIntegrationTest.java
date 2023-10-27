@@ -108,9 +108,10 @@ public abstract class MiwIntegrationTest {
     protected VerifiableCredential newVerifiableCredential(String id, String issuer) {
         return new VerifiableCredentialBuilder()
                 .id(URI.create(id))
+                .context(List.of(VerifiableCredential.DEFAULT_CONTEXT))
                 .type(List.of(VERIFIABLE_CREDENTIAL))
                 .issuer(URI.create(issuer))
-                .credentialSubject(List.of(new VerifiableCredentialSubject(Map.of("foo", "bar"))))
+                .credentialSubject(List.of(new VerifiableCredentialSubject(Map.of("id", "foobar"))))
                 .issuanceDate(Instant.now())
                 .expirationDate(Instant.now().plus(1, java.time.temporal.ChronoUnit.DAYS))
                 .build();
