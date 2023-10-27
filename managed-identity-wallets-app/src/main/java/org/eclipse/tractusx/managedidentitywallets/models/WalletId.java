@@ -29,7 +29,7 @@ import lombok.Value;
 @Value
 @EqualsAndHashCode
 @ToString
-public class HolderWalletId {
+public class WalletId {
     @NonNull
     String text;
 }

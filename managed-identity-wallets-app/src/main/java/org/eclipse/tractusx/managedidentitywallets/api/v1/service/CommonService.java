@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
-import org.eclipse.tractusx.managedidentitywallets.models.HolderWalletId;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
@@ -77,7 +77,7 @@ public class CommonService {
     }
 
     public Wallet getWalletByBpn(String bpn) {
-        final HolderWalletId walletId = new HolderWalletId(bpn);
+        final WalletId walletId = new WalletId(bpn);
         final WalletQuery walletQuery = WalletQuery.builder()
                 .walletId(walletId)
                 .build();

@@ -26,13 +26,15 @@ import lombok.Value;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
-import org.eclipse.tractusx.managedidentitywallets.models.HolderWalletId;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+
+import java.util.List;
 
 @Value
 @Builder
 public class VerifiableCredentialQuery {
-    VerifiableCredentialType verifiableCredentialType;
-    HolderWalletId holderWalletId;
+    List<VerifiableCredentialType> verifiableCredentialTypes;
+    WalletId holderWalletId;
     VerifiableCredentialIssuer verifiableCredentialIssuer;
     VerifiableCredentialId verifiableCredentialId;
 }

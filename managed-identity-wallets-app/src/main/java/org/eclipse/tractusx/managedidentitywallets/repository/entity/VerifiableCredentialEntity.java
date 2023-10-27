@@ -38,8 +38,10 @@ public class VerifiableCredentialEntity extends AbstractEntity {
     public static final String TABLE_NAME = "verifiable_credential";
 
     public static final String COLUMN_JSON = "raw";
+    public static final String COLUMN_ID = "id";
 
     @Id
+    @Column(name = COLUMN_ID, nullable = false)
     private String id;
 
     @Column(name = COLUMN_JSON, nullable = false)

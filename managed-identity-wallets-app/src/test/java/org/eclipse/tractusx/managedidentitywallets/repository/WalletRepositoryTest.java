@@ -23,11 +23,11 @@ package org.eclipse.tractusx.managedidentitywallets.repository;
 
 import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.ManagedIdentityWalletsApplication;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.util.MiwIntegrationTest;
 import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletDescription;
-import org.eclipse.tractusx.managedidentitywallets.models.HolderWalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
 import org.junit.jupiter.api.Assertions;
@@ -52,7 +52,7 @@ public class WalletRepositoryTest extends MiwIntegrationTest {
     @SneakyThrows
     public void testWalletCreation() {
         final Wallet wallet = createRandomWallet();
-        final HolderWalletId walletId = wallet.getWalletId();
+        final WalletId walletId = wallet.getWalletId();
 
         final WalletQuery query = WalletQuery.builder()
                 .walletId(walletId)
@@ -67,7 +67,7 @@ public class WalletRepositoryTest extends MiwIntegrationTest {
     @SneakyThrows
     public void testWalletUpdate() {
 
-        final HolderWalletId walletId = new HolderWalletId("foo");
+        final WalletId walletId = new WalletId("foo");
         final WalletName walletName = new WalletName("bar");
         final WalletDescription walletDescription = new WalletDescription("baz");
 
@@ -98,7 +98,7 @@ public class WalletRepositoryTest extends MiwIntegrationTest {
     @SneakyThrows
     public void testWalletDeletion() {
 
-        final HolderWalletId walletId = new HolderWalletId("foo");
+        final WalletId walletId = new WalletId("foo");
         final WalletName walletName = new WalletName("bar");
         final WalletDescription walletDescription = new WalletDescription("baz");
 

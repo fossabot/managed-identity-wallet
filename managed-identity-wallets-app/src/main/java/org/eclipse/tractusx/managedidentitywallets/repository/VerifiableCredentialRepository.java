@@ -28,7 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
-import org.eclipse.tractusx.managedidentitywallets.models.HolderWalletId;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.*;
 import org.eclipse.tractusx.managedidentitywallets.repository.map.VerifiableCredentialEntityMap;
@@ -60,7 +60,7 @@ public class VerifiableCredentialRepository {
     private final VerifiableCredentialEntityMap verifiableCredentialEntityMap;
 
     @Transactional
-    public void createWalletIntersection(@NonNull VerifiableCredentialId verifiableCredentialId, @NonNull HolderWalletId walletId) {
+    public void createWalletIntersection(@NonNull VerifiableCredentialId verifiableCredentialId, @NonNull WalletId walletId) {
         if (log.isTraceEnabled()) {
             log.trace("createWalletIntersection: wallet={}, credential={}", walletId, verifiableCredentialId);
         }
@@ -152,7 +152,7 @@ public class VerifiableCredentialRepository {
     }
 
     @Transactional
-    public void deleteWalletIntersection(@NonNull VerifiableCredentialId verifiableCredentialId, @NonNull HolderWalletId walletId) throws WalletNotFoundException, VerifiableCredentialNotFoundException {
+    public void deleteWalletIntersection(@NonNull VerifiableCredentialId verifiableCredentialId, @NonNull WalletId walletId) throws WalletNotFoundException, VerifiableCredentialNotFoundException {
         if (log.isTraceEnabled()) {
             log.trace("deleteWalletIntersection: walletId={}, credentialId={}", walletId, verifiableCredentialId);
         }

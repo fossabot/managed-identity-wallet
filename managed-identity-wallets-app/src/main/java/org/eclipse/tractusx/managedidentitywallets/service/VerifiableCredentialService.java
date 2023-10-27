@@ -36,7 +36,9 @@ import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCr
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationUtils;
@@ -62,13 +64,26 @@ public class VerifiableCredentialService {
         return verifiableCredentialRepository.findOne(query);
     }
 
+    public Optional<VerifiableCredential> findOne(@NonNull VerifiableCredentialQuery query) {
+        return verifiableCredentialRepository.findOne(query);
+    }
+
     public Page<VerifiableCredential> findAll(int page, int size) {
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder().build();
         return findAll(query, page, size);
     }
 
+    public Page<VerifiableCredential> findAll(int page, int size, Sort sort) {
+        final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder().build();
+        return findAll(query, page, size, sort);
+    }
+
     public Page<VerifiableCredential> findAll(@NonNull VerifiableCredentialQuery query, int page, int size) {
-        final Pageable pageable = Pageable.ofSize(size).withPage(page);
+        return findAll(query, page, size, Sort.unsorted());
+    }
+
+    public Page<VerifiableCredential> findAll(@NonNull VerifiableCredentialQuery query, int page, int size, Sort sort) {
+        final Pageable pageable = PageRequest.of(page, size, sort);
         return verifiableCredentialRepository.findAll(query, pageable);
     }
 

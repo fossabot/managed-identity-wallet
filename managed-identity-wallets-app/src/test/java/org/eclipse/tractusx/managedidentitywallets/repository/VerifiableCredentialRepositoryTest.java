@@ -116,7 +116,7 @@ public class VerifiableCredentialRepositoryTest extends MiwIntegrationTest {
         createRandomVerifiableCredential();
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
-                .verifiableCredentialType(new VerifiableCredentialType("VerifiableCredential"))
+                .verifiableCredentialTypes(new VerifiableCredentialType("VerifiableCredential"))
                 .build();
         final Page<VerifiableCredential> result = verifiableCredentialRepository.findAll(query, Pageable.unpaged());
 

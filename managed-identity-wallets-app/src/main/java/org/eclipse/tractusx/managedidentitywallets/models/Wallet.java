@@ -35,7 +35,7 @@ import java.util.List;
 public class Wallet {
 
     @NonNull
-    HolderWalletId walletId;
+    WalletId walletId;
 
     @NonNull
     WalletDescription walletDescription;

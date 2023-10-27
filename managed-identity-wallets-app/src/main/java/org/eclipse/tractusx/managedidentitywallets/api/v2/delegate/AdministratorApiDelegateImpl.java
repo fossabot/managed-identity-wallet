@@ -87,7 +87,7 @@ public class AdministratorApiDelegateImpl implements AdministratorApiDelegate {
             log.debug("deleteWalletById(walletId={})", walletId);
         }
 
-        walletService.findById(new HolderWalletId(walletId)).ifPresent(walletService::delete);
+        walletService.findById(new WalletId(walletId)).ifPresent(walletService::delete);
         return ResponseEntity.noContent().build();
     }
 
@@ -97,7 +97,7 @@ public class AdministratorApiDelegateImpl implements AdministratorApiDelegate {
             log.debug("getWalletById(walletId={})", walletId);
         }
 
-        final Optional<Wallet> wallet = walletService.findById(new HolderWalletId(walletId));
+        final Optional<Wallet> wallet = walletService.findById(new WalletId(walletId));
         if (wallet.isPresent()) {
             final WalletResponsePayloadV2 payloadV2 = apiMapper.mapWalletResponsePayloadV2(wallet.get());
             return ResponseEntity.ok(payloadV2);
@@ -200,8 +200,8 @@ public class AdministratorApiDelegateImpl implements AdministratorApiDelegate {
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
                 .verifiableCredentialIssuer(Optional.ofNullable(issuer).map(VerifiableCredentialIssuer::new).orElse(null))
                 .verifiableCredentialId(Optional.ofNullable(id).map(VerifiableCredentialId::new).orElse(null))
-                .verifiableCredentialType(Optional.ofNullable(type).map(VerifiableCredentialType::new).orElse(null))
-                .holderWalletId(Optional.ofNullable(holder).map(HolderWalletId::new).orElse(null))
+                .verifiableCredentialTypes(Optional.ofNullable(type).map(VerifiableCredentialType::new).orElse(null))
+                .holderWalletId(Optional.ofNullable(holder).map(WalletId::new).orElse(null))
                 .build();
 
         final Page<VerifiableCredential> verifiableCredentials = verifiableCredentialService.findAll(verifiableCredentialQuery, page, perPage);

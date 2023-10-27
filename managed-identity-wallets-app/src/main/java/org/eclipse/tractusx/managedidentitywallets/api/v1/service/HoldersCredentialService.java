@@ -23,7 +23,14 @@ package org.eclipse.tractusx.managedidentitywallets.api.v1.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialEntity;
+import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
+import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -49,6 +56,10 @@ public class HoldersCredentialService {
 
     private final VerifiableCredentialRepository verifiableCredentialRepository;
 
+
+    private final VerifiableCredentialService verifiableCredentialService;
+
+
     /**
      * Gets list of holder's credentials
      *
@@ -58,80 +69,53 @@ public class HoldersCredentialService {
      * @param callerBPN        the caller bpn
      * @return the credentials
      */
-    public PageImpl<VerifiableCredential> getCredentials(String credentialId, String issuerIdentifier, String sortColumn, String sortType, List<String> type, int pageNumber, int size, String callerBPN) {
-        return null;
-//        if (credentialId != null) {
-//            final Optional<VerifiableCredential> credential = verifiableCredentialRepository.findByHolderAndId(callerBPN, credentialId);
-//            if (credential.isEmpty()) {
-//                return new PageImpl<>(Collections.emptyList(), PageRequest.of(pageNumber, size), 0);
-//            } else {
-//                return new PageImpl<>(Collections.singletonList(credential.get()), PageRequest.of(pageNumber, size), 1);
-//            }
-//        }
-//
-//        Sort sort = Sort.unsorted();
-//        if (sortColumn != null) {
-//            final Sort.Direction direction = Sort.Direction.fromOptionalString(sortType.toUpperCase())
-//                    .orElse(Sort.DEFAULT_DIRECTION);
-//
-//            switch (sortColumn) {
-//                case "createdAt":
-//                    sort = Sort.by(direction, AbstractEntity.COLUMN_CREATED_AT);
-//                    break;
-//                case "credentialId":
-//                    sort = Sort.by(direction, VerifiableCredential.ID);
-//                    break;
-//                case "issuerDid":
-//                    sort = Sort.by(direction, VerifiableCredential.ISSUER);
-//                    break;
-//                case "type":
-//                    log.warn("Sorting by type is not supported. A Verifiable Credential my have multiple types.");
-//                default:
-//                    log.warn("Sorting by {} is not supported.", sortColumn);
-//            }
-//        }
-//
-//        Pageable pageable = PageRequest.of(pageNumber, size, sort);
-//
-//
-//        FilterRequest filterRequest = new FilterRequest();
-//        filterRequest.setPage(pageNumber);
-//        filterRequest.setSize(size);
-//
-//        //Holder must be caller of API
-//        Wallet holderWallet = commonService.getWalletByIdentifier(callerBPN);
-//        filterRequest.appendCriteria(StringPool.HOLDER_DID, Operator.EQUALS, holderWallet.getDid());
-//
-//        if (StringUtils.hasText(issuerIdentifier)) {
-//            Wallet issuerWallet = commonService.getWalletByIdentifier(issuerIdentifier);
-//            filterRequest.appendCriteria(StringPool.ISSUER_DID, Operator.EQUALS, issuerWallet.getDid());
-//        }
-//
-//        if (StringUtils.hasText(credentialId)) {
-//            filterRequest.appendCriteria(StringPool.CREDENTIAL_ID, Operator.EQUALS, credentialId);
-//        }
-//        FilterRequest request = new FilterRequest();
-//        if (!CollectionUtils.isEmpty(type)) {
-//            request.setPage(filterRequest.getPage());
-//            request.setSize(filterRequest.getSize());
-//            request.setCriteriaOperator(CriteriaOperator.OR);
-//            for (String str : type) {
-//                request.appendCriteria(StringPool.TYPE, Operator.CONTAIN, str);
-//            }
-//        }
-//
-//        Sort sort = new Sort();
-//        sort.setColumn(sortColumn);
-//        sort.setSortType(SortType.valueOf(sortType.toUpperCase()));
-//        filterRequest.setSort(sort);
-//        Page<HoldersCredential> filter = filter(filterRequest, request, CriteriaOperator.AND);
-//
-//        List<VerifiableCredential> list = new ArrayList<>(filter.getContent().size());
-//        for (HoldersCredential credential : filter.getContent()) {
-//            list.add(credential.getData());
-//        }
-//
-//        return new PageImpl<>(list, filter.getPageable(), filter.getTotalElements());
+    public Page<VerifiableCredential> getCredentials(String credentialId, String issuerIdentifier, String sortColumn, String sortType, List<String> type, int pageNumber, int size, String callerBPN) {
+        if (credentialId != null) {
+
+            VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
+                    .verifiableCredentialId(new VerifiableCredentialId(credentialId))
+                    .holderWalletId(new WalletId(callerBPN))
+                    .build();
+            final Optional<VerifiableCredential> credential = verifiableCredentialService.findOne(verifiableCredentialQuery);
+            if (credential.isEmpty()) {
+                return new PageImpl<>(Collections.emptyList(), PageRequest.of(pageNumber, size), 0);
+            } else {
+                return new PageImpl<>(Collections.singletonList(credential.get()), PageRequest.of(pageNumber, size), 1);
+            }
+        }
+
+        Sort sort = Sort.unsorted();
+        if (sortColumn != null) {
+            final Sort.Direction direction = Sort.Direction.fromOptionalString(sortType.toUpperCase())
+                    .orElse(Sort.DEFAULT_DIRECTION);
+
+            switch (sortColumn) {
+                case "createdAt":
+                    sort = Sort.by(direction, VerifiableCredentialEntity.COLUMN_CREATED_AT);
+                    break;
+                case "credentialId":
+                    sort = Sort.by(direction, VerifiableCredentialEntity.COLUMN_ID);
+                    break;
+                case "issuerDid":
+                    log.warn("Sorting by issuer is not supported.");
+                    break;
+                case "type":
+                    log.warn("Sorting by type is not supported. A Verifiable Credential my have multiple types.");
+                    break;
+                default:
+                    log.warn("Sorting by {} is not supported.", sortColumn);
+                    break;
+            }
+        }
+
+        final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
+                .holderWalletId(new WalletId(callerBPN))
+                .verifiableCredentialTypes(type.stream().map(VerifiableCredentialType::new).toList())
+                .verifiableCredentialIssuer(new VerifiableCredentialIssuer(issuerIdentifier))
+                .build();
+
+        return verifiableCredentialService
+                .findAll(verifiableCredentialQuery, pageNumber, size, sort);
     }
 
     /**

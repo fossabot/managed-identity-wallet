@@ -26,7 +26,7 @@ import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.eclipse.tractusx.managedidentitywallets.models.HolderWalletId;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.QWalletEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
@@ -42,7 +42,7 @@ public class WalletPredicate {
 
         /* By Wallet Id */
         Optional.ofNullable(query.getWalletId())
-                .map(HolderWalletId::getText)
+                .map(WalletId::getText)
                 .map(WalletPredicate::hasId)
                 .ifPresent(predicate::and);
 
