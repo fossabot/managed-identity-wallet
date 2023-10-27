@@ -22,12 +22,12 @@
 package org.eclipse.tractusx.managedidentitywallets.util;
 
 import io.restassured.RestAssured;
-import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
-import org.eclipse.tractusx.managedidentitywallets.event.WalletCreatedEvent;
-import org.eclipse.tractusx.managedidentitywallets.event.WalletCreatingEvent;
-import org.eclipse.tractusx.managedidentitywallets.models.*;
+import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletDescription;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
 import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
@@ -35,18 +35,15 @@ import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCreden
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialSubject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.event.EventListener;
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-import static org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialType.*;
+import static org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialType.VERIFIABLE_CREDENTIAL;
 
 public abstract class MiwIntegrationTest {
 
@@ -69,13 +66,13 @@ public abstract class MiwIntegrationTest {
     private VerifiableCredentialRepository verifiableCredentialRepository;
 
     @SneakyThrows
-    protected VerifiableCredential createRandomVerifiableCredential(WalletId walletId) {
+    protected VerifiableCredential createRandomVerifiableCredential() {
         final String random = UUID.randomUUID().toString();
-        return createVerifiableCredential(walletId, "did:test:id" + random, "did:test:issuer" + random);
+        return createVerifiableCredential("did:test:id" + random, "did:test:issuer" + random);
     }
 
     @SneakyThrows
-    protected VerifiableCredential createVerifiableCredential(WalletId walletId, String id, String issuer) {
+    protected VerifiableCredential createVerifiableCredential(String id, String issuer) {
         VerifiableCredential verifiableCredential = new VerifiableCredentialBuilder()
                 .id(URI.create(id))
                 .type(List.of(VERIFIABLE_CREDENTIAL))
@@ -85,7 +82,7 @@ public abstract class MiwIntegrationTest {
                 .expirationDate(Instant.now().plus(1, java.time.temporal.ChronoUnit.DAYS))
                 .build();
 
-        verifiableCredentialRepository.create(verifiableCredential, walletId);
+        verifiableCredentialRepository.create(verifiableCredential);
         return verifiableCredential;
     }
 

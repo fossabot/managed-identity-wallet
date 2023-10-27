@@ -55,6 +55,16 @@ public interface WalletsApiMapper {
     @Mapping(target = "walletName.text", source = "name")
     Wallet mapCreateWalletResponsePayloadV2(CreateWalletRequestPayloadV2 wallet);
 
+    @Mapping(target = "walletId.text", source = "id")
+    @Mapping(target = "walletDescription.text", source = "description")
+    @Mapping(target = "walletName.text", source = "name")
+    Wallet mapUpdateWalletRequestPayloadV2(UpdateWalletRequestPayloadV2 wallet);
+
+    @Mapping(target = "id", source = "walletId.text")
+    @Mapping(target = "description", source = "walletDescription.text")
+    @Mapping(target = "name", source = "walletName.text")
+    UpdateWalletResponsePayloadV2 mapUpdateWalletResponsePayloadV2(Wallet wallet);
+
     @Mapping(target = "size", source = "numberOfElements")
     @Mapping(target = "page", source = "number")
     @Mapping(target = "totalElements", source = "totalElements")

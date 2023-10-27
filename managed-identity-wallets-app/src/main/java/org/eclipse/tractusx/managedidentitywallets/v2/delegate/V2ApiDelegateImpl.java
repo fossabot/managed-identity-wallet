@@ -27,6 +27,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.exceptions.WalletAlreadyExistsException;
+import org.eclipse.tractusx.managedidentitywallets.exceptions.WalletDoesNotExistException;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
@@ -51,7 +52,7 @@ public class V2ApiDelegateImpl implements V2ApiDelegate {
     private final MIWSettings miwSettings;
 
     @Override
-    public ResponseEntity<CreateWalletResponsePayloadV2> createWallet(@NonNull CreateWalletRequestPayloadV2 createWalletResponsePayloadV2) {
+    public ResponseEntity<CreateWalletResponsePayloadV2> adminCreateWallet(@NonNull CreateWalletRequestPayloadV2 createWalletResponsePayloadV2) {
         if (log.isDebugEnabled()) {
             log.debug("createWallet(wallet={})", createWalletResponsePayloadV2);
         }
@@ -80,7 +81,7 @@ public class V2ApiDelegateImpl implements V2ApiDelegate {
     }
 
     @Override
-    public ResponseEntity<Void> deleteWalletById(@NonNull String walletId) {
+    public ResponseEntity<Void> adminDeleteWalletById(@NonNull String walletId) {
         if (log.isDebugEnabled()) {
             log.debug("deleteWalletById(walletId={})", walletId);
         }
@@ -90,7 +91,7 @@ public class V2ApiDelegateImpl implements V2ApiDelegate {
     }
 
     @Override
-    public ResponseEntity<WalletResponsePayloadV2> getWalletById(@NonNull String walletId) {
+    public ResponseEntity<WalletResponsePayloadV2> adminGetWalletById(@NonNull String walletId) {
         if (log.isDebugEnabled()) {
             log.debug("getWalletById(walletId={})", walletId);
         }
@@ -104,7 +105,7 @@ public class V2ApiDelegateImpl implements V2ApiDelegate {
     }
 
     @Override
-    public ResponseEntity<ListWalletsResponsePayloadV2> getWallets(Integer page, Integer perPage) {
+    public ResponseEntity<ListWalletsResponsePayloadV2> adminGetWallets(Integer page, Integer perPage) {
         if (log.isDebugEnabled()) {
             log.debug("getWallets(page={}, perPage={})", page, perPage);
         }
@@ -118,8 +119,25 @@ public class V2ApiDelegateImpl implements V2ApiDelegate {
     }
 
     @Override
-    public ResponseEntity<UpdateWalletResponsePayloadV2> updateWalletById(@NonNull String walletId, @NonNull UpdateWalletRequestPayloadV2 updateWalletRequestPayloadV2) {
-        return V2ApiDelegate.super.updateWalletById(walletId, updateWalletRequestPayloadV2);
+    public ResponseEntity<UpdateWalletResponsePayloadV2> adminUpdateWallet(@NonNull UpdateWalletRequestPayloadV2 updateWalletRequestPayloadV2) {
+        if (log.isDebugEnabled()) {
+            log.debug("updateWalletById(updateWalletRequestPayloadV2={})", updateWalletRequestPayloadV2);
+        }
+        try {
+            final Wallet wallet = walletsApiMapper.mapUpdateWalletRequestPayloadV2(updateWalletRequestPayloadV2);
+            walletService.update(wallet);
+            final Optional<Wallet> updatedWallet = walletService.findById(wallet.getWalletId());
+            if (updatedWallet.isPresent()) {
+                final UpdateWalletResponsePayloadV2 response = walletsApiMapper.mapUpdateWalletResponsePayloadV2(updatedWallet.get());
+                return ResponseEntity.status(202).body(response);
+            } else {
+                log.error("Wallet {} was not updated", wallet.getWalletId());
+                return ResponseEntity.internalServerError().build();
+            }
+
+        } catch (WalletDoesNotExistException e) {
+            return ResponseEntity.notFound().build();
+        }
     }
 
 }

@@ -223,15 +223,15 @@ paths:
 
   /admin/wallets:
     get:
-      operationId: getWallets
+      operationId: adminGetWallets
       tags:
         - V2
         - Admin
         - Wallets
       summary: Get All Wallets
       parameters:
-        - $ref: '#/components/parameters/Page'
-        - $ref: '#/components/parameters/Per_Page'
+        - $ref: '#/components/parameters/Query_Page'
+        - $ref: '#/components/parameters/Query_Per_Page'
       description: Retrieves a list of wallets.
       responses:
         '200':
@@ -242,7 +242,7 @@ paths:
                 $ref: '#/components/schemas/ListWalletsResponsePayload'
 
     post:
-      operationId: createWallet
+      operationId: adminCreateWallet
       tags:
         - V2
         - Admin
@@ -267,51 +267,14 @@ paths:
         '400':
           description: Bad request.
 
-  /admin/wallets/{walletId}:
-    get:
-      operationId: getWalletById
-      tags:
-        - V2
-        - Admin
-        - Wallets
-      summary: Get Wallet for User
-      description: Retrieves a wallet for a user by user ID.
-      parameters:
-        - $ref: '#/components/parameters/Path_Wallet'
-      responses:
-        '200':
-          description: Successful response with the requested wallet.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/WalletResponsePayload'
-        '404':
-          description: Wallet not found.
-
-    delete:
-      operationId: deleteWalletById
-      tags:
-        - V2
-        - Admin
-        - Wallets
-      summary: Delete Wallet for User
-      description: Deletes a wallet for by wallet ID.
-      parameters:
-        - $ref: '#/components/parameters/Path_Wallet'
-      responses:
-        '204':
-          description: Wallet deleted.
-
     put:
-      operationId: updateWalletById
+      operationId: adminUpdateWallet
       tags:
         - V2
         - Admin
         - Wallets
       summary: Update Wallet for User
       description: Updates a wallet for a user by user ID.
-      parameters:
-        - $ref: '#/components/parameters/Path_Wallet'
       requestBody:
         required: true
         content:
@@ -328,21 +291,57 @@ paths:
         '400':
           description: Bad request.
 
-  /admin/verifiable-credentials/{walletId}:
+  /admin/wallets/{walletId}:
     get:
+      operationId: adminGetWalletById
+      tags:
+        - V2
+        - Admin
+        - Wallets
+      summary: Get Wallet for User
+      description: Retrieves a wallet for a user by user ID.
+      parameters:
+        - $ref: '#/components/parameters/Path_Wallet_Id'
+      responses:
+        '200':
+          description: Successful response with the requested wallet.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletResponsePayload'
+        '404':
+          description: Wallet not found.
+
+    delete:
+      operationId: adminDeleteWalletById
+      tags:
+        - V2
+        - Admin
+        - Wallets
+      summary: Delete Wallet for User
+      description: Deletes a wallet for by wallet ID.
+      parameters:
+        - $ref: '#/components/parameters/Path_Wallet_Id'
+      responses:
+        '204':
+          description: Wallet deleted.
+
+  /admin/verifiable-credentials:
+    get:
+      operationId: adminGetVerifiableCredentials
       tags:
         - V2
         - Admin
         - Verifiable Credentials
-      summary: Get Verifiable Credentials for User
-      description: Retrieves a list of verifiable credentials for a user by user ID.
+      summary: Get Verifiable Credentials
+      description: Retrieves a list of verifiable credentials
       parameters:
-        - name: walletId
-          in: path
-          required: true
-          description: The ID of the user for whom verifiable credentials should be retrieved.
-          schema:
-            type: string
+        - $ref: '#/components/parameters/Query_Page'
+        - $ref: '#/components/parameters/Query_Per_Page'
+        - $ref: '#/components/parameters/Query_Verifiable_Credential_Id'
+        - $ref: '#/components/parameters/Query_Verifiable_Credential_Type'
+        - $ref: '#/components/parameters/Query_Verifiable_Credential_Issuer'
+        - $ref: '#/components/parameters/Query_Verifiable_Credential_Holder'
       responses:
         '200':
           description: Successful response with a list of verifiable credentials.
@@ -351,169 +350,90 @@ paths:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/VerifiableCredential'
+                  $ref: '#/components/schemas/VerifiableCredentialResponsePayload'
 
-    post:
+  /admin/verifiable-credentials/{verifiableCredentialId}:
+    get:
+      operationId: adminGetVerifiableCredentialById
       tags:
         - V2
         - Admin
         - Verifiable Credentials
-      summary: Create Verifiable Credential for User
-      description: Creates a verifiable credential for a user.
+      summary: Get Verifiable Credentials by Id
+      description: Retrieves a list of verifiable credentials for a user by user ID.
       parameters:
-        - name: walletId
-          in: path
-          required: true
-          description: The ID of the user for whom the verifiable credential should be created.
-          schema:
-            type: string
+        - $ref: '#/components/parameters/Path_Verifiable_Credential_Id'
+      responses:
+        '200':
+          description: Successful response with a verifiable credentials.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/VerifiableCredentialResponsePayload'
+        '404':
+          description: Verifiable credential not found.
+
+    post:
+      operationId: adminCreateVerifiableCredential
+      tags:
+        - V2
+        - Admin
+        - Verifiable Credentials
+      summary: Create Verifiable Credential
+      description: Creates a verifiable credential
+      parameters:
+        - $ref: '#/components/parameters/Path_Verifiable_Credential_Id'
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/VerifiableCredential'
+              $ref: '#/components/schemas/CreateVerifiableCredentialRequestPayload'
       responses:
         '201':
           description: Verifiable credential created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateVerifiableCredentialResponsePayload'
         '400':
           description: Bad request.
 
     delete:
+      operationId: adminDeleteVerifiableCredentialById
       tags:
         - V2
         - Admin
         - Verifiable Credentials
-      summary: Delete Verifiable Credential for User
-      description: Deletes a verifiable credential for a user by user ID.
+      summary: Delete Verifiable Credential
+      description: Deletes a verifiable credential
       parameters:
-        - name: walletId
-          in: path
-          required: true
-          description: The ID of the user for whom the verifiable credential should be deleted.
-          schema:
-            type: string
+        - $ref: '#/components/parameters/Path_Verifiable_Credential_Id'
       responses:
         '204':
           description: Verifiable credential deleted successfully.
         '404':
           description: Verifiable credential not found.
 
-  /admin/verifiable-presentations/{walletId}:
-    post:
-      tags:
-        - V2
-        - Admin
-        - Verifiable Presentations
-      summary: Issue Verifiable Presentation for User
-      description: Issues a verifiable presentation for a user.
-      parameters:
-        - name: walletId
-          in: path
-          required: true
-          description: The ID of the user for whom the verifiable presentation should be issued.
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/VerifiableCredential'
-      responses:
-        '201':
-          description: Verifiable presentation issued successfully.
-        '400':
-          description: Bad request.
-
-  /admin/verifiable-credentials/issued/{walletId}:
-    post:
-      tags:
-        - V2
-        - Admin
-        - Verifiable Credentials
-      summary: Issue Verifiable Credential for User
-      description: Issues a verifiable credential for a user.
-      parameters:
-        - name: walletId
-          in: path
-          required: true
-          description: The ID of the user for whom the verifiable credential should be issued.
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/VerifiableCredential'
-      responses:
-        '201':
-          description: Verifiable credential issued successfully.
-        '400':
-          description: Bad request.
-
-    get:
-      tags:
-        - V2
-        - Admin
-        - Verifiable Credentials
-      summary: Get Issued Verifiable Credentials for User
-      description: Retrieves a list of issued verifiable credentials for a user by user ID.
-      parameters:
-        - name: walletId
-          in: path
-          required: true
-          description: The ID of the user for whom issued verifiable credentials should be retrieved.
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successful response with a list of issued verifiable credentials.
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: '#/components/schemas/VerifiableCredential'
-
-  /admin/verifiable-credentials/revoke/{walletId}:
-    post:
-      tags:
-        - V2
-        - Admin
-        - Verifiable Credentials
-      summary: Revoke Issued Verifiable Credential for User
-      description: Revokes an issued verifiable credential for a user by user ID.
-      parameters:
-        - name: walletId
-          in: path
-          required: true
-          description: The ID of the user for whom the verifiable credential should be revoked.
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/VerifiableCredential'
-      responses:
-        '204':
-          description: Verifiable credential revoked successfully.
-        '400':
-          description: Bad request.
-
 components:
   parameters:
-    Path_Wallet:
+    Path_Wallet_Id:
       name: walletId
       in: path
       required: true
       description: The ID of the wallet.
       schema:
         type: string
-    Page:
+    Path_Verifiable_Credential_Id:
+      name: verifiableCredentialId
+      in: path
+      required: true
+      description: The ID of the verifiable credential.
+      schema:
+        type: string
+    Query_Page:
       name: page
       in: query
       required: false
@@ -521,7 +441,7 @@ components:
       schema:
         type: integer
         minimum: 0
-    Per_Page:
+    Query_Per_Page:
       name: per_page
       in: query
       required: false
@@ -529,6 +449,34 @@ components:
       schema:
         type: integer
         minimum: 1
+    Query_Verifiable_Credential_Id:
+      name: id
+      in: query
+      required: false
+      description: Verifiable Credential ID
+      schema:
+        type: string
+    Query_Verifiable_Credential_Type:
+      name: type
+      in: query
+      required: false
+      description: Verifiable Credential ID
+      schema:
+        type: string
+    Query_Verifiable_Credential_Issuer:
+      name: issuer
+      in: query
+      required: false
+      description: Verifiable Credential ID
+      schema:
+        type: string
+    Query_Verifiable_Credential_Holder:
+      name: holder
+      in: query
+      required: false
+      description: Verifiable Credential ID
+      schema:
+        type: string
   schemas:
     Page:
       type: object
@@ -570,6 +518,24 @@ components:
     UpdateWalletResponsePayload:
       allOf:
         - $ref: '#/components/schemas/Wallet'
+    ListVerifiableCredentialResponsePayload:
+      allOf:
+        - $ref: '#/components/schemas/Page'
+        - type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/VerifiableCredential'
+    CreateVerifiableCredentialResponsePayload:
+      allOf:
+        - $ref: '#/components/schemas/VerifiableCredential'
+    CreateVerifiableCredentialRequestPayload:
+      allOf:
+        - $ref: '#/components/schemas/VerifiableCredential'
+    VerifiableCredentialResponsePayload:
+      allOf:
+        - $ref: '#/components/schemas/VerifiableCredential'
     Wallet:
       type: object
       properties:

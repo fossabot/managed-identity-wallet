@@ -50,8 +50,7 @@ public class VerifiableCredentialRepositoryTest extends MiwIntegrationTest {
 
     @Test
     public void testCreate() {
-        final Wallet wallet = createRandomWallet();
-        final VerifiableCredential verifiableCredential = createRandomVerifiableCredential(wallet.getWalletId());
+        final VerifiableCredential verifiableCredential = createRandomVerifiableCredential();
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
                 .verifiableCredentialId(new VerifiableCredentialId(verifiableCredential.getId().toString()))
@@ -64,14 +63,13 @@ public class VerifiableCredentialRepositoryTest extends MiwIntegrationTest {
     @Test
     @SneakyThrows
     public void testDelete() {
-        final Wallet wallet = createRandomWallet();
-        final VerifiableCredential verifiableCredential = createRandomVerifiableCredential(wallet.getWalletId());
+        final VerifiableCredential verifiableCredential = createRandomVerifiableCredential();
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
                 .verifiableCredentialId(new VerifiableCredentialId(verifiableCredential.getId().toString()))
                 .build();
 
-        verifiableCredentialRepository.delete(verifiableCredential, wallet.getWalletId());
+        verifiableCredentialRepository.delete(verifiableCredential);
         final Optional<VerifiableCredential> result = verifiableCredentialRepository.findOne(query);
 
         Assertions.assertTrue(result.isPresent(), "VerifiableCredential not found");
@@ -80,10 +78,9 @@ public class VerifiableCredentialRepositoryTest extends MiwIntegrationTest {
     @Test
     @SneakyThrows
     public void testFindByIssuer() {
-        final Wallet wallet = createRandomWallet();
-        final VerifiableCredential verifiableCredential = createRandomVerifiableCredential(wallet.getWalletId());
-        createRandomVerifiableCredential(wallet.getWalletId());
-        createRandomVerifiableCredential(wallet.getWalletId());
+        final VerifiableCredential verifiableCredential = createRandomVerifiableCredential();
+        createRandomVerifiableCredential();
+        createRandomVerifiableCredential();
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
                 .verifiableCredentialIssuer(new VerifiableCredentialIssuer(verifiableCredential.getIssuer().toString()))
@@ -98,13 +95,13 @@ public class VerifiableCredentialRepositoryTest extends MiwIntegrationTest {
     @SneakyThrows
     public void testFindByHolder() {
         final Wallet wallet = createRandomWallet();
-        createRandomVerifiableCredential(wallet.getWalletId());
-        createRandomVerifiableCredential(wallet.getWalletId());
-        createRandomVerifiableCredential(wallet.getWalletId());
+        final VerifiableCredential verifiableCredential = createRandomVerifiableCredential();
+        final VerifiableCredentialId verifiableCredentialId = new VerifiableCredentialId(verifiableCredential.getId().toString());
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
                 .holderWalletId(wallet.getWalletId())
                 .build();
+        verifiableCredentialRepository.createWalletIntersection(verifiableCredentialId, wallet.getWalletId());
         final Page<VerifiableCredential> result = verifiableCredentialRepository.findAll(query, Pageable.unpaged());
 
         Assertions.assertEquals(3, result.getTotalElements());
@@ -113,11 +110,10 @@ public class VerifiableCredentialRepositoryTest extends MiwIntegrationTest {
     @Test
     @SneakyThrows
     public void testFindByType() {
-        final Wallet wallet = createRandomWallet();
 
-        createRandomVerifiableCredential(wallet.getWalletId());
-        createRandomVerifiableCredential(wallet.getWalletId());
-        createRandomVerifiableCredential(wallet.getWalletId());
+        createRandomVerifiableCredential();
+        createRandomVerifiableCredential();
+        createRandomVerifiableCredential();
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
                 .verifiableCredentialType(new VerifiableCredentialType("VerifiableCredential"))

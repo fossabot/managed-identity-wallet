@@ -24,7 +24,9 @@ package org.eclipse.tractusx.managedidentitywallets.v2.api;
 import org.eclipse.tractusx.managedidentitywallets.ManagedIdentityWalletsApplication;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.CreateWalletRequestPayloadV2;
+import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.UpdateWalletRequestPayloadV2;
 import org.eclipse.tractusx.managedidentitywallets.util.MiwIntegrationTest;
 import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
 import org.junit.jupiter.api.Assertions;
@@ -73,6 +75,42 @@ public class AdminApiTest extends MiwIntegrationTest {
                 .statusCode(409);
 
         Assertions.assertEquals(1, walletRepository.count(), "Wallet should have been created");
+    }
+
+    @Test
+    public void testAdminApiUpdateWalletRequest() {
+
+        final Wallet wallet = createRandomWallet();
+        final UpdateWalletRequestPayloadV2 payload = new UpdateWalletRequestPayloadV2();
+        payload.id(wallet.getWalletId().getText());
+        payload.name("foo");
+        payload.description("bar");
+
+        given()
+                .contentType("application/json")
+                .body(payload)
+                .when()
+                .put("/api/v2/admin/wallets")
+                .then()
+                .log().all()
+                .statusCode(202);
+
+        payload.id("foo"); // non-existing wallet
+        given()
+                .contentType("application/json")
+                .body(payload)
+                .when()
+                .put("/api/v2/admin/wallets")
+                .then()
+                .log().all()
+                .statusCode(404);
+
+        final WalletQuery walletQuery = WalletQuery.builder()
+                .walletId(wallet.getWalletId())
+                .build();
+        final Wallet storedWallet = walletRepository.findOne(walletQuery).orElseThrow();
+        Assertions.assertEquals("foo", storedWallet.getWalletName().getText(), "Wallet name should have been updated");
+        Assertions.assertEquals("bar", storedWallet.getWalletDescription().getText(), "Wallet description should have been updated");
     }
 
     @Test
