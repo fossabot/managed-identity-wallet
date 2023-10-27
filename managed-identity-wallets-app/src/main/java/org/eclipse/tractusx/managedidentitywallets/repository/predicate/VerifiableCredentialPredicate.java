@@ -54,7 +54,7 @@ public class VerifiableCredentialPredicate {
                 .map(VerifiableCredentialPredicate::hasType)
                 .ifPresent(predicate::and);
 
-        /* By Wallet Id */
+        /* By Holder Wallet Id */
         Optional.ofNullable(query.getHolderWalletId())
                 .map(WalletId::getText)
                 .map(VerifiableCredentialPredicate::hasWallet)

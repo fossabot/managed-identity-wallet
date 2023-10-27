@@ -28,7 +28,7 @@ import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialCre
 import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialCreatingEvent;
 import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialDeletedEvent;
 import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialDeletingEvent;
-import org.eclipse.tractusx.managedidentitywallets.exceptions.VerifiableCredentialAlreadyExistsException;
+import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;

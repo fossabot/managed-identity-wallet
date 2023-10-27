@@ -19,14 +19,16 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository.map;
+package org.eclipse.tractusx.managedidentitywallets.exception;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.tractusx.managedidentitywallets.exception.MappingException;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 
-public abstract class AbstractMap<TIn, TOut> {
+public class VerifiableCredentialAlreadyExistsException extends Exception {
 
-    protected static final ObjectMapper MAPPER = new ObjectMapper();
+    private final VerifiableCredentialId verifiableCredentialId;
 
-    public abstract TIn map(TOut entity) throws MappingException;
+    public VerifiableCredentialAlreadyExistsException(VerifiableCredentialId verifiableCredentialId) {
+        super("VerifiableCredential already exists. " + verifiableCredentialId);
+        this.verifiableCredentialId = verifiableCredentialId;
+    }
 }

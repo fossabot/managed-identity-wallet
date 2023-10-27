@@ -19,16 +19,18 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.exceptions;
+package org.eclipse.tractusx.managedidentitywallets.exception;
 
-import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
+import lombok.Getter;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 
-public class VerifiableCredentialAlreadyExistsException extends Exception {
+@Getter
+public class WalletDoesNotExistException extends Exception {
 
-    private final VerifiableCredentialId verifiableCredentialId;
+    private final WalletId WalletId;
 
-    public VerifiableCredentialAlreadyExistsException(VerifiableCredentialId verifiableCredentialId) {
-        super("VerifiableCredential already exists. " + verifiableCredentialId);
-        this.verifiableCredentialId = verifiableCredentialId;
+    public WalletDoesNotExistException(org.eclipse.tractusx.managedidentitywallets.models.WalletId walletId) {
+        super("Wallet does not exist. " + walletId);
+        WalletId = walletId;
     }
 }

@@ -19,16 +19,30 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.exceptions;
+package org.eclipse.tractusx.managedidentitywallets.v2.map;
 
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import lombok.NonNull;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
+import org.eclipse.tractusx.ssi.lib.validation.JsonLdValidatorImpl;
+import org.springframework.stereotype.Component;
 
-public class WalletAlreadyExistsException extends Exception {
+import java.util.Map;
 
-    private final WalletId walletId;
+@Component
+public class VerifiableCredentialsMapper {
 
-    public WalletAlreadyExistsException(org.eclipse.tractusx.managedidentitywallets.models.WalletId walletId) {
-        super("Wallet already exists. " + walletId);
-        this.walletId = walletId;
+    public boolean isVerifiableCredential(@NonNull Map<String, Object> vcMap) {
+        try {
+            JsonLdValidatorImpl jsonLdValidator = new JsonLdValidatorImpl();
+
+            new VerifiableCredential(vcMap);
+            return true;
+        } catch (NullPointerException | IllegalArgumentException e) {
+            return false;
+        }
+    }
+
+    public VerifiableCredential map(@NonNull Map<String, Object> vcMap) {
+        return new VerifiableCredential(vcMap);
     }
 }

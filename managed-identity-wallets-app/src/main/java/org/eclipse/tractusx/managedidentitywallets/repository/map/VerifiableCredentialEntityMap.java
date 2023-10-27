@@ -24,7 +24,7 @@ package org.eclipse.tractusx.managedidentitywallets.repository.map;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.eclipse.tractusx.managedidentitywallets.exceptions.MappingException;
+import org.eclipse.tractusx.managedidentitywallets.exception.MappingException;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialEntity;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.stereotype.Component;

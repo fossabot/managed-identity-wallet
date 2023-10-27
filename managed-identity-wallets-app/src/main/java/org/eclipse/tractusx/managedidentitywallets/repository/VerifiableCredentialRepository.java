@@ -25,9 +25,9 @@ import com.querydsl.core.types.Predicate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.managedidentitywallets.exceptions.VerifiableCredentialAlreadyExistsException;
-import org.eclipse.tractusx.managedidentitywallets.exceptions.VerifiableCredentialDoesNotExistException;
-import org.eclipse.tractusx.managedidentitywallets.exceptions.WalletDoesNotExistException;
+import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialAlreadyExistsException;
+import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialDoesNotExistException;
+import org.eclipse.tractusx.managedidentitywallets.exception.WalletDoesNotExistException;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.*;
@@ -59,6 +59,7 @@ public class VerifiableCredentialRepository {
 
     private final VerifiableCredentialEntityMap verifiableCredentialEntityMap;
 
+    @Transactional
     public void createWalletIntersection(@NonNull VerifiableCredentialId verifiableCredentialId, @NonNull WalletId walletId)
             throws WalletDoesNotExistException, VerifiableCredentialDoesNotExistException {
         if (log.isTraceEnabled()) {
@@ -194,6 +195,18 @@ public class VerifiableCredentialRepository {
 
         // if it does not exist there is nothing to delete
         verifiableCredentialEntity.ifPresent(verifiableCredentialJpaRepository::delete);
+    }
+
+    public long count() {
+        return count(VerifiableCredentialQuery.builder().build());
+    }
+
+    public long count(@NonNull VerifiableCredentialQuery query) {
+        final Predicate predicate = VerifiableCredentialPredicate.fromQuery(query);
+        if (log.isTraceEnabled()) {
+            log.trace("count: predicate={}", predicate);
+        }
+        return verifiableCredentialJpaRepository.count(predicate);
     }
 
     public Page<VerifiableCredential> findAll(@NonNull VerifiableCredentialQuery query, @NonNull Pageable p) {

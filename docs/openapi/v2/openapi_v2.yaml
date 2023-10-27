@@ -352,6 +352,29 @@ paths:
                 items:
                   $ref: '#/components/schemas/VerifiableCredentialResponsePayload'
 
+    post:
+      operationId: adminCreateVerifiableCredential
+      tags:
+        - V2
+        - Admin
+        - Verifiable Credentials
+      summary: Create Verifiable Credential
+      description: Creates a verifiable credential
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVerifiableCredentialRequestPayload'
+      responses:
+        '201':
+          description: Verifiable credential created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateVerifiableCredentialResponsePayload'
+        '400':
+          description: Bad request.
   /admin/verifiable-credentials/{verifiableCredentialId}:
     get:
       operationId: adminGetVerifiableCredentialById
@@ -375,31 +398,6 @@ paths:
         '404':
           description: Verifiable credential not found.
 
-    post:
-      operationId: adminCreateVerifiableCredential
-      tags:
-        - V2
-        - Admin
-        - Verifiable Credentials
-      summary: Create Verifiable Credential
-      description: Creates a verifiable credential
-      parameters:
-        - $ref: '#/components/parameters/Path_Verifiable_Credential_Id'
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/CreateVerifiableCredentialRequestPayload'
-      responses:
-        '201':
-          description: Verifiable credential created successfully.
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/CreateVerifiableCredentialResponsePayload'
-        '400':
-          description: Bad request.
 
     delete:
       operationId: adminDeleteVerifiableCredentialById
@@ -519,23 +517,23 @@ components:
       allOf:
         - $ref: '#/components/schemas/Wallet'
     ListVerifiableCredentialResponsePayload:
-      allOf:
-        - $ref: '#/components/schemas/Page'
-        - type: object
-          properties:
-            items:
-              type: array
-              items:
-                $ref: '#/components/schemas/VerifiableCredential'
+      type: array
+      items:
+        description: key value map
+        type: object
+        additionalProperties: true
     CreateVerifiableCredentialResponsePayload:
-      allOf:
-        - $ref: '#/components/schemas/VerifiableCredential'
+      description: key value map
+      type: object
+      additionalProperties: true
     CreateVerifiableCredentialRequestPayload:
-      allOf:
-        - $ref: '#/components/schemas/VerifiableCredential'
+      description: key value map
+      type: object
+      additionalProperties: true
     VerifiableCredentialResponsePayload:
-      allOf:
-        - $ref: '#/components/schemas/VerifiableCredential'
+      description: key value map
+      type: object
+      additionalProperties: true
     Wallet:
       type: object
       properties:
@@ -549,22 +547,29 @@ components:
           type: string
           description: The description of the wallet.
 
-    VerifiableCredential:
-      type: object
-    VerifiablePresentation:
-      type: object
     DidRequest:
       type: object
       properties:
-        did:
-          type: string
+        did_document:
+          $ref: "#/components/schemas/DidDocument"
     DidResponse:
       type: object
       properties:
-        did:
-          type: string
         did_document:
-          type: object
+          $ref: "#/components/schemas/DidDocument"
+    VerifiableCredential:
+      description: key value map
+      type: object
+      additionalProperties: true
+    VerifiablePresentation:
+      description: key value map
+      type: object
+      additionalProperties: true
+    DidDocument:
+      description: key value map
+      type: object
+      additionalProperties: true
+
   securitySchemes:
     OAuth2:
       type: oauth2

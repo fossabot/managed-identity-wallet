@@ -73,14 +73,7 @@ public abstract class MiwIntegrationTest {
 
     @SneakyThrows
     protected VerifiableCredential createVerifiableCredential(String id, String issuer) {
-        VerifiableCredential verifiableCredential = new VerifiableCredentialBuilder()
-                .id(URI.create(id))
-                .type(List.of(VERIFIABLE_CREDENTIAL))
-                .issuer(URI.create(issuer))
-                .credentialSubject(List.of(new VerifiableCredentialSubject(Map.of("foo", "bar"))))
-                .issuanceDate(Instant.now())
-                .expirationDate(Instant.now().plus(1, java.time.temporal.ChronoUnit.DAYS))
-                .build();
+        final VerifiableCredential verifiableCredential = newVerifiableCredential(id, issuer);
 
         verifiableCredentialRepository.create(verifiableCredential);
         return verifiableCredential;
@@ -109,6 +102,17 @@ public abstract class MiwIntegrationTest {
                 .walletName(walletName)
                 .walletDescription(walletDescription)
                 .ed25519Keys(List.of())
+                .build();
+    }
+
+    protected VerifiableCredential newVerifiableCredential(String id, String issuer) {
+        return new VerifiableCredentialBuilder()
+                .id(URI.create(id))
+                .type(List.of(VERIFIABLE_CREDENTIAL))
+                .issuer(URI.create(issuer))
+                .credentialSubject(List.of(new VerifiableCredentialSubject(Map.of("foo", "bar"))))
+                .issuanceDate(Instant.now())
+                .expirationDate(Instant.now().plus(1, java.time.temporal.ChronoUnit.DAYS))
                 .build();
     }
 }

@@ -19,18 +19,15 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.exceptions;
+package org.eclipse.tractusx.managedidentitywallets.exception;
 
-import lombok.Getter;
-import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
+public class MappingException extends RuntimeException {
 
-@Getter
-public class VerifiableCredentialDoesNotExistException extends Exception {
+        public MappingException(String message) {
+            super(message);
+        }
 
-    private final VerifiableCredentialId verifiableCredentialId;
-
-    public VerifiableCredentialDoesNotExistException(VerifiableCredentialId verifiableCredentialId) {
-        super("VerifiableCredential does not exist. " + verifiableCredentialId);
-        this.verifiableCredentialId = verifiableCredentialId;
-    }
+        public MappingException(String message, Throwable throwable) {
+            super(message, throwable);
+        }
 }

@@ -26,6 +26,8 @@ import com.querydsl.core.types.ExpressionUtils;
 import com.querydsl.core.types.Predicate;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import lombok.NoArgsConstructor;
+import lombok.NonNull;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.QWalletEntity;
@@ -37,20 +39,21 @@ import java.util.Optional;
 @NoArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 public class WalletPredicate {
 
-    public static Predicate fromQuery(WalletQuery query) {
+    public static Predicate fromQuery(@NonNull WalletQuery query) {
 
-        Predicate predicate = notNull();
+        final BooleanBuilder predicate = new BooleanBuilder(notNull());
 
-        final String id = Optional.ofNullable(query.getWalletId()).map(WalletId::getText).orElse(null);
-        final String name = Optional.ofNullable(query.getName()).map(WalletName::getText).orElse(null);
+        /* By Wallet Id */
+        Optional.ofNullable(query.getWalletId())
+                .map(WalletId::getText)
+                .map(WalletPredicate::hasId)
+                .ifPresent(predicate::and);
 
-        if (Objects.nonNull(id)) {
-            predicate = ExpressionUtils.and(predicate, hasId(id));
-        }
-
-        if (Objects.nonNull(name)) {
-            predicate = ExpressionUtils.and(predicate, hasName(name));
-        }
+        /* By Wallet Name */
+        Optional.ofNullable(query.getName())
+                .map(WalletName::getText)
+                .map(WalletPredicate::hasName)
+                .ifPresent(predicate::and);
 
         return predicate;
     }

@@ -23,7 +23,7 @@ package org.eclipse.tractusx.managedidentitywallets.repository.map;
 
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.eclipse.tractusx.managedidentitywallets.exceptions.MappingException;
+import org.eclipse.tractusx.managedidentitywallets.exception.MappingException;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
 import org.springframework.stereotype.Component;

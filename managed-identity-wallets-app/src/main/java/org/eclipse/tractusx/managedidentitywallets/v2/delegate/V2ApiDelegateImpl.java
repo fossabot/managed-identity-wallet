@@ -26,13 +26,14 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
-import org.eclipse.tractusx.managedidentitywallets.exceptions.WalletAlreadyExistsException;
-import org.eclipse.tractusx.managedidentitywallets.exceptions.WalletDoesNotExistException;
+import org.eclipse.tractusx.managedidentitywallets.exception.WalletAlreadyExistsException;
+import org.eclipse.tractusx.managedidentitywallets.exception.WalletDoesNotExistException;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.managedidentitywallets.spring.controllers.v2.V2ApiDelegate;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.*;
+import org.eclipse.tractusx.managedidentitywallets.v2.map.VerifiableCredentialsMapper;
 import org.eclipse.tractusx.managedidentitywallets.v2.map.WalletsApiMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -40,6 +41,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Slf4j
@@ -50,6 +53,7 @@ public class V2ApiDelegateImpl implements V2ApiDelegate {
     private final WalletService walletService;
     private final WalletsApiMapper walletsApiMapper;
     private final MIWSettings miwSettings;
+    private final VerifiableCredentialsMapper verifiableCredentialsMapper;
 
     @Override
     public ResponseEntity<CreateWalletResponsePayloadV2> adminCreateWallet(@NonNull CreateWalletRequestPayloadV2 createWalletResponsePayloadV2) {
@@ -140,4 +144,33 @@ public class V2ApiDelegateImpl implements V2ApiDelegate {
         }
     }
 
+    @Override
+    public ResponseEntity<Map<String, Object>> adminCreateVerifiableCredential(Map<String, Object> requestBody) {
+        if (log.isDebugEnabled()) {
+            log.debug("createVerifiableCredential(requestBody={})", requestBody);
+        }
+
+        if (!verifiableCredentialsMapper.isVerifiableCredential(requestBody)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        final Map<String, Object> vc = verifiableCredentialsMapper.map(requestBody);
+
+        return V2ApiDelegate.super.adminCreateVerifiableCredential(requestBody);
+    }
+
+    @Override
+    public ResponseEntity<Void> adminDeleteVerifiableCredentialById(String verifiableCredentialId) {
+        return V2ApiDelegate.super.adminDeleteVerifiableCredentialById(verifiableCredentialId);
+    }
+
+    @Override
+    public ResponseEntity<List<Map<String, Object>>> adminGetVerifiableCredentialById(String verifiableCredentialId) {
+        return V2ApiDelegate.super.adminGetVerifiableCredentialById(verifiableCredentialId);
+    }
+
+    @Override
+    public ResponseEntity<List<Map<String, Object>>> adminGetVerifiableCredentials(Integer page, Integer perPage, String id, String type, String issuer, String holder) {
+        return V2ApiDelegate.super.adminGetVerifiableCredentials(page, perPage, id, type, issuer, holder);
+    }
 }

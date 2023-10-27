@@ -25,8 +25,8 @@ import com.querydsl.core.types.Predicate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.managedidentitywallets.exceptions.WalletAlreadyExistsException;
-import org.eclipse.tractusx.managedidentitywallets.exceptions.WalletDoesNotExistException;
+import org.eclipse.tractusx.managedidentitywallets.exception.WalletAlreadyExistsException;
+import org.eclipse.tractusx.managedidentitywallets.exception.WalletDoesNotExistException;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.Ed25519KeyEntity;
@@ -139,6 +139,7 @@ public class WalletRepository {
         walletJpaRepository.deleteAll();
     }
 
+    @Transactional
     public void delete(@NonNull WalletId walletId) {
         if (log.isTraceEnabled()) {
             log.trace("delete: wallet={}", walletId);

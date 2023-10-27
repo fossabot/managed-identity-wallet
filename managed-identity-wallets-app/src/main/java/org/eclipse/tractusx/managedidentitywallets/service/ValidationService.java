@@ -19,18 +19,29 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.exceptions;
+package org.eclipse.tractusx.managedidentitywallets.service;
 
-import lombok.Getter;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.ssi.lib.exception.InvalidJsonLdException;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
+import org.eclipse.tractusx.ssi.lib.validation.JsonLdValidator;
+import org.eclipse.tractusx.ssi.lib.validation.JsonLdValidatorImpl;
+import org.springframework.stereotype.Service;
 
-@Getter
-public class WalletDoesNotExistException extends Exception {
+@Service
+public class ValidationService {
 
-    private final WalletId WalletId;
+    private final JsonLdValidator jsonLdValidator;
 
-    public WalletDoesNotExistException(org.eclipse.tractusx.managedidentitywallets.models.WalletId walletId) {
-        super("Wallet does not exist. " + walletId);
-        WalletId = walletId;
+    public ValidationService() {
+        jsonLdValidator = new JsonLdValidatorImpl();
+    }
+
+    public boolean isValid(VerifiableCredential verifiableCredential) {
+        try {
+            jsonLdValidator.validate(verifiableCredential);
+        } catch (InvalidJsonLdException e) {
+            return false;
+        }
+        return true;
     }
 }

@@ -19,9 +19,16 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository.predicate;
+package org.eclipse.tractusx.managedidentitywallets.exception;
 
-public enum SortOrder {
-    ASC,
-    DESC
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+
+public class WalletAlreadyExistsException extends Exception {
+
+    private final WalletId walletId;
+
+    public WalletAlreadyExistsException(org.eclipse.tractusx.managedidentitywallets.models.WalletId walletId) {
+        super("Wallet already exists. " + walletId);
+        this.walletId = walletId;
+    }
 }
