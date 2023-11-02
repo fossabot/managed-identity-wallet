@@ -33,36 +33,29 @@ public interface WalletsApiMapper {
 
     @Mapping(target = "walletId.text", source = "id")
     @Mapping(target = "walletName.text", source = "name")
-    @Mapping(target = "walletDescription.text", source = "description")
     Wallet mapWallet(WalletV2 walletV2);
 
     @Mapping(target = "id", source = "walletId.text")
-    @Mapping(target = "description", source = "walletDescription.text")
     @Mapping(target = "name", source = "walletName.text")
     WalletV2 mapWalletV2(Wallet wallet);
 
     @Mapping(target = "id", source = "walletId.text")
-    @Mapping(target = "description", source = "walletDescription.text")
     @Mapping(target = "name", source = "walletName.text")
     WalletResponsePayloadV2 mapWalletResponsePayloadV2(Wallet wallet);
 
     @Mapping(target = "id", source = "walletId.text")
-    @Mapping(target = "description", source = "walletDescription.text")
     @Mapping(target = "name", source = "walletName.text")
     CreateWalletResponsePayloadV2 mapCreateWalletResponsePayloadV2(Wallet wallet);
 
     @Mapping(target = "walletId.text", source = "id")
-    @Mapping(target = "walletDescription.text", source = "description")
     @Mapping(target = "walletName.text", source = "name")
     Wallet mapCreateWalletResponsePayloadV2(CreateWalletRequestPayloadV2 wallet);
 
     @Mapping(target = "walletId.text", source = "id")
-    @Mapping(target = "walletDescription.text", source = "description")
     @Mapping(target = "walletName.text", source = "name")
     Wallet mapUpdateWalletRequestPayloadV2(UpdateWalletRequestPayloadV2 wallet);
 
     @Mapping(target = "id", source = "walletId.text")
-    @Mapping(target = "description", source = "walletDescription.text")
     @Mapping(target = "name", source = "walletName.text")
     UpdateWalletResponsePayloadV2 mapUpdateWalletResponsePayloadV2(Wallet wallet);
 

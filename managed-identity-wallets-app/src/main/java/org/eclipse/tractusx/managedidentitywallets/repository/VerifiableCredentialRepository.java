@@ -226,4 +226,11 @@ public class VerifiableCredentialRepository {
                 .map(verifiableCredentialEntityMap::map);
     }
 
+    public boolean exists(@NonNull VerifiableCredentialQuery query) {
+        final Predicate predicate = VerifiableCredentialPredicate.fromQuery(query);
+        if (log.isTraceEnabled()) {
+            log.trace("exists: predicate={}", predicate);
+        }
+        return verifiableCredentialJpaRepository.findOne(predicate).isPresent();
+    }
 }

@@ -25,15 +25,20 @@ import com.querydsl.core.types.Predicate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.Ed25519KeyEntity;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialEntity;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialWalletIntersectionEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.map.WalletMap;
 import org.eclipse.tractusx.managedidentitywallets.repository.predicate.WalletPredicate;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
@@ -41,6 +46,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
 @Component
@@ -50,6 +56,7 @@ public class WalletRepository {
 
     private final WalletJpaRepository walletJpaRepository;
     private final VerifiableCredentialWalletIntersectionJpaRepository verifiableCredentialWalletIntersectionJpaRepository;
+    private final VerifiableCredentialJpaRepository verifiableCredentialJpaRepository;
     private final Ed25519KeyJpaRepository ed25519KeyJpaRepository;
     private final WalletMap walletMap;
 
@@ -59,20 +66,18 @@ public class WalletRepository {
         /* Create New Wallet */
         final String walletId = wallet.getWalletId().getText();
         final String walletName = wallet.getWalletName().getText();
-        final String walletDescription = wallet.getWalletDescription().getText();
 
         final WalletEntity walletEntity = new WalletEntity();
         walletEntity.setId(walletId);
         walletEntity.setName(walletName);
-        walletEntity.setDescription(walletDescription);
 
-        final List<Ed25519KeyEntity> ed25519KeyEntities = wallet.getEd25519Keys().stream()
+        final List<Ed25519KeyEntity> ed25519KeyEntities = wallet.getStoredEd25519Keys().stream()
                 .map(k -> {
                     final Ed25519KeyEntity keyEntity = new Ed25519KeyEntity();
-                    keyEntity.setVaultSecret(k.getVaultSecret());
-                    keyEntity.setDescription(k.getDescription());
+                    keyEntity.setId(UUID.randomUUID().toString());
+                    keyEntity.setVaultSecret(k.getVaultSecret().getText());
                     keyEntity.setWallet(walletEntity);
-                    keyEntity.setDidIdentifier(k.getDidIdentifier());
+                    keyEntity.setDidFragment(k.getDidFragment().getText());
                     return keyEntity;
                 }).collect(Collectors.toList());
         walletEntity.setEd25519Keys(ed25519KeyEntities);
@@ -86,8 +91,9 @@ public class WalletRepository {
         if (log.isTraceEnabled()) {
             log.trace("create: wallet={}", wallet);
         }
-        walletJpaRepository.save(walletEntity);
+
         ed25519KeyJpaRepository.saveAll(ed25519KeyEntities);
+        walletJpaRepository.save(walletEntity);
     }
 
     @Transactional
@@ -103,18 +109,14 @@ public class WalletRepository {
 
         /* Update Wallet */
         final String walletName = wallet.getWalletName().getText();
-        final String walletDescription = wallet.getWalletDescription().getText();
-
         walletEntity.setName(walletName);
-        walletEntity.setDescription(walletDescription);
 
-        final List<Ed25519KeyEntity> ed25519KeyEntities = wallet.getEd25519Keys().stream()
+        final List<Ed25519KeyEntity> ed25519KeyEntities = wallet.getStoredEd25519Keys().stream()
                 .map(k -> {
                     final Ed25519KeyEntity keyEntity = new Ed25519KeyEntity();
-                    keyEntity.setVaultSecret(k.getVaultSecret());
-                    keyEntity.setDescription(k.getDescription());
+                    keyEntity.setVaultSecret(k.getVaultSecret().getText());
                     keyEntity.setWallet(walletEntity);
-                    keyEntity.setDidIdentifier(k.getDidIdentifier());
+                    keyEntity.setDidFragment(k.getDidFragment().getText());
                     return keyEntity;
                 }).collect(Collectors.toList());
 
@@ -159,6 +161,27 @@ public class WalletRepository {
         return walletJpaRepository.count(predicate);
     }
 
+    public boolean exists(@NonNull WalletQuery query) {
+        final Predicate predicate = WalletPredicate.fromQuery(query);
+        if (log.isTraceEnabled()) {
+            log.trace("exists: predicate={}", predicate);
+        }
+        return walletJpaRepository.findOne(predicate).isPresent();
+
+    }
+
+    public boolean existsById(@NonNull WalletId walletId) {
+        if (log.isTraceEnabled()) {
+            log.trace("existsById: walletId={}", walletId);
+        }
+        return walletJpaRepository.findById(walletId.getText()).isPresent();
+    }
+
+    public Optional<Wallet> findById(@NonNull WalletId walletId) {
+        final WalletQuery query = WalletQuery.builder().walletId(walletId).build();
+        return findOne(query);
+    }
+
     public Optional<Wallet> findOne(@NonNull WalletQuery query) {
         final Predicate predicate = WalletPredicate.fromQuery(query);
         if (log.isTraceEnabled()) {
@@ -177,4 +200,32 @@ public class WalletRepository {
         return walletJpaRepository.findAll(predicate, pageable)
                 .map(walletMap::map);
     }
+
+    public void storeVerifiableCredentialInWallet(@NonNull Wallet wallet, @NonNull VerifiableCredential verifiableCredential) {
+        final Optional<WalletEntity> walletEntity = walletJpaRepository.findById(wallet.getWalletId().getText());
+        if (walletEntity.isEmpty()) {
+            throw new WalletNotFoundException(wallet.getWalletId());
+        }
+
+        final Optional<VerifiableCredentialEntity> verifiableCredentialEntity = verifiableCredentialJpaRepository.findById(verifiableCredential.getId().toString());
+        if (verifiableCredentialEntity.isEmpty()) {
+            final VerifiableCredentialId verifiableCredentialId = new VerifiableCredentialId(verifiableCredential.getId().toString());
+            throw new VerifiableCredentialNotFoundException(verifiableCredentialId);
+        }
+
+        final VerifiableCredentialWalletIntersectionEntity.VerifiableCredentialIntersectionEntityId verifiableCredentialIntersectionEntityId = new VerifiableCredentialWalletIntersectionEntity.VerifiableCredentialIntersectionEntityId();
+        verifiableCredentialIntersectionEntityId.setVerifiableCredential(verifiableCredentialEntity.get());
+        verifiableCredentialIntersectionEntityId.setWallet(walletEntity.get());
+        final VerifiableCredentialWalletIntersectionEntity verifiableCredentialWalletIntersectionEntity = new VerifiableCredentialWalletIntersectionEntity();
+        verifiableCredentialWalletIntersectionEntity.setId(verifiableCredentialIntersectionEntityId);
+
+        // if it's not already stored put it into the wallet
+        if (!verifiableCredentialWalletIntersectionJpaRepository.existsById(verifiableCredentialIntersectionEntityId)) {
+            if (log.isTraceEnabled()) {
+                log.trace("storeVerifiableCredentialInWallet: wallet={}, verifiableCredential={}", wallet, verifiableCredential);
+            }
+            verifiableCredentialWalletIntersectionJpaRepository.save(verifiableCredentialWalletIntersectionEntity);
+        }
+    }
+
 }

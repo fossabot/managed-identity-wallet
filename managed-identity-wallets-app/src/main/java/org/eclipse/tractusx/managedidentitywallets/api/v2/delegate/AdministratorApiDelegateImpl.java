@@ -41,6 +41,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -200,7 +201,7 @@ public class AdministratorApiDelegateImpl implements AdministratorApiDelegate {
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
                 .verifiableCredentialIssuer(Optional.ofNullable(issuer).map(VerifiableCredentialIssuer::new).orElse(null))
                 .verifiableCredentialId(Optional.ofNullable(id).map(VerifiableCredentialId::new).orElse(null))
-                .verifiableCredentialTypes(Optional.ofNullable(type).map(VerifiableCredentialType::new).orElse(null))
+                .verifiableCredentialTypes(Optional.ofNullable(type).map(VerifiableCredentialType::new).map(List::of).orElse(null))
                 .holderWalletId(Optional.ofNullable(holder).map(WalletId::new).orElse(null))
                 .build();
 

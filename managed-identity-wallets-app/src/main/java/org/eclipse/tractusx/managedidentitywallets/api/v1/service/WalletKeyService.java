@@ -70,11 +70,11 @@ public class WalletKeyService {
         final Wallet walletEntity = walletRepository.findOne(walletQuery)
                 .orElseThrow(() -> new WalletNotFoundProblem(walletId));
 
-        var latestKey = walletEntity.getEd25519Keys().stream()
-                .max((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()))
+        var latestKey = walletEntity.getStoredEd25519Keys().stream()
+                .findFirst()
                 .orElseThrow(() -> new RuntimeException("No key found for wallet " + walletId));
 
-        final byte[] key = vaultService.resolvePrivateKey(latestKey.getVaultSecret());
+        final byte[] key = vaultService.resolveKey(latestKey).getPrivateKey();
         return Ed25519Key.asPrivateKey(key);
     }
 

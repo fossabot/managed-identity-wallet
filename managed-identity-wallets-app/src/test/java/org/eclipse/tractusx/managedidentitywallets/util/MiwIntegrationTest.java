@@ -25,7 +25,6 @@ import io.restassured.RestAssured;
 import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletDescription;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
 import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
@@ -81,27 +80,33 @@ public abstract class MiwIntegrationTest {
 
     protected Wallet createRandomWallet() {
         final String random = UUID.randomUUID().toString();
-        return createWallet("id" + random, "name" + random, "description" + random);
+        return createWallet("id" + random, "name" + random);
     }
 
     @SneakyThrows
-    protected Wallet createWallet(String id, String name, String description) {
-        final Wallet wallet = newWalletObject(id, name, description);
+    protected Wallet createWallet(String id) {
+        final Wallet wallet = newWalletObject(id, "name" + id);
 
         walletRepository.create(wallet);
         return wallet;
     }
 
-    protected Wallet newWalletObject(String id, String name, String description) {
+    @SneakyThrows
+    protected Wallet createWallet(String id, String name) {
+        final Wallet wallet = newWalletObject(id, name);
+
+        walletRepository.create(wallet);
+        return wallet;
+    }
+
+    protected Wallet newWalletObject(String id, String name) {
         final WalletId walletId = new WalletId(id == null ? UUID.randomUUID().toString() : id);
         final WalletName walletName = new WalletName(name == null ? UUID.randomUUID().toString() : name);
-        final WalletDescription walletDescription = new WalletDescription(description == null ? UUID.randomUUID().toString() : description);
 
         return Wallet.builder()
                 .walletId(walletId)
                 .walletName(walletName)
-                .walletDescription(walletDescription)
-                .ed25519Keys(List.of())
+                .storedEd25519Keys(List.of())
                 .build();
     }
 

@@ -29,6 +29,7 @@ import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -46,6 +47,10 @@ public class WalletService {
 
     private final WalletRepository walletRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
+
+    public void storeVerifiableCredential(@NonNull Wallet wallet, @NonNull VerifiableCredential verifiableCredential) {
+        walletRepository.storeVerifiableCredentialInWallet(wallet, verifiableCredential);
+    }
 
     public Optional<Wallet> findById(@NonNull WalletId id) {
         final WalletQuery query = WalletQuery.builder()

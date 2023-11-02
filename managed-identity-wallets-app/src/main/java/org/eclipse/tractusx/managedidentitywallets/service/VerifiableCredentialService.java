@@ -68,6 +68,18 @@ public class VerifiableCredentialService {
         return verifiableCredentialRepository.findOne(query);
     }
 
+    public boolean existsById(@NonNull VerifiableCredentialId verifiableCredentialId) {
+        return findById(verifiableCredentialId).isPresent();
+    }
+
+    public boolean exists(@NonNull VerifiableCredentialQuery query) {
+        return findOne(query).isPresent();
+    }
+
+    public Page<VerifiableCredential> findAll(VerifiableCredentialQuery query) {
+        return findAll(query, 0, Integer.MAX_VALUE);
+    }
+
     public Page<VerifiableCredential> findAll(int page, int size) {
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder().build();
         return findAll(query, page, size);

@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
+import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
@@ -117,15 +118,16 @@ public class CommonService {
         DidDocumentBuilder didDocumentBuilder = new DidDocumentBuilder();
         didDocumentBuilder.id(did.toUri());
 
-        for (var key : wallet.getEd25519Keys()) {
+        for (var key : wallet.getStoredEd25519Keys()) {
 
-            final byte[] privateKey = vaultService.resolvePrivateKey(key.getVaultSecret());
+            final ResolvedEd25519Key resolvedEd25519Key = vaultService.resolveKey(key);
+            final byte[] privateKey = resolvedEd25519Key.getPrivateKey();
             IPrivateKey x21559PrivateKey = new x21559PrivateKey(privateKey);
 
-            final byte[] publicKey = vaultService.resolvePublicKey(key.getVaultSecret());
+            final byte[] publicKey = resolvedEd25519Key.getPublicKey();
             IPublicKey x21559PublicKey = new x21559PublicKey(publicKey);
 
-            final String keyId = key.getDidIdentifier();
+            final String keyId = key.getDidFragment().getText();
             JsonWebKey jwk = new JsonWebKey(keyId, x21559PublicKey, x21559PrivateKey);
             JWKVerificationMethod jwkVerificationMethod =
                     new JWKVerificationMethodBuilder().did(did).jwk(jwk).build();

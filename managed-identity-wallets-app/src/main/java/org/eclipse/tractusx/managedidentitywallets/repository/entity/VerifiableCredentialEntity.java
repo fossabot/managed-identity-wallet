@@ -36,7 +36,6 @@ import java.util.Set;
 public class VerifiableCredentialEntity extends AbstractEntity {
 
     public static final String TABLE_NAME = "verifiable_credential";
-
     public static final String COLUMN_JSON = "raw";
     public static final String COLUMN_ID = "id";
 

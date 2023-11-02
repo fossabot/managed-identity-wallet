@@ -38,7 +38,6 @@ import lombok.NoArgsConstructor;
 public class VerifiableCredentialTypeEntity extends AbstractEntity {
 
     public static final String TABLE_NAME = "verifiable_credential_type";
-
     public static final String COLUMN_TYPE = "type";
 
     @Id

@@ -25,7 +25,6 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
-import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 
 @Data
 @NoArgsConstructor
@@ -35,22 +34,18 @@ import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 public class Ed25519KeyEntity extends AbstractEntity {
 
     public static final String TABLE_NAME = "key_ed25519";
-
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_WALLET_ID = "wallet_id";
-    public static final String COLUMN_DID_IDENTIFIER = "did_identifier";
-    public static final String COLUMN_DESCRIPTION = "description";
+    public static final String COLUMN_DID_FRAGMENT = "did_fragment";
+
     public static final String COLUMN_VAULT_SECRET = "vault_secret";
 
     @Id
     @Column(name = COLUMN_ID, nullable = false)
     private String id;
 
-    @Column(name = COLUMN_DID_IDENTIFIER, nullable = false)
-    private String didIdentifier;
-
-    @Column(name = COLUMN_DESCRIPTION)
-    private String description;
+    @Column(name = COLUMN_DID_FRAGMENT, nullable = false)
+    private String didFragment;
 
     @Column(name = COLUMN_VAULT_SECRET, nullable = false)
     private String vaultSecret;

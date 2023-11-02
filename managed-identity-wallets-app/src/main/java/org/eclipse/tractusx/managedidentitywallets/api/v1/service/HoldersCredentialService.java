@@ -23,14 +23,20 @@ package org.eclipse.tractusx.managedidentitywallets.api.v1.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.text.StringEscapeUtils;
+import org.eclipse.tractusx.managedidentitywallets.api.v1.entity.HoldersCredential;
+import org.eclipse.tractusx.managedidentitywallets.api.v1.entity.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.ForbiddenException;
+import org.eclipse.tractusx.managedidentitywallets.api.v1.utils.CommonUtils;
+import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
-import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
+import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;
@@ -54,10 +60,9 @@ public class HoldersCredentialService {
 
     private final WalletKeyService walletKeyService;
 
-    private final VerifiableCredentialRepository verifiableCredentialRepository;
-
 
     private final VerifiableCredentialService verifiableCredentialService;
+    private final WalletService walletService;
 
 
     /**
@@ -72,7 +77,7 @@ public class HoldersCredentialService {
     public Page<VerifiableCredential> getCredentials(String credentialId, String issuerIdentifier, String sortColumn, String sortType, List<String> type, int pageNumber, int size, String callerBPN) {
         if (credentialId != null) {
 
-            VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
+            final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
                     .verifiableCredentialId(new VerifiableCredentialId(credentialId))
                     .holderWalletId(new WalletId(callerBPN))
                     .build();
@@ -126,31 +131,35 @@ public class HoldersCredentialService {
      * @return the verifiable credential
      */
     public VerifiableCredential issueCredential(Map<String, Object> data, String callerBpn) {
-//        VerifiableCredential verifiableCredential = new VerifiableCredential(data);
-//        Wallet issuerWallet = commonService.getWalletByIdentifier(verifiableCredential.getIssuer().toString());
-//
-//        //validate BPN access, Holder must be caller of API
-//        Validate.isFalse(callerBpn.equals(issuerWallet.getBpn())).launch(new ForbiddenException(BASE_WALLET_BPN_IS_NOT_MATCHING_WITH_REQUEST_BPN_FROM_TOKEN));
-//
-//        // get Key
-//        byte[] privateKeyBytes = walletKeyService.getPrivateKeyByWalletIdentifierAsBytes(issuerWallet.getId());
-//
-//        // Create Credential
-//        HoldersCredential credential = CommonUtils.getHoldersCredential(verifiableCredential.getCredentialSubject().get(0),
-//                verifiableCredential.getTypes(), issuerWallet.getDidDocument(),
-//                privateKeyBytes, issuerWallet.getDid(),
-//                verifiableCredential.getContext(), Date.from(verifiableCredential.getExpirationDate()), true);
-//
-//        //Store Credential in holder table
-//        credential = create(credential);
-//
-//        log.debug("VC type of {} issued to bpn ->{}", StringEscapeUtils.escapeJava(verifiableCredential.getTypes().toString()), StringEscapeUtils.escapeJava(callerBpn));
-//        // Return VC
-//        return credential.getData();
-        return null;
-    }
+        final VerifiableCredential verifiableCredential = new VerifiableCredential(data);
+        final Wallet issuerWallet =
+                commonService.getWalletByIdentifier(verifiableCredential.getIssuer().toString());
 
-    private void isCredentialExistWithId(String holderDid, String credentialId) {
-//        Validate.isFalse(holdersCredentialRepository.existsByHolderDidAndCredentialId(holderDid, credentialId)).launch(new CredentialNotFoundProblem("Credential ID: " + credentialId + " is not exists "));
+        //validate BPN access, Holder must be caller of API
+        if (!callerBpn.equals(issuerWallet.getBpn())) {
+            throw new ForbiddenException(BASE_WALLET_BPN_IS_NOT_MATCHING_WITH_REQUEST_BPN_FROM_TOKEN);
+        }
+
+        // get Key
+        byte[] privateKeyBytes = walletKeyService.getPrivateKeyByWalletIdentifierAsBytes(issuerWallet.getId());
+
+        // Create Credential
+        HoldersCredential credential = CommonUtils.getHoldersCredential(verifiableCredential.getCredentialSubject().get(0),
+                verifiableCredential.getTypes(), issuerWallet.getDidDocument(),
+                privateKeyBytes, issuerWallet.getDid(),
+                verifiableCredential.getContext(), Date.from(verifiableCredential.getExpirationDate()));
+
+        //Store Credential in holder table
+        verifiableCredentialService.create(verifiableCredential);
+        final WalletId walletId = new WalletId(callerBpn);
+        final Optional<org.eclipse.tractusx.managedidentitywallets.models.Wallet> wallet = walletService.findById(walletId);
+        if (wallet.isEmpty()) {
+            throw new WalletNotFoundException(walletId);
+        }
+        walletService.storeVerifiableCredential(wallet.get(), verifiableCredential);
+
+        log.debug("VC type of {} issued to bpn ->{}", StringEscapeUtils.escapeJava(verifiableCredential.getTypes().toString()), StringEscapeUtils.escapeJava(callerBpn));
+        // Return VC
+        return credential.getData();
     }
 }

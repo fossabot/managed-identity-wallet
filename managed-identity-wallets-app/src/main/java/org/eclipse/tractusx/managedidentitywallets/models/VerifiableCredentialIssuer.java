@@ -22,12 +22,15 @@
 package org.eclipse.tractusx.managedidentitywallets.models;
 
 import lombok.EqualsAndHashCode;
+import lombok.NonNull;
 import lombok.ToString;
 import lombok.Value;
+import lombok.experimental.NonFinal;
 
 @Value
 @EqualsAndHashCode
 @ToString
 public class VerifiableCredentialIssuer {
+    @NonNull
     String text;
 }

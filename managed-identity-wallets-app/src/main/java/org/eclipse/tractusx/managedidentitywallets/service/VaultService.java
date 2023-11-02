@@ -21,23 +21,36 @@
 
 package org.eclipse.tractusx.managedidentitywallets.service;
 
+import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
+import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Service
 public class VaultService {
-    public byte[] resolvePublicKey(String secretName) {
-        return null;
+
+    private final List<ResolvedEd25519Key> keys = new ArrayList<>();
+
+    public ResolvedEd25519Key resolveKey(StoredEd25519Key storedEd25519Key) {
+        return keys.stream()
+                .filter(k -> k.getVaultSecret().equals(storedEd25519Key.getVaultSecret()))
+                .findFirst()
+                .orElseThrow();
     }
 
-    public byte[] resolvePrivateKey(String secretName) {
-        return null;
+    public StoredEd25519Key storeKey(ResolvedEd25519Key resolvedEd25519Key) {
+        keys.add(resolvedEd25519Key);
+        return mapToStoredKey(resolvedEd25519Key);
     }
 
-    public void storePublicKey(String secretName) {
-
-    }
-
-    public void storePrivateKey(String secretName) {
-
+    private static StoredEd25519Key mapToStoredKey(ResolvedEd25519Key resolvedEd25519Key) {
+        return StoredEd25519Key.builder()
+                .id(resolvedEd25519Key.getId())
+                .createdAt(resolvedEd25519Key.getCreatedAt())
+                .didFragment(resolvedEd25519Key.getDidFragment())
+                .vaultSecret(resolvedEd25519Key.getVaultSecret())
+                .build();
     }
 }

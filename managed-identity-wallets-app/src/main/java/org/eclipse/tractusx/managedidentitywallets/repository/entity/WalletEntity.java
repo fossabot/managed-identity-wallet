@@ -39,18 +39,14 @@ import java.util.Set;
 public class WalletEntity extends AbstractEntity {
 
     public static final String TABLE_NAME = "wallet";
-
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_NAME = "name";
-    public static final String COLUMN_DESCRIPTION = "description";
 
     @Id
     private String id;
 
     @Unique
     private String name;
-
-    private String description;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "wallet", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Ed25519KeyEntity> ed25519Keys;

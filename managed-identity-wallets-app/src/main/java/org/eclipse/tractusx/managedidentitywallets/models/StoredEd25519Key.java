@@ -19,27 +19,27 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository.entity;
+package org.eclipse.tractusx.managedidentitywallets.models;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.NonNull;
+import lombok.Value;
 
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(of = "issuer", callSuper = false)
-@Entity(name= VerifiableCredentialIssuerEntity.TABLE_NAME)
-@Table(name = VerifiableCredentialIssuerEntity.TABLE_NAME)
-public class VerifiableCredentialIssuerEntity extends AbstractEntity {
+import java.time.Instant;
 
-    public static final String TABLE_NAME = "verifiable_credential_issuer";
-    public static final String COLUMN_ISSUER = "issuer";
+@Value
+@AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
+@Builder
+public class StoredEd25519Key implements Ed25519Key {
 
-    @Id
-    @Column(name = COLUMN_ISSUER, nullable = false)
-    private String issuer;
+    @NonNull
+    Ed25519KeyId id;
+    @NonNull
+    DidFragment didFragment;
+    @NonNull
+    VaultSecret vaultSecret;
+    @NonNull
+    Instant createdAt;
 }
+

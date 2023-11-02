@@ -28,7 +28,6 @@ import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer
 import org.eclipse.tractusx.managedidentitywallets.event.*;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletDescription;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
@@ -71,9 +70,9 @@ public class WalletServiceTest extends MiwIntegrationTest {
     @Test
     @SneakyThrows
     public void testWalletCreation() {
-        final Wallet w1 = newWalletObject("1", "1", "1");
-        final Wallet w2 = newWalletObject("2", "2", "2");
-        final Wallet w3 = newWalletObject("3", "3", "3");
+        final Wallet w1 = newWalletObject("1", "1");
+        final Wallet w2 = newWalletObject("2", "2");
+        final Wallet w3 = newWalletObject("3", "3");
 
         walletService.create(w1);
         walletService.create(w2);
@@ -97,11 +96,9 @@ public class WalletServiceTest extends MiwIntegrationTest {
 
         final WalletId originalId = originalWallet.getWalletId();
         final WalletName newName = new WalletName("updatedName");
-        final WalletDescription newDescription = new WalletDescription("updatedDescription");
         final Wallet modifiedWallet = Wallet.builder()
                 .walletId(originalId)
                 .walletName(newName)
-                .walletDescription(newDescription)
                 .build();
 
         walletService.update(modifiedWallet);
@@ -111,7 +108,6 @@ public class WalletServiceTest extends MiwIntegrationTest {
         Assertions.assertEquals(1, walletEventTracker.walletUpdatingEvents.size(), "1 WalletUpdatingEvent should have been fired");
         Assertions.assertEquals(1, walletEventTracker.walletUpdatedEvents.size(), "1 walletUpdatedEvents should have been fired");
         Assertions.assertEquals(newName, updatedWallet.getWalletName(), "WalletName should have been updated");
-        Assertions.assertEquals(newDescription, updatedWallet.getWalletDescription(), "WalletDescription should have been updated");
     }
 
     @Test
@@ -139,9 +135,9 @@ public class WalletServiceTest extends MiwIntegrationTest {
     @Test
     @SneakyThrows
     public void testWalletFindById() {
-        createWallet("1", "name", "1");
-        createWallet("2", "name", "2");
-        createWallet("3", "name", "3");
+        createWallet("1", "name");
+        createWallet("2", "name");
+        createWallet("3", "name");
 
         final Optional<Wallet> wallet = walletService.findById(new WalletId("1"));
 
@@ -151,9 +147,9 @@ public class WalletServiceTest extends MiwIntegrationTest {
     @Test
     @SneakyThrows
     public void testWalletFindByName() {
-        createWallet("1", "name", "1");
-        createWallet("2", "name", "2");
-        createWallet("3", "name", "3");
+        createWallet("1", "name");
+        createWallet("2", "name");
+        createWallet("3", "name");
 
         final WalletQuery walletQuery = WalletQuery.builder()
                 .name(new WalletName("name"))

@@ -27,7 +27,6 @@ import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.util.MiwIntegrationTest;
 import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletDescription;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
 import org.junit.jupiter.api.Assertions;
@@ -69,13 +68,11 @@ public class WalletRepositoryTest extends MiwIntegrationTest {
 
         final WalletId walletId = new WalletId("foo");
         final WalletName walletName = new WalletName("bar");
-        final WalletDescription walletDescription = new WalletDescription("baz");
 
         final Wallet.WalletBuilder walletBuilder = Wallet.builder()
                 .walletId(walletId)
                 .walletName(walletName)
-                .walletDescription(walletDescription)
-                .ed25519Keys(List.of());
+                .storedEd25519Keys(List.of());
 
         walletRepository.create(walletBuilder.build());
 
@@ -100,13 +97,11 @@ public class WalletRepositoryTest extends MiwIntegrationTest {
 
         final WalletId walletId = new WalletId("foo");
         final WalletName walletName = new WalletName("bar");
-        final WalletDescription walletDescription = new WalletDescription("baz");
 
         final Wallet wallet = Wallet.builder()
                 .walletId(walletId)
                 .walletName(walletName)
-                .walletDescription(walletDescription)
-                .ed25519Keys(List.of())
+                .storedEd25519Keys(List.of())
                 .build();
 
         walletRepository.create(wallet);
@@ -136,8 +131,8 @@ public class WalletRepositoryTest extends MiwIntegrationTest {
     @Test
     public void testFindByName() {
         final String name = "foo";
-        createWallet(null, name, null);
-        createWallet(null, name, null);
+        createWallet(null, name);
+        createWallet(null, name);
         createRandomWallet();
         createRandomWallet();
 

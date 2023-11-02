@@ -38,23 +38,21 @@ public class WalletMap extends AbstractMap<Wallet, WalletEntity> {
 
         final WalletId walletId = new WalletId(entity.getId());
         final WalletName walletName = new WalletName(entity.getName());
-        final WalletDescription walletDescription = new WalletDescription(entity.getDescription());
 
-        final List<Ed25519Key> keys = entity.getEd25519Keys()
+        final List<StoredEd25519Key> keys = entity.getEd25519Keys()
                 .stream().map(
-                        key -> Ed25519Key.builder()
-                                .didIdentifier(key.getDidIdentifier())
-                                .vaultSecret(key.getVaultSecret())
+                        key -> StoredEd25519Key.builder()
+                                .id(new Ed25519KeyId(key.getId()))
+                                .didFragment(new DidFragment(key.getDidFragment()))
+                                .vaultSecret(new VaultSecret(key.getVaultSecret()))
                                 .createdAt(key.getCreatedAt().toInstant())
-                                .description(key.getDescription())
                                 .build()
                 ).toList();
 
         return Wallet.builder()
                 .walletId(walletId)
                 .walletName(walletName)
-                .walletDescription(walletDescription)
-                .ed25519Keys(keys)
+                .storedEd25519Keys(keys)
                 .build();
     }
 }

@@ -39,6 +39,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.ContextConfiguration;
 
+import java.util.List;
 import java.util.Optional;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {ManagedIdentityWalletsApplication.class})
@@ -116,7 +117,7 @@ public class VerifiableCredentialRepositoryTest extends MiwIntegrationTest {
         createRandomVerifiableCredential();
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
-                .verifiableCredentialTypes(new VerifiableCredentialType("VerifiableCredential"))
+                .verifiableCredentialTypes(List.of(new VerifiableCredentialType("VerifiableCredential")))
                 .build();
         final Page<VerifiableCredential> result = verifiableCredentialRepository.findAll(query, Pageable.unpaged());
 

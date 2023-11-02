@@ -38,6 +38,7 @@ import java.util.List;
 @Builder
 public class Wallet {
 
+    private String id;
     private String name;
 
     private String did;

@@ -115,7 +115,6 @@ public class AdministratorApiDelegateImplTest extends MiwIntegrationTest {
                 .build();
         final Wallet storedWallet = walletRepository.findOne(walletQuery).orElseThrow();
         Assertions.assertEquals("foo", storedWallet.getWalletName().getText(), "Wallet name should have been updated");
-        Assertions.assertEquals("bar", storedWallet.getWalletDescription().getText(), "Wallet description should have been updated");
     }
 
     @Test

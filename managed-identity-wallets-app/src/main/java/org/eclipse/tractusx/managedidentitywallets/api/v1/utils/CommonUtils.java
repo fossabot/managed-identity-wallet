@@ -78,11 +78,11 @@ public class CommonUtils {
      * @return the credential
      */
     public static HoldersCredential getHoldersCredential(VerifiableCredentialSubject subject, List<String> types, DidDocument issuerDoc,
-                                                         byte[] privateKeyBytes, String holderDid, List<URI> contexts, Date expiryDate, boolean selfIssued) {
+                                                         byte[] privateKeyBytes, String holderDid, List<URI> contexts, Date expiryDate) {
         List<String> cloneTypes = new ArrayList<>(types);
 
         // Create VC
-        VerifiableCredential verifiableCredential = createVerifiableCredential(issuerDoc, types,
+        VerifiableCredential verifiableCredential = getVerifiableCredential(issuerDoc, types,
                 subject, privateKeyBytes, contexts, expiryDate);
 
         cloneTypes.remove(VerifiableCredentialType.VERIFIABLE_CREDENTIAL);
@@ -94,14 +94,14 @@ public class CommonUtils {
                 .type(String.join(",", cloneTypes))
                 .credentialId(verifiableCredential.getId().toString())
                 .data(verifiableCredential)
-                .selfIssued(selfIssued)
+                .selfIssued(issuerDoc.getId().toString().equals(holderDid)) // TODO should be holderBpn.equals(miwSettings.authorityWalletBpn())
                 .build();
     }
 
     @SneakyThrows({UnsupportedSignatureTypeException.class, InvalidePrivateKeyFormat.class})
-    private static VerifiableCredential createVerifiableCredential(DidDocument issuerDoc, List<String> verifiableCredentialType,
-                                                                   VerifiableCredentialSubject verifiableCredentialSubject,
-                                                                   byte[] privateKey, List<URI> contexts, Date expiryDate) {
+    private static VerifiableCredential getVerifiableCredential(DidDocument issuerDoc, List<String> verifiableCredentialType,
+                                                                VerifiableCredentialSubject verifiableCredentialSubject,
+                                                                byte[] privateKey, List<URI> contexts, Date expiryDate) {
         //VC Builder
 
         // if the credential does not contain the JWS proof-context add it
