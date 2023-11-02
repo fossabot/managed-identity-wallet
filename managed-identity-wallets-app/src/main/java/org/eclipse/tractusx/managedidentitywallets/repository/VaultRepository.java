@@ -19,27 +19,7 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.models;
+package org.eclipse.tractusx.managedidentitywallets.repository;
 
-import lombok.*;
-
-import java.util.ArrayList;
-import java.util.List;
-
-@Value
-@Builder
-@AllArgsConstructor
-@ToString
-public class Wallet {
-
-
-    @NonNull
-    WalletId walletId;
-
-    @NonNull
-    WalletName walletName;
-
-    @Builder.Default
-    @NonNull
-    List<StoredEd25519Key> storedEd25519Keys = new ArrayList<>();
+public class VaultRepository {
 }

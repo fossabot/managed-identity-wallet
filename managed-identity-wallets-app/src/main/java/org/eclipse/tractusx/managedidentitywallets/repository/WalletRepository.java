@@ -114,6 +114,7 @@ public class WalletRepository {
         final List<Ed25519KeyEntity> ed25519KeyEntities = wallet.getStoredEd25519Keys().stream()
                 .map(k -> {
                     final Ed25519KeyEntity keyEntity = new Ed25519KeyEntity();
+                    keyEntity.setId(k.getId().getText());
                     keyEntity.setVaultSecret(k.getVaultSecret().getText());
                     keyEntity.setWallet(walletEntity);
                     keyEntity.setDidFragment(k.getDidFragment().getText());
@@ -127,8 +128,9 @@ public class WalletRepository {
         if (log.isTraceEnabled()) {
             log.trace("update: wallet={}", wallet);
         }
-        walletJpaRepository.save(walletEntity);
+
         ed25519KeyJpaRepository.saveAll(ed25519KeyEntities);
+        walletJpaRepository.save(walletEntity);
     }
 
     @Transactional

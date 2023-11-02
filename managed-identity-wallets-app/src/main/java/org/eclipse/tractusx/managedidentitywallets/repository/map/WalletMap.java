@@ -29,6 +29,7 @@ import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntit
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @NoArgsConstructor
@@ -47,7 +48,7 @@ public class WalletMap extends AbstractMap<Wallet, WalletEntity> {
                                 .vaultSecret(new VaultSecret(key.getVaultSecret()))
                                 .createdAt(key.getCreatedAt().toInstant())
                                 .build()
-                ).toList();
+                ).collect(Collectors.toList());
 
         return Wallet.builder()
                 .walletId(walletId)

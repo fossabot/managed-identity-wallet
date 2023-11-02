@@ -23,48 +23,46 @@ package org.eclipse.tractusx.managedidentitywallets.listener;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
+import org.eclipse.tractusx.managedidentitywallets.event.WalletCreatedEvent;
+import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
-import org.eclipse.tractusx.managedidentitywallets.util.KeyGenerator;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
-import org.springframework.boot.context.event.ApplicationStartedEvent;
+import org.eclipse.tractusx.managedidentitywallets.util.KeyGenerator;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
+import org.springframework.transaction.annotation.Transactional;
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
-public class ApplicationStartedEventListener {
+public class WalletCreatedEventListener {
 
-    private final MIWSettings miwSettings;
-    private final WalletService walletService;
     private final KeyGenerator keyGenerator;
+    private final WalletService walletService;
     private final VaultService vaultService;
 
     @EventListener
-    public void onApplicationStartedEvent(ApplicationStartedEvent event) {
-        final WalletId walletId = new WalletId(miwSettings.authorityWalletBpn());
-        final WalletName walletName = new WalletName(miwSettings.authorityWalletName());
+    @Transactional
+    public void onWalletCreatedEvent(WalletCreatedEvent event) {
 
-        if (walletService.existsById(walletId)) {
-            log.trace("Authority wallet already exists, skipping creation");
+        final WalletId walletId = event.getWallet().getWalletId();
+        final Wallet wallet = walletService.findById(walletId)
+                .orElseThrow(() -> new WalletNotFoundException(walletId));
+
+        final boolean hasKeys = !wallet.getStoredEd25519Keys().isEmpty();
+        if (hasKeys) {
             return;
         }
 
         final DidFragment didFragment = new DidFragment("key-1");
         final ResolvedEd25519Key resolvedEd25519Key = keyGenerator.generateNewEd25519Key(didFragment);
+
+        log.trace("Storing key {} in vault", resolvedEd25519Key.getPublicKey());
         final StoredEd25519Key storedEd25519Key = vaultService.storeKey(resolvedEd25519Key);
 
-        final Wallet wallet = Wallet.builder()
-                .walletId(walletId)
-                .walletName(walletName)
-                .storedEd25519Keys(List.of(storedEd25519Key))
-                .build();
-
-        log.info("Creating authority wallet with id {}", walletId.getText());
-        walletService.create(wallet);
+        log.trace("Updating wallet {} with key {}", walletId, storedEd25519Key.getId());
+        wallet.getStoredEd25519Keys().add(storedEd25519Key);
+        walletService.update(wallet);
     }
 }
