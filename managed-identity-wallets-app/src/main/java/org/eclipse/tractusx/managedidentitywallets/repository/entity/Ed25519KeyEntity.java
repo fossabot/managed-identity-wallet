@@ -41,16 +41,16 @@ public class Ed25519KeyEntity extends AbstractEntity {
     public static final String COLUMN_VAULT_SECRET = "vault_secret";
 
     @Id
-    @Column(name = COLUMN_ID, nullable = false)
+    @Column(name = COLUMN_ID, nullable = false, updatable = false)
     private String id;
 
-    @Column(name = COLUMN_DID_FRAGMENT, nullable = false)
+    @Column(name = COLUMN_DID_FRAGMENT, nullable = false, updatable = false)
     private String didFragment;
 
-    @Column(name = COLUMN_VAULT_SECRET, nullable = false)
+    @Column(name = COLUMN_VAULT_SECRET, nullable = false, updatable = false)
     private String vaultSecret;
 
     @ManyToOne
-    @JoinColumn(name = COLUMN_WALLET_ID, nullable = false)
+    @JoinColumn(name = COLUMN_WALLET_ID, nullable = false, updatable = false)
     private WalletEntity wallet;
 }

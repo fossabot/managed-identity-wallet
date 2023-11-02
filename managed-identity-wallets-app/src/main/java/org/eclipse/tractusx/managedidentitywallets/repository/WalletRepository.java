@@ -92,8 +92,8 @@ public class WalletRepository {
             log.trace("create: wallet={}", wallet);
         }
 
-        ed25519KeyJpaRepository.saveAll(ed25519KeyEntities);
         walletJpaRepository.save(walletEntity);
+        ed25519KeyJpaRepository.saveAll(ed25519KeyEntities);
     }
 
     @Transactional

@@ -21,6 +21,7 @@
 
 package org.eclipse.tractusx.managedidentitywallets.config;
 
+import lombok.NonNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.format.annotation.DateTimeFormat;
 

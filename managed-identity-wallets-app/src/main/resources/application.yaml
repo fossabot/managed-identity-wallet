@@ -32,6 +32,11 @@ spring:
 ## only needed if you want to enable API doc
 springdoc:
   swagger-ui:
+    urls:
+      - name: v1
+        url: openapi_v1.yaml
+      - name: v2
+        url: openapi_v2.yaml
     oauth:
       clientId: ${KEYCLOAK_MIW_PUBLIC_CLIENT} #It should be public client created in keycloak
     disable-swagger-default-url: true

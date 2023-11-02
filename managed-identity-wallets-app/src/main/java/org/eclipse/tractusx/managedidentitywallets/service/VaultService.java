@@ -21,6 +21,7 @@
 
 package org.eclipse.tractusx.managedidentitywallets.service;
 
+import org.eclipse.tractusx.managedidentitywallets.exception.Ed25519KeyNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
 import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
 import org.springframework.stereotype.Service;
@@ -33,7 +34,7 @@ public class VaultService {
 
     private final List<ResolvedEd25519Key> keys = new ArrayList<>();
 
-    public ResolvedEd25519Key resolveKey(StoredEd25519Key storedEd25519Key) {
+    public ResolvedEd25519Key resolveKey(StoredEd25519Key storedEd25519Key) throws Ed25519KeyNotFoundException {
         return keys.stream()
                 .filter(k -> k.getVaultSecret().equals(storedEd25519Key.getVaultSecret()))
                 .findFirst()

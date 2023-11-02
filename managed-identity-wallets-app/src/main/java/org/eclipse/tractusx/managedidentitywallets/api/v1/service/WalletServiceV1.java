@@ -21,6 +21,7 @@
 
 package org.eclipse.tractusx.managedidentitywallets.api.v1.service;
 
+import com.smartsensesolutions.java.commons.sort.SortType;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
@@ -42,17 +43,23 @@ import org.eclipse.tractusx.managedidentitywallets.api.v1.dto.CreateWalletReques
 import org.eclipse.tractusx.managedidentitywallets.api.v1.entity.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.ForbiddenException;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.utils.Validate;
+import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
 import org.eclipse.tractusx.ssi.lib.crypt.jwk.JsonWebKey;
 import org.eclipse.tractusx.ssi.lib.crypt.IKeyGenerator;
 import org.eclipse.tractusx.ssi.lib.crypt.KeyPair;
 import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559Generator;
+import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559PrivateKey;
+import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559PublicKey;
 import org.eclipse.tractusx.ssi.lib.did.web.DidWebFactory;
 import org.eclipse.tractusx.ssi.lib.model.did.*;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialSubject;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialType;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -162,16 +169,36 @@ public class WalletServiceV1 {
      * @return the wallets
      */
     public Page<Wallet> getWallets(int pageNumber, int size, String sortColumn, String sortType) {
-        return null;
-//        FilterRequest filterRequest = new FilterRequest();
-//        filterRequest.setSize(size);
-//        filterRequest.setPage(pageNumber);
-//
-//        Sort sort = new Sort();
-//        sort.setColumn(sortColumn);
-//        sort.setSortType(SortType.valueOf(sortType.toUpperCase()));
-//        filterRequest.setSort(sort);
-//        return filter(filterRequest);
+
+        Sort sort = Sort.unsorted();
+
+        Sort.Direction direction = Sort.Direction.ASC;
+        if (sortType != null) {
+            try {
+                direction = Sort.Direction.valueOf(sortType.toUpperCase());
+            } catch (Exception e) {
+                log.debug("Invalid sort type provided ->{}", sortType);
+            }
+        }
+
+        if (sortColumn != null) {
+            switch (sortColumn.toLowerCase()) {
+                case "did":
+                case "bpn":
+                    sort = Sort.by(direction, "walletId.text");
+                    break;
+                case "name":
+                    sort = Sort.by(direction, "walletName.text");
+                    break;
+                default:
+                    log.debug("Invalid sort column provided ->{}", sortColumn);
+            }
+        }
+
+        final Pageable pageable = PageRequest.of(pageNumber, size, sort);
+        final WalletQuery walletQuery = WalletQuery.builder().build();
+        return walletRepository.findAll(walletQuery, pageable)
+                .map(this::map);
     }
 
     /**
@@ -257,23 +284,43 @@ public class WalletServiceV1 {
                 .build();
     }
 
-    /**
-     * Create authority wallet on application start up, skip if already created.
-     */
-    @PostConstruct
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED, propagation = Propagation.REQUIRED)
-    public void createAuthorityWallet() {
-        final WalletId walletId = new WalletId(miwSettings.authorityWalletBpn());
-        if (!walletRepository.existsById(walletId)) {
-            CreateWalletRequest request = CreateWalletRequest.builder()
-                    .name(miwSettings.authorityWalletName())
-                    .bpn(miwSettings.authorityWalletBpn())
-                    .build();
-            createWallet(request, true, miwSettings.authorityWalletBpn());
-            log.info("Authority wallet created with bpn {}", StringEscapeUtils.escapeJava(miwSettings.authorityWalletBpn()));
-        } else {
-            log.info("Authority wallet exists with bpn {}", StringEscapeUtils.escapeJava(miwSettings.authorityWalletBpn()));
-        }
+    @SneakyThrows
+    private Wallet map(org.eclipse.tractusx.managedidentitywallets.models.Wallet w) {
+
+        final var key = vaultService.resolveKey(
+                w.getStoredEd25519Keys().stream().findFirst().orElseThrow());
+        var keyId = key.getId().getText();
+
+        //create did json
+        Did did = DidWebFactory.fromHostnameAndPath(miwSettings.host(), w.getWalletId().getText());
+
+        JsonWebKey jwk = new JsonWebKey(keyId, new x21559PublicKey(key.getPublicKey()), new x21559PrivateKey(key.getPrivateKey()));
+        JWKVerificationMethod jwkVerificationMethod =
+                new JWKVerificationMethodBuilder().did(did).jwk(jwk).build();
+
+        DidDocumentBuilder didDocumentBuilder = new DidDocumentBuilder();
+        didDocumentBuilder.id(did.toUri());
+        didDocumentBuilder.verificationMethods(List.of(jwkVerificationMethod));
+        DidDocument didDocument = didDocumentBuilder.build();
+        //modify context URLs
+        List<URI> context = didDocument.getContext();
+        List<URI> mutableContext = new ArrayList<>(context);
+        miwSettings.didDocumentContextUrls().forEach(uri -> {
+            if (!mutableContext.contains(uri)) {
+                mutableContext.add(uri);
+            }
+        });
+        didDocument.put("@context", mutableContext);
+        didDocument = DidDocument.fromJson(didDocument.toJson());
+
+
+        return Wallet.builder()
+                .didDocument(didDocument)
+                .bpn(w.getWalletId().getText())
+                .name(w.getWalletName().getText())
+                .did(did.toUri().toString())
+                .algorithm(StringPool.ED_25519)
+                .build();
     }
 
     private void validateCreateWallet(CreateWalletRequest request, String callerBpn) {
@@ -314,6 +361,7 @@ public class WalletServiceV1 {
      * @param holderbpn the holder wallet bpn
      * @return the verifiable credential
      */
+    @SneakyThrows
     public VerifiableCredential issueBpnCredential(String holderbpn) {
 
         final WalletId issuerWalletId = new WalletId(miwSettings.authorityWalletBpn());

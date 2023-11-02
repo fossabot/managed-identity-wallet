@@ -40,7 +40,7 @@ public class RestURI {
      */
     public static final String DID_DOCUMENTS = "/api/didDocuments/{identifier}";
     public static final String DID_RESOLVE = "/{bpn}/did.json";
-    /**
+    /** q
      * The constant WALLETS_BY_BPN.
      */
     public static final String API_WALLETS_IDENTIFIER = "/api/wallets/{identifier}";

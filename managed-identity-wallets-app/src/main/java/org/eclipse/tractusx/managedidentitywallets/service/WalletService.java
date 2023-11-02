@@ -52,6 +52,10 @@ public class WalletService {
         walletRepository.storeVerifiableCredentialInWallet(wallet, verifiableCredential);
     }
 
+    public boolean existsById(@NonNull WalletId walletId){
+        return walletRepository.existsById(walletId);
+    }
+
     public Optional<Wallet> findById(@NonNull WalletId id) {
         final WalletQuery query = WalletQuery.builder()
                 .walletId(id)

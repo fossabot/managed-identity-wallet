@@ -42,5 +42,4 @@ public class ManagedIdentityWalletsApplication {
     public static void main(String[] args) {
         SpringApplication.run(ManagedIdentityWalletsApplication.class, args);
     }
-
 }

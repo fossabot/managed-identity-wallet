@@ -81,6 +81,11 @@ dependencies {
     annotationProcessor group: "com.querydsl", name: "querydsl-apt", classifier: "jakarta"
     annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
+//    implementation "io.springfox:springfox-swagger2:2.9.2"
+//    implementation "io.springfox:springfox-swagger-ui:3.0.0"
+//    implementation "io.springfox:springfox-boot-starter:3.0.0"
+
+    implementation 'com.h2database:h2:2.2.220'
     // https://mvnrepository.com/artifact/org.hibernate.validator/hibernate-validator
     implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
 
@@ -101,7 +106,6 @@ dependencies {
     testAnnotationProcessor group: "com.querydsl", name: "querydsl-apt", classifier: "jakarta"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation "org.testcontainers:testcontainers"
-    testImplementation 'com.h2database:h2:2.2.220'
     testImplementation "org.testcontainers:junit-jupiter"
     testImplementation group: 'com.github.dasniko', name: 'testcontainers-keycloak', version: '2.5.0'
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.2.0'

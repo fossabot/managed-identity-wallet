@@ -40,7 +40,7 @@ public abstract class AbstractEntity {
 
     @CreationTimestamp
     @Temporal(value = TemporalType.TIMESTAMP)
-    @Column(name = COLUMN_CREATED_AT, nullable = false)
+    @Column(name = COLUMN_CREATED_AT, nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
     @UpdateTimestamp

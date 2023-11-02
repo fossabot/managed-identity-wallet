@@ -19,15 +19,18 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.models;
+package org.eclipse.tractusx.managedidentitywallets.exception;
 
-import lombok.NonNull;
+import lombok.Getter;
+import org.eclipse.tractusx.managedidentitywallets.models.Ed25519KeyId;
 
-import java.time.Instant;
+public class Ed25519KeyNotFoundException extends Exception {
+    @Getter
+    private final Ed25519KeyId keyId;
 
-public interface Ed25519Key {
-    Ed25519KeyId getId();
-    DidFragment getDidFragment();
-    VaultSecret getVaultSecret();
-    Instant getCreatedAt();
+
+    public Ed25519KeyNotFoundException(Ed25519KeyId keyId) {
+        super("Key not found: " + keyId);
+        this.keyId = keyId;
+    }
 }

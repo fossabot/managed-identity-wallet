@@ -23,6 +23,20 @@ package org.eclipse.tractusx.managedidentitywallets.models;
 
 import lombok.*;
 
+/**
+ * In the context of Decentralized Identifiers (DIDs), a "DID Fragment" refers to a portion of the DID that comes
+ * after a '#' character. The DID Fragment is often used to reference a specific resource or document
+ * associated with the DID.
+ * <p>
+ * For example, a DID might look like this: did:example:12345678
+ * <p>
+ * In this case, the DID is did:example:12345678, and the DID Fragment would be any part of the DID that appears after
+ * a '#' character, if present. For example:
+ * <p>
+ * did:example:12345678#section-1
+ * <p>
+ * Such a did fragment is represented using this class by calling 'new DidFragment("section-1")'.
+ */
 @Value
 @EqualsAndHashCode
 @ToString

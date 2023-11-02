@@ -1,0 +1,39 @@
+server:
+  port: 8080
+spring:
+  liquibase:
+    change-log: classpath:/db/changelog/changelog-master.xml
+  application:
+    name: miw
+  datasource:
+    url: jdbc:h2:mem:testdb
+    driver-class-name: org.h2.Driver
+    username: sa
+    password: password
+  jpa:
+    database-platform: org.hibernate.dialect.H2Dialect
+    show-sql: false
+    hibernate:
+      ddl-auto: validate
+
+# log level
+logging:
+  level:
+    root: INFO
+
+miw:
+  host: localhost
+  encryptionKey: d6aab34fb68e090c2789a9b1a67648d3
+  authorityWalletBpn: BPNL000000000000
+  authorityWalletName: Test
+  authorityWalletDid: did:web:localhost%3A8080:BPNL000000000000
+  vcContexts: https://www.w3.org/2018/credentials/v1, https://catenax-ng.github.io/product-core-schemas/businessPartnerData.json
+  summaryVcContexts: https://www.w3.org/2018/credentials/v1, https://catenax-ng.github.io/product-core-schemas/SummaryVC.json
+  vcExpiryDate: 01-10-2025
+  supportedFrameworkVCTypes: PcfCredential, SustainabilityCredential, QualityCredential, TraceabilityCredential, BehaviorTwinCredential, ResiliencyCredential
+  enforceHttps: false
+  contractTemplatesUrl: https://public.catena-x.org/contracts/
+  didDocumentContextUrls: https://www.w3.org/ns/did/v1,https://w3c.github.io/vc-jws-2020/contexts/v1
+  apiDefaultPageSize: 10
+  security:
+    enabled: false
