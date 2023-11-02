@@ -21,8 +21,6 @@
 
 package org.eclipse.tractusx.managedidentitywallets.api.v1.service;
 
-import com.smartsensesolutions.java.commons.sort.SortType;
-import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
@@ -33,22 +31,20 @@ import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.MIWVerifiable
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.entity.HoldersCredential;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.DuplicateWalletProblem;
+import org.eclipse.tractusx.managedidentitywallets.api.v1.map.WalletMapV1;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.utils.CommonUtils;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
-import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.dto.CreateWalletRequest;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.entity.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.ForbiddenException;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.utils.Validate;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
+import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.ssi.lib.crypt.jwk.JsonWebKey;
-import org.eclipse.tractusx.ssi.lib.crypt.IKeyGenerator;
-import org.eclipse.tractusx.ssi.lib.crypt.KeyPair;
-import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559Generator;
 import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559PrivateKey;
 import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559PublicKey;
 import org.eclipse.tractusx.ssi.lib.did.web.DidWebFactory;
@@ -57,8 +53,6 @@ import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCreden
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialSubject;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialType;
 import org.springframework.data.domain.Page;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -67,7 +61,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.io.StringWriter;
 import java.net.URI;
-import java.time.Instant;
 import java.util.*;
 
 /**
@@ -82,7 +75,7 @@ public class WalletServiceV1 {
      * The constant BASE_WALLET_BPN_IS_NOT_MATCHING_WITH_REQUEST_BPN_FROM_TOKEN.
      */
     public static final String BASE_WALLET_BPN_IS_NOT_MATCHING_WITH_REQUEST_BPN_FROM_TOKEN = "Base wallet BPN is not matching with request BPN(from token)";
-    private final WalletRepository walletRepository;
+    private final WalletService walletService;
     private final VerifiableCredentialRepository verifiableCredentialRepository;
 
     private final VaultService vaultService;
@@ -92,6 +85,8 @@ public class WalletServiceV1 {
     private final IssuersCredentialService issuersCredentialService;
 
     private final CommonService commonService;
+
+    private final WalletMapV1 walletMapV1;
 
 
     /**
@@ -195,10 +190,9 @@ public class WalletServiceV1 {
             }
         }
 
-        final Pageable pageable = PageRequest.of(pageNumber, size, sort);
         final WalletQuery walletQuery = WalletQuery.builder().build();
-        return walletRepository.findAll(walletQuery, pageable)
-                .map(this::map);
+        return walletService.findAll(walletQuery, pageNumber, size, sort)
+                .map(walletMapV1::map);
     }
 
     /**
@@ -224,64 +218,16 @@ public class WalletServiceV1 {
     public Wallet createWallet(CreateWalletRequest request, boolean authority, String callerBpn) {
         validateCreateWallet(request, callerBpn);
 
-        //create private key pair
-        IKeyGenerator keyGenerator = new x21559Generator();
-        KeyPair keyPair = keyGenerator.generateKey();
+        final WalletId walletId = new WalletId(request.getBpn());
+        final WalletName walletName = new WalletName(request.getName());
+        final org.eclipse.tractusx.managedidentitywallets.models.Wallet wallet =
+                org.eclipse.tractusx.managedidentitywallets.models.Wallet.builder()
+                        .walletId(walletId)
+                        .walletName(walletName)
+                        .build();
+        walletService.create(wallet);
 
-        //create did json
-        Did did = DidWebFactory.fromHostnameAndPath(miwSettings.host(), request.getBpn());
-
-        String keyId = UUID.randomUUID().toString();
-
-        JsonWebKey jwk = new JsonWebKey(keyId, keyPair.getPublicKey(), keyPair.getPrivateKey());
-        JWKVerificationMethod jwkVerificationMethod =
-                new JWKVerificationMethodBuilder().did(did).jwk(jwk).build();
-
-        DidDocumentBuilder didDocumentBuilder = new DidDocumentBuilder();
-        didDocumentBuilder.id(did.toUri());
-        didDocumentBuilder.verificationMethods(List.of(jwkVerificationMethod));
-        DidDocument didDocument = didDocumentBuilder.build();
-        //modify context URLs
-        List<URI> context = didDocument.getContext();
-        List<URI> mutableContext = new ArrayList<>(context);
-        miwSettings.didDocumentContextUrls().forEach(uri -> {
-            if (!mutableContext.contains(uri)) {
-                mutableContext.add(uri);
-            }
-        });
-        didDocument.put("@context", mutableContext);
-        didDocument = DidDocument.fromJson(didDocument.toJson());
-        log.debug("did document created for bpn ->{}", StringEscapeUtils.escapeJava(request.getBpn()));
-
-
-        final ResolvedEd25519Key resolvedEd25519Key = ResolvedEd25519Key.builder()
-                .id(new Ed25519KeyId(keyId))
-                .vaultSecret(new VaultSecret(keyId))
-                .privateKey(keyPair.getPrivateKey().asByte())
-                .publicKey(keyPair.getPublicKey().asByte())
-                .didFragment(new DidFragment(UUID.randomUUID().toString()))
-                .createdAt(Instant.now())
-                .build();
-        final StoredEd25519Key storedEd25519Key = vaultService.storeKey(resolvedEd25519Key);
-
-        //Save wallet
-        final org.eclipse.tractusx.managedidentitywallets.models.Wallet wallet = org.eclipse.tractusx.managedidentitywallets.models.Wallet.builder()
-                .walletId(new WalletId(request.getBpn()))
-                .walletName(new WalletName(request.getName()))
-                .storedEd25519Keys(List.of(storedEd25519Key))
-                .build();
-        walletRepository.create(wallet);
-
-        //issue BPN credentials
-        issueBpnCredential(request.getBpn());
-
-        return Wallet.builder()
-                .didDocument(didDocument)
-                .bpn(request.getBpn())
-                .name(request.getName())
-                .did(did.toUri().toString())
-                .algorithm(StringPool.ED_25519)
-                .build();
+        return walletMapV1.map(wallet);
     }
 
     @SneakyThrows
@@ -329,7 +275,7 @@ public class WalletServiceV1 {
 
         // check wallet already exists
         final WalletId walletId = new WalletId(request.getBpn());
-        boolean exist = walletRepository.existsById(walletId);
+        boolean exist = walletService.existsById(walletId);
         if (exist) {
             throw new DuplicateWalletProblem("Wallet is already exists for bpn " + request.getBpn());
         }
@@ -365,11 +311,11 @@ public class WalletServiceV1 {
     public VerifiableCredential issueBpnCredential(String holderbpn) {
 
         final WalletId issuerWalletId = new WalletId(miwSettings.authorityWalletBpn());
-        final org.eclipse.tractusx.managedidentitywallets.models.Wallet issuerWallet = walletRepository.findById(issuerWalletId)
+        final org.eclipse.tractusx.managedidentitywallets.models.Wallet issuerWallet = walletService.findById(issuerWalletId)
                 .orElseThrow(() -> new WalletNotFoundException(issuerWalletId));
 
         final WalletId holderWalletId = new WalletId(holderbpn);
-        final org.eclipse.tractusx.managedidentitywallets.models.Wallet holderWallet = walletRepository.findById(holderWalletId)
+        final org.eclipse.tractusx.managedidentitywallets.models.Wallet holderWallet = walletService.findById(holderWalletId)
                 .orElseThrow(() -> new WalletNotFoundException(holderWalletId));
         final Did holderDid = DidWebFactory.fromHostnameAndPath(miwSettings.host(), holderbpn);
 
@@ -387,7 +333,7 @@ public class WalletServiceV1 {
 
         //Store Credential in holder wallet
         verifiableCredentialRepository.create(holdersCredential.getData());
-        walletRepository.storeVerifiableCredentialInWallet(holderWallet, holdersCredential.getData());
+        walletService.storeVerifiableCredential(holderWallet, holdersCredential.getData());
 
         //update summery VC
         issuersCredentialService.

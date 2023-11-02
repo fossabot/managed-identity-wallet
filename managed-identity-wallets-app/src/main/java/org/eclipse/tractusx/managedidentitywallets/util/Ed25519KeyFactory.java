@@ -32,13 +32,12 @@ import org.eclipse.tractusx.ssi.lib.crypt.KeyPair;
 import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559Generator;
 import org.eclipse.tractusx.ssi.lib.exception.KeyGenerationException;
 import org.springframework.stereotype.Component;
-import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.util.UUID;
 
 @Component
-public class KeyGenerator {
+public class Ed25519KeyFactory {
 
     public ResolvedEd25519Key generateNewEd25519Key() {
         return generateNewEd25519Key(new DidFragment(UUID.randomUUID().toString()));

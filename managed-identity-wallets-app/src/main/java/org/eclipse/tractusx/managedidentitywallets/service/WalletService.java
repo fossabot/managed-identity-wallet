@@ -32,7 +32,9 @@ import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationUtils;
@@ -72,6 +74,13 @@ public class WalletService {
         final Pageable pageable = Pageable.ofSize(size).withPage(page);
         return walletRepository.findAll(query, pageable);
     }
+
+
+    public Page<Wallet> findAll(@NonNull WalletQuery query, int page, int size, Sort sort) {
+        final Pageable pageable = PageRequest.of(page, size, sort);
+        return walletRepository.findAll(query, pageable);
+    }
+
 
     public void create(@NonNull Wallet wallet) {
         applicationEventPublisher.publishEvent(new WalletCreatingEvent(wallet));

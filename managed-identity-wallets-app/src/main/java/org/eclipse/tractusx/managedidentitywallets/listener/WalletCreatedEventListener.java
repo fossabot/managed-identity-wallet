@@ -27,8 +27,11 @@ import org.eclipse.tractusx.managedidentitywallets.event.WalletCreatedEvent;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
+import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
-import org.eclipse.tractusx.managedidentitywallets.util.KeyGenerator;
+import org.eclipse.tractusx.managedidentitywallets.util.CxVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.util.Ed25519KeyFactory;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,17 +41,18 @@ import org.springframework.transaction.annotation.Transactional;
 @Slf4j
 public class WalletCreatedEventListener {
 
-    private final KeyGenerator keyGenerator;
+    private final Ed25519KeyFactory ed25519KeyFactory;
+    private final CxVerifiableCredentialFactory cxVerifiableCredentialFactory;
     private final WalletService walletService;
+    private final VerifiableCredentialService verifiableCredentialService;
     private final VaultService vaultService;
 
     @EventListener
     @Transactional
-    public void onWalletCreatedEvent(WalletCreatedEvent event) {
+    public void generateEd25519Key(WalletCreatedEvent event) {
 
+        final Wallet wallet = event.getWallet();
         final WalletId walletId = event.getWallet().getWalletId();
-        final Wallet wallet = walletService.findById(walletId)
-                .orElseThrow(() -> new WalletNotFoundException(walletId));
 
         final boolean hasKeys = !wallet.getStoredEd25519Keys().isEmpty();
         if (hasKeys) {
@@ -56,7 +60,7 @@ public class WalletCreatedEventListener {
         }
 
         final DidFragment didFragment = new DidFragment("key-1");
-        final ResolvedEd25519Key resolvedEd25519Key = keyGenerator.generateNewEd25519Key(didFragment);
+        final ResolvedEd25519Key resolvedEd25519Key = ed25519KeyFactory.generateNewEd25519Key(didFragment);
 
         log.trace("Storing key {} in vault", resolvedEd25519Key.getPublicKey());
         final StoredEd25519Key storedEd25519Key = vaultService.storeKey(resolvedEd25519Key);
@@ -64,5 +68,16 @@ public class WalletCreatedEventListener {
         log.trace("Updating wallet {} with key {}", walletId, storedEd25519Key.getId());
         wallet.getStoredEd25519Keys().add(storedEd25519Key);
         walletService.update(wallet);
+    }
+
+    @EventListener
+    @Transactional
+    public void issueBusinessPartnerCredential(WalletCreatedEvent event) {
+        final Wallet wallet = event.getWallet();
+        final VerifiableCredential bpnCredential = cxVerifiableCredentialFactory
+                .createBusinessPartnerNumberCredential(event.getWallet());
+
+        verifiableCredentialService.create(bpnCredential);
+        walletService.storeVerifiableCredential(wallet, bpnCredential);
     }
 }
