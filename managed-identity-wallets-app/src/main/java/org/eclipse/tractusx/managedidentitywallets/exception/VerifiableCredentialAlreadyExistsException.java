@@ -30,7 +30,7 @@ public class VerifiableCredentialAlreadyExistsException extends RuntimeException
     private final VerifiableCredentialId verifiableCredentialId;
 
     public VerifiableCredentialAlreadyExistsException(VerifiableCredentialId verifiableCredentialId) {
-        super("VerifiableCredential already exists. " + verifiableCredentialId);
+        super("VerifiableCredential already exists: " + verifiableCredentialId);
         this.verifiableCredentialId = verifiableCredentialId;
     }
 }

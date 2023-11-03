@@ -30,7 +30,7 @@ public class WalletAlreadyExistsException extends RuntimeException {
     private final WalletId walletId;
 
     public WalletAlreadyExistsException(WalletId walletId) {
-        super(String.format("Wallet %s already exists.", walletId));
+        super("Wallet already exists: " + walletId);
         this.walletId = walletId;
     }
 }

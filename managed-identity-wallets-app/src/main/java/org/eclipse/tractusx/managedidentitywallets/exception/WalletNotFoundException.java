@@ -22,14 +22,15 @@
 package org.eclipse.tractusx.managedidentitywallets.exception;
 
 import lombok.Getter;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 
 @Getter
 public class WalletNotFoundException extends RuntimeException {
 
-    private final org.eclipse.tractusx.managedidentitywallets.models.WalletId WalletId;
+    private final WalletId walletId;
 
-    public WalletNotFoundException(org.eclipse.tractusx.managedidentitywallets.models.WalletId walletId) {
-        super("Wallet does not exist. " + walletId);
-        WalletId = walletId;
+    public WalletNotFoundException(WalletId walletId) {
+        super("Wallet does not exist: " + walletId);
+        this.walletId = walletId;
     }
 }
