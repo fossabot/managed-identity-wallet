@@ -24,12 +24,11 @@ package org.eclipse.tractusx.managedidentitywallets.listener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.event.WalletCreatedEvent;
-import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
-import org.eclipse.tractusx.managedidentitywallets.util.CxVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredentialFactory.BusinessPartnerVerifiableCredentialFactory;
 import org.eclipse.tractusx.managedidentitywallets.util.Ed25519KeyFactory;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.context.event.EventListener;
@@ -42,7 +41,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class WalletCreatedEventListener {
 
     private final Ed25519KeyFactory ed25519KeyFactory;
-    private final CxVerifiableCredentialFactory cxVerifiableCredentialFactory;
+    private final BusinessPartnerVerifiableCredentialFactory businessPartnerVerifiableCredentialFactory;
     private final WalletService walletService;
     private final VerifiableCredentialService verifiableCredentialService;
     private final VaultService vaultService;
@@ -74,7 +73,7 @@ public class WalletCreatedEventListener {
     @Transactional
     public void issueBusinessPartnerCredential(WalletCreatedEvent event) {
         final Wallet wallet = event.getWallet();
-        final VerifiableCredential bpnCredential = cxVerifiableCredentialFactory
+        final VerifiableCredential bpnCredential = businessPartnerVerifiableCredentialFactory
                 .createBusinessPartnerNumberCredential(event.getWallet());
 
         verifiableCredentialService.create(bpnCredential);

@@ -19,25 +19,20 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.models;
+package org.eclipse.tractusx.managedidentitywallets.event;
 
-import lombok.*;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 
-import java.time.Instant;
-
-@Value
-@AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
-@Builder
-@ToString
-public class StoredEd25519Key implements Ed25519Key {
+@RequiredArgsConstructor
+@Getter
+public class VerifiableCredentialRemovingFromWalletEvent {
+    @NonNull
+    private final VerifiableCredential verifiableCredential;
 
     @NonNull
-    Ed25519KeyId id;
-    @NonNull
-    DidFragment didFragment;
-    @NonNull
-    VaultSecret vaultSecret;
-    @NonNull
-    Instant createdAt;
+    private final Wallet wallet;
 }
-

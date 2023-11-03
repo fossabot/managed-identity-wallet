@@ -143,13 +143,23 @@ public class WalletRepository {
         walletJpaRepository.deleteAll();
     }
 
-    @Transactional
     public void delete(@NonNull WalletId walletId) {
         if (log.isTraceEnabled()) {
             log.trace("delete: wallet={}", walletId);
         }
         walletJpaRepository.deleteById(walletId.getText());
     }
+
+    @Transactional
+    public void deleteAll(@NonNull WalletQuery query) {
+        final Predicate predicate = WalletPredicate.fromQuery(query);
+        if (log.isTraceEnabled()) {
+            log.trace("deleteAll: predicate={}", predicate);
+        }
+        final Iterable<WalletEntity> wallets = walletJpaRepository.findAll(predicate);
+        walletJpaRepository.deleteAll(wallets);
+    }
+
 
     public long count() {
         return count(WalletQuery.builder().build());
@@ -204,6 +214,32 @@ public class WalletRepository {
     }
 
     public void storeVerifiableCredentialInWallet(@NonNull Wallet wallet, @NonNull VerifiableCredential verifiableCredential) {
+        final VerifiableCredentialWalletIntersectionEntity verifiableCredentialWalletIntersectionEntity = createVerifiableCredentialWalletIntersectionEntity(wallet, verifiableCredential);
+        final VerifiableCredentialWalletIntersectionEntity.VerifiableCredentialIntersectionEntityId verifiableCredentialIntersectionEntityId = verifiableCredentialWalletIntersectionEntity.getId();
+
+        // if it's not already stored put it into the wallet
+        if (!verifiableCredentialWalletIntersectionJpaRepository.existsById(verifiableCredentialIntersectionEntityId)) {
+            if (log.isTraceEnabled()) {
+                log.trace("storeVerifiableCredentialInWallet: wallet={}, verifiableCredential={}", wallet, verifiableCredential);
+            }
+            verifiableCredentialWalletIntersectionJpaRepository.save(verifiableCredentialWalletIntersectionEntity);
+        }
+    }
+
+    public void removeVerifiableCredentialFromWallet(@NonNull Wallet wallet, @NonNull VerifiableCredential verifiableCredential) {
+        final VerifiableCredentialWalletIntersectionEntity verifiableCredentialWalletIntersectionEntity = createVerifiableCredentialWalletIntersectionEntity(wallet, verifiableCredential);
+        final VerifiableCredentialWalletIntersectionEntity.VerifiableCredentialIntersectionEntityId verifiableCredentialIntersectionEntityId = verifiableCredentialWalletIntersectionEntity.getId();
+
+        // if it's stored remove it
+        if (verifiableCredentialWalletIntersectionJpaRepository.existsById(verifiableCredentialIntersectionEntityId)) {
+            if (log.isTraceEnabled()) {
+                log.trace("removeVerifiableCredentialFromWallet: wallet={}, verifiableCredential={}", wallet, verifiableCredential);
+            }
+            verifiableCredentialWalletIntersectionJpaRepository.delete(verifiableCredentialWalletIntersectionEntity);
+        }
+    }
+
+    private VerifiableCredentialWalletIntersectionEntity createVerifiableCredentialWalletIntersectionEntity(@NonNull Wallet wallet, @NonNull VerifiableCredential verifiableCredential) {
         final Optional<WalletEntity> walletEntity = walletJpaRepository.findById(wallet.getWalletId().getText());
         if (walletEntity.isEmpty()) {
             throw new WalletNotFoundException(wallet.getWalletId());
@@ -221,13 +257,7 @@ public class WalletRepository {
         final VerifiableCredentialWalletIntersectionEntity verifiableCredentialWalletIntersectionEntity = new VerifiableCredentialWalletIntersectionEntity();
         verifiableCredentialWalletIntersectionEntity.setId(verifiableCredentialIntersectionEntityId);
 
-        // if it's not already stored put it into the wallet
-        if (!verifiableCredentialWalletIntersectionJpaRepository.existsById(verifiableCredentialIntersectionEntityId)) {
-            if (log.isTraceEnabled()) {
-                log.trace("storeVerifiableCredentialInWallet: wallet={}, verifiableCredential={}", wallet, verifiableCredential);
-            }
-            verifiableCredentialWalletIntersectionJpaRepository.save(verifiableCredentialWalletIntersectionEntity);
-        }
+        return verifiableCredentialWalletIntersectionEntity;
     }
 
 }

@@ -515,9 +515,6 @@ components:
         name:
           type: string
           description: The name of the wallet.
-        description:
-          type: string
-          description: The description of the wallet.
     VerifiableCredential:
       description: key value map
       type: object

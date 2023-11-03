@@ -52,9 +52,17 @@ public class WalletService {
 
     public void storeVerifiableCredential(@NonNull Wallet wallet, @NonNull VerifiableCredential verifiableCredential) {
         walletRepository.storeVerifiableCredentialInWallet(wallet, verifiableCredential);
+        applicationEventPublisher.publishEvent(new VerifiableCredentialStoringInWalletEvent(verifiableCredential, wallet));
+        afterCommit(() -> applicationEventPublisher.publishEvent(new VerifiableCredentialStoredInWalletEvent(verifiableCredential, wallet)));
     }
 
-    public boolean existsById(@NonNull WalletId walletId){
+    public void removeVerifiableCredential(@NonNull Wallet wallet, @NonNull VerifiableCredential verifiableCredential) {
+        walletRepository.storeVerifiableCredentialInWallet(wallet, verifiableCredential);
+        applicationEventPublisher.publishEvent(new VerifiableCredentialRemovingFromWalletEvent(verifiableCredential, wallet));
+        afterCommit(() -> applicationEventPublisher.publishEvent(new VerifiableCredentialRemovedFromWalletEvent(verifiableCredential, wallet)));
+    }
+
+    public boolean existsById(@NonNull WalletId walletId) {
         return walletRepository.existsById(walletId);
     }
 
@@ -75,30 +83,36 @@ public class WalletService {
         return walletRepository.findAll(query, pageable);
     }
 
-
     public Page<Wallet> findAll(@NonNull WalletQuery query, int page, int size, Sort sort) {
         final Pageable pageable = PageRequest.of(page, size, sort);
         return walletRepository.findAll(query, pageable);
     }
 
-
     public void create(@NonNull Wallet wallet) {
-        applicationEventPublisher.publishEvent(new WalletCreatingEvent(wallet));
         walletRepository.create(wallet);
+        applicationEventPublisher.publishEvent(new WalletCreatingEvent(wallet));
         afterCommit(() -> applicationEventPublisher.publishEvent(new WalletCreatedEvent(wallet)));
     }
 
     public void update(@NonNull Wallet wallet) {
-        applicationEventPublisher.publishEvent(new WalletUpdatingEvent(wallet));
         walletRepository.update(wallet);
+        applicationEventPublisher.publishEvent(new WalletUpdatingEvent(wallet));
         afterCommit(() -> applicationEventPublisher.publishEvent(new WalletUpdatedEvent(wallet)));
     }
 
     public void delete(@NonNull Wallet wallet) {
-        applicationEventPublisher.publishEvent(new WalletDeletingEvent(wallet));
         walletRepository.delete(wallet.getWalletId());
+        applicationEventPublisher.publishEvent(new WalletDeletingEvent(wallet));
         afterCommit(() -> applicationEventPublisher.publishEvent(new WalletDeletedEvent(wallet)));
     }
+
+
+    public void deleteAll(@NonNull Wallet wallet) {
+        walletRepository.delete(wallet.getWalletId());
+        applicationEventPublisher.publishEvent(new WalletDeletingEvent(wallet));
+        afterCommit(() -> applicationEventPublisher.publishEvent(new WalletDeletedEvent(wallet)));
+    }
+
 
     private static void afterCommit(Runnable runnable) {
         TransactionSynchronizationUtils.invokeAfterCommit(List.of(

@@ -19,7 +19,7 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.util;
+package org.eclipse.tractusx.managedidentitywallets.util.verifiableCredentialFactory;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -28,9 +28,13 @@ import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.MIWVerifiable
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.exception.Ed25519KeyNotFoundException;
-import org.eclipse.tractusx.managedidentitywallets.models.*;
+import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
+import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
+import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
+import org.eclipse.tractusx.managedidentitywallets.util.DidFactory;
 import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559PrivateKey;
 import org.eclipse.tractusx.ssi.lib.exception.InvalidePrivateKeyFormat;
 import org.eclipse.tractusx.ssi.lib.exception.UnsupportedSignatureTypeException;
@@ -42,6 +46,7 @@ import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCreden
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialType;
 import org.eclipse.tractusx.ssi.lib.proof.LinkedDataProofGenerator;
 import org.eclipse.tractusx.ssi.lib.proof.SignatureType;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.net.URI;
@@ -51,34 +56,25 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@Component
-@RequiredArgsConstructor
-public class CxVerifiableCredentialFactory {
+public abstract class VerifiableCredentialFactory {
 
+    @Autowired
+    private DidFactory didFactory;
+    @Autowired
+    private MIWSettings miwSettings;
+    @Autowired
+    private WalletService walletService;
+    @Autowired
+    private VaultService vaultService;
 
-    private final DidFactory didFactory;
-    private final MIWSettings miwSettings;
-    private final WalletService walletService;
-    private final VaultService vaultService;
-
-    public VerifiableCredential createBusinessPartnerNumberCredential(@NonNull Wallet wallet) {
-        final WalletId walletId = wallet.getWalletId();
-        final Did did = didFactory.generateDid(wallet);
-
-        final VerifiableCredentialSubject verifiableCredentialSubject =
-                new VerifiableCredentialSubject(Map.of(
-                        StringPool.TYPE, MIWVerifiableCredentialType.BPN_CREDENTIAL,
-                        StringPool.ID, did.toString(),
-                        StringPool.BPN, walletId.getText()));
-
-        return createdIssuedCredential(verifiableCredentialSubject, MIWVerifiableCredentialType.BPN_CREDENTIAL);
+    protected VerifiableCredential createdIssuedCredential(VerifiableCredentialSubject subject, String type) {
+        return createdIssuedCredential(subject, type, miwSettings.vcExpiryDate().toInstant());
     }
 
     @SneakyThrows({UnsupportedSignatureTypeException.class, Ed25519KeyNotFoundException.class, InvalidePrivateKeyFormat.class})
-    public VerifiableCredential createdIssuedCredential(VerifiableCredentialSubject subject, String type) {
+    protected VerifiableCredential createdIssuedCredential(VerifiableCredentialSubject subject, String type, Instant expiryDate) {
 
         final List<URI> contexts = miwSettings.vcContexts();
-        final Instant expirationDate = miwSettings.vcExpiryDate().toInstant();
         final Wallet issuerWallet = getIssuerWallet();
         final Did issuerDid = didFactory.generateDid(issuerWallet);
 
@@ -93,7 +89,7 @@ public class CxVerifiableCredentialFactory {
                         .id(URI.create(issuerDid + "#" + UUID.randomUUID()))
                         .type(List.of(VerifiableCredentialType.VERIFIABLE_CREDENTIAL, type))
                         .issuer(issuerDid.toUri())
-                        .expirationDate(expirationDate)
+                        .expirationDate(expiryDate)
                         .issuanceDate(Instant.now())
                         .credentialSubject(subject);
 

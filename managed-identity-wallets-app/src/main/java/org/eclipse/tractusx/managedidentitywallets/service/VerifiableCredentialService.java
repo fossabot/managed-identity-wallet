@@ -100,14 +100,14 @@ public class VerifiableCredentialService {
     }
 
     public void create(@NonNull @IsJsonLdValid VerifiableCredential verifiableCredential) {
-        applicationEventPublisher.publishEvent(new VerifiableCredentialCreatingEvent(verifiableCredential));
         verifiableCredentialRepository.create(verifiableCredential);
+        applicationEventPublisher.publishEvent(new VerifiableCredentialCreatingEvent(verifiableCredential));
         afterCommit(() -> applicationEventPublisher.publishEvent(new VerifiableCredentialCreatedEvent(verifiableCredential)));
     }
 
     public void delete(@NonNull VerifiableCredential verifiableCredential) {
-        applicationEventPublisher.publishEvent(new VerifiableCredentialDeletingEvent(verifiableCredential));
         verifiableCredentialRepository.delete(verifiableCredential);
+        applicationEventPublisher.publishEvent(new VerifiableCredentialDeletingEvent(verifiableCredential));
         afterCommit(() -> applicationEventPublisher.publishEvent(new VerifiableCredentialDeletedEvent(verifiableCredential)));
     }
 

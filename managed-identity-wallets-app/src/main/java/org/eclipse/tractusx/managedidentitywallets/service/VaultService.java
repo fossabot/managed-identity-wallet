@@ -21,37 +21,27 @@
 
 package org.eclipse.tractusx.managedidentitywallets.service;
 
+import lombok.RequiredArgsConstructor;
 import org.eclipse.tractusx.managedidentitywallets.exception.Ed25519KeyNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
 import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
+import org.eclipse.tractusx.managedidentitywallets.repository.VaultRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
+@RequiredArgsConstructor
 public class VaultService {
 
-    private final List<ResolvedEd25519Key> keys = new ArrayList<>();
+    private final VaultRepository vaultRepository;
 
     public ResolvedEd25519Key resolveKey(StoredEd25519Key storedEd25519Key) throws Ed25519KeyNotFoundException {
-        return keys.stream()
-                .filter(k -> k.getVaultSecret().equals(storedEd25519Key.getVaultSecret()))
-                .findFirst()
-                .orElseThrow();
+        return vaultRepository.resolveKey(storedEd25519Key);
     }
 
     public StoredEd25519Key storeKey(ResolvedEd25519Key resolvedEd25519Key) {
-        keys.add(resolvedEd25519Key);
-        return mapToStoredKey(resolvedEd25519Key);
-    }
-
-    private static StoredEd25519Key mapToStoredKey(ResolvedEd25519Key resolvedEd25519Key) {
-        return StoredEd25519Key.builder()
-                .id(resolvedEd25519Key.getId())
-                .createdAt(resolvedEd25519Key.getCreatedAt())
-                .didFragment(resolvedEd25519Key.getDidFragment())
-                .vaultSecret(resolvedEd25519Key.getVaultSecret())
-                .build();
+        return vaultRepository.storeKey(resolvedEd25519Key);
     }
 }

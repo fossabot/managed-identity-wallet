@@ -22,12 +22,14 @@
 package org.eclipse.tractusx.managedidentitywallets.repository.query;
 
 import lombok.Builder;
+import lombok.Singular;
 import lombok.Value;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Value

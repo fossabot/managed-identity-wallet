@@ -21,16 +21,14 @@
 
 package org.eclipse.tractusx.managedidentitywallets.models;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 
 import java.time.Instant;
 
 @Value
 @AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 @Builder
+@ToString(exclude = {"privateKey"})
 public class ResolvedEd25519Key implements Ed25519Key {
 
     @NonNull
