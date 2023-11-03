@@ -29,7 +29,6 @@ import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialCre
 import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialCreatingEvent;
 import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialDeletedEvent;
 import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialDeletingEvent;
-import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
@@ -44,7 +43,6 @@ import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationUtils;
 import org.springframework.validation.annotation.Validated;
 
-import javax.validation.Valid;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,22 +55,18 @@ public class VerifiableCredentialService {
     private final VerifiableCredentialRepository verifiableCredentialRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public Optional<VerifiableCredential> findById(@NonNull VerifiableCredentialId id) {
+    public Optional<VerifiableCredential> findById(@NonNull final VerifiableCredentialId id) {
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
                 .verifiableCredentialId(id)
                 .build();
         return verifiableCredentialRepository.findOne(query);
     }
 
-    public Optional<VerifiableCredential> findOne(@NonNull VerifiableCredentialQuery query) {
+    public Optional<VerifiableCredential> findOne(@NonNull final VerifiableCredentialQuery query) {
         return verifiableCredentialRepository.findOne(query);
     }
 
-    public boolean existsById(@NonNull VerifiableCredentialId verifiableCredentialId) {
-        return findById(verifiableCredentialId).isPresent();
-    }
-
-    public boolean exists(@NonNull VerifiableCredentialQuery query) {
+    public boolean exists(@NonNull final VerifiableCredentialQuery query) {
         return findOne(query).isPresent();
     }
 

@@ -106,14 +106,6 @@ public class WalletService {
         afterCommit(() -> applicationEventPublisher.publishEvent(new WalletDeletedEvent(wallet)));
     }
 
-
-    public void deleteAll(@NonNull Wallet wallet) {
-        walletRepository.delete(wallet.getWalletId());
-        applicationEventPublisher.publishEvent(new WalletDeletingEvent(wallet));
-        afterCommit(() -> applicationEventPublisher.publishEvent(new WalletDeletedEvent(wallet)));
-    }
-
-
     private static void afterCommit(Runnable runnable) {
         TransactionSynchronizationUtils.invokeAfterCommit(List.of(
                 new TransactionSynchronization() {

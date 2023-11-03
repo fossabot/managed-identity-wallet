@@ -23,10 +23,12 @@ package org.eclipse.tractusx.managedidentitywallets.api;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
+import org.eclipse.tractusx.managedidentitywallets.spring.controllers.v2.AdministratorApi;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -35,46 +37,77 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
-@ControllerAdvice
+import java.util.Map;
+
+@Slf4j
+@ControllerAdvice(basePackageClasses = {AdministratorApi.class})
 public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
     @ExceptionHandler(value = {WalletNotFoundException.class})
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     @ResponseBody
-    public ResponseEntity<String> handleWalletDoesNotExistException(WalletNotFoundException ex) {
-        return ResponseEntity.status(404).body(ex.getMessage());
+    public ResponseEntity<Object> handleWalletDoesNotExistException(WalletNotFoundException ex) {
+        if (log.isDebugEnabled()) {
+            log.debug("WalletNotFoundException: {}", ex.getMessage(), ex);
+        }
+
+        return ResponseEntity.status(404).body(createMessage(ex.getMessage()));
     }
 
     @ExceptionHandler(value = {VerifiableCredentialNotFoundException.class})
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     @ResponseBody
-    public ResponseEntity<String> handleVerifiableCredentialDoesNotExistException(VerifiableCredentialNotFoundException ex) {
-        return ResponseEntity.status(404).body(ex.getMessage());
+    public ResponseEntity<Object> handleVerifiableCredentialDoesNotExistException(VerifiableCredentialNotFoundException ex) {
+        if (log.isDebugEnabled()) {
+            log.debug("VerifiableCredentialNotFoundException: {}", ex.getMessage(), ex);
+        }
+
+        return ResponseEntity.status(404).body(createMessage(ex.getMessage()));
     }
 
     @ExceptionHandler(value = {VerifiableCredentialAlreadyExistsException.class})
     @ResponseStatus(value = HttpStatus.CONFLICT)
     @ResponseBody
-    public ResponseEntity<String> handleVerifiableCredentialAlreadyExistsException(VerifiableCredentialAlreadyExistsException ex) {
-        return ResponseEntity.status(409).body(ex.getMessage());
+    public ResponseEntity<Object> handleVerifiableCredentialAlreadyExistsException(VerifiableCredentialAlreadyExistsException ex) {
+        if (log.isDebugEnabled()) {
+            log.debug("VerifiableCredentialAlreadyExistsException: {}", ex.getMessage(), ex);
+        }
+
+        return ResponseEntity.status(409).body(createMessage(ex.getMessage()));
     }
 
     @ExceptionHandler(value = {WalletAlreadyExistsException.class})
     @ResponseStatus(value = HttpStatus.CONFLICT)
     @ResponseBody
-    public ResponseEntity<String> handleWalletAlreadyExistsException(WalletAlreadyExistsException ex) {
-        return ResponseEntity.status(409).body(ex.getMessage());
+    public ResponseEntity<Object> handleWalletAlreadyExistsException(WalletAlreadyExistsException ex) {
+        if (log.isDebugEnabled()) {
+            log.debug("WalletAlreadyExistsException: {}", ex.getMessage(), ex);
+        }
+
+        return ResponseEntity.status(409).body(createMessage(ex.getMessage()));
     }
 
     @ExceptionHandler(value = {ConstraintViolationException.class})
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ResponseEntity<String> handleValidationFailure(ConstraintViolationException ex) {
+    public ResponseEntity<Object> handleValidationFailure(ConstraintViolationException ex) {
+        if (log.isDebugEnabled()) {
+            log.debug("ConstraintViolationException: {}", ex.getMessage(), ex);
+        }
+
         StringBuilder messages = new StringBuilder();
 
         for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
+            if (!messages.isEmpty()) {
+                messages.append(", ");
+            }
             messages.append(violation.getMessage());
         }
 
-        return ResponseEntity.badRequest().body(messages.toString());
+        return ResponseEntity.badRequest().body(createMessage(messages.toString()));
     }
+
+    private static Object createMessage(String message) {
+        return Map.of("message", message);
+    }
+
 }

@@ -21,10 +21,11 @@
 
 package org.eclipse.tractusx.managedidentitywallets.api.v1.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
+import org.eclipse.tractusx.managedidentitywallets.api.v1.entity.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
@@ -32,8 +33,6 @@ import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredenti
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
-import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
-import org.eclipse.tractusx.managedidentitywallets.api.v1.entity.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
 import org.eclipse.tractusx.ssi.lib.crypt.IPrivateKey;
 import org.eclipse.tractusx.ssi.lib.crypt.IPublicKey;
@@ -58,8 +57,6 @@ import java.util.Map;
 @Slf4j
 @RequiredArgsConstructor
 public class CommonService {
-
-    private static final ObjectMapper MAPPER = new ObjectMapper();
 
     private final WalletRepository walletRepository;
     private final VerifiableCredentialRepository verifiableCredentialRepository;
@@ -101,10 +98,6 @@ public class CommonService {
                 .didDocument(didDocument)
                 .verifiableCredentials(verifiableCredentials.stream().toList())
                 .build();
-    }
-
-    public Did getDidByIdentifier(String identifier) {
-        return getDidByBpn(asBpn(identifier));
     }
 
     public Did getDidByBpn(String bpn) {

@@ -43,10 +43,13 @@ import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
-import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
+import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
+import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredentialFactory.DismantlerVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredentialFactory.FrameworkVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredentialFactory.MembershipVerifiableCredentialFactory;
 import org.eclipse.tractusx.ssi.lib.did.resolver.DidDocumentResolverRegistry;
 import org.eclipse.tractusx.ssi.lib.did.resolver.DidDocumentResolverRegistryImpl;
 import org.eclipse.tractusx.ssi.lib.did.web.DidWebDocumentResolver;
@@ -86,12 +89,15 @@ public class IssuersCredentialService {
 
 
     private final WalletKeyService walletKeyService;
-    private final WalletRepository walletRepository;
+    private final WalletService walletService;
 
 
     private final CommonService commonService;
 
     private final VerifiableCredentialService verifiableCredentialService;
+    private final MembershipVerifiableCredentialFactory membershipVerifiableCredentialFactory;
+    private final DismantlerVerifiableCredentialFactory dismantlerVerifiableCredentialFactory;
+    private final FrameworkVerifiableCredentialFactory frameworkVerifiableCredentialFactory;
 
     /**
      * Gets credentials.
@@ -149,7 +155,6 @@ public class IssuersCredentialService {
                 .findAll(verifiableCredentialQuery, pageNumber, size, sort);
     }
 
-
     /**
      * Issue framework credential verifiable credential.
      *
@@ -168,34 +173,23 @@ public class IssuersCredentialService {
         Wallet baseWallet = commonService.getWalletByIdentifier(miwSettings.authorityWalletBpn());
 
         validateAccess(callerBPN, baseWallet);
-        // get Key
-        byte[] privateKeyBytes = walletKeyService.getPrivateKeyByWalletIdentifierAsBytes(baseWallet.getId());
 
-        //if base wallet issue credentials to itself
-        boolean isSelfIssued = isSelfIssued(holderWallet.getBpn());
-
-        VerifiableCredentialSubject subject = new VerifiableCredentialSubject(Map.of(
-                StringPool.TYPE, request.getType(),
-                StringPool.ID, holderWallet.getDid(),
-                StringPool.HOLDER_IDENTIFIER, holderWallet.getBpn(),
-                StringPool.CONTRACT_TEMPLATE, request.getContractTemplate(),
-                StringPool.CONTRACT_VERSION, request.getContractVersion()));
-        List<String> types = List.of(VerifiableCredentialType.VERIFIABLE_CREDENTIAL, MIWVerifiableCredentialType.USE_CASE_FRAMEWORK_CONDITION);
-        HoldersCredential holdersCredential = CommonUtils.getHoldersCredential(subject, types, baseWallet.getDidDocument(), privateKeyBytes, holderWallet.getDid(), miwSettings.vcContexts(), miwSettings.vcExpiryDate());
+        final org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType verifiableCredentialType = new org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType(request.getType());
+        final String contractTemplate = request.getContractTemplate();
+        final String contractVersion = request.getContractVersion();
+        final org.eclipse.tractusx.managedidentitywallets.models.Wallet wallet = walletService.findById(new WalletId(request.getHolderIdentifier()))
+                .orElseThrow(() -> new WalletNotFoundProblem("Wallet not found"));
+        final VerifiableCredential verifiableCredential = frameworkVerifiableCredentialFactory.createDismantlerVerifiableCredential(
+                wallet, verifiableCredentialType, contractTemplate, contractVersion);
 
         //save in holder wallet
-        verifiableCredentialService.create(holdersCredential.getData());
-        var storedWallet = walletRepository.findById(new WalletId(request.getHolderIdentifier()))
-                .orElseThrow(() -> new WalletNotFoundProblem("Wallet not found"));
-        walletRepository.storeVerifiableCredentialInWallet(storedWallet, holdersCredential.getData());
-
-        //update summery cred
-        updateSummeryCredentials(baseWallet.getDidDocument(), privateKeyBytes, baseWallet.getDid(), holderWallet.getBpn(), holderWallet.getDid(), request.getType());
+        verifiableCredentialService.create(verifiableCredential);
+        walletService.storeVerifiableCredential(wallet, verifiableCredential);
 
         log.debug("Framework VC of type ->{} issued to bpn ->{}", StringEscapeUtils.escapeJava(request.getType()), StringEscapeUtils.escapeJava(holderWallet.getBpn()));
 
         // Return VC
-        return holdersCredential.getData();
+        return verifiableCredential;
     }
 
     /**
@@ -208,46 +202,35 @@ public class IssuersCredentialService {
     @Transactional(isolation = Isolation.READ_UNCOMMITTED, propagation = Propagation.REQUIRED)
     public VerifiableCredential issueDismantlerCredential(IssueDismantlerCredentialRequest request, String callerBPN) {
 
-//        //Fetch Holder Wallet
-//        Wallet holderWallet = commonService.getWalletByIdentifier(request.getBpn());
-//
-//        // Fetch Issuer Wallet
-//        Wallet issuerWallet = commonService.getWalletByIdentifier(miwSettings.authorityWalletBpn());
-//
-//        validateAccess(callerBPN, issuerWallet);
-//
-//        //check duplicate
-//        isCredentialExit(holderWallet.getDid(), MIWVerifiableCredentialType.DISMANTLER_CREDENTIAL);
-//
-//        byte[] privateKeyBytes = walletKeyService.getPrivateKeyByWalletIdentifierAsBytes(issuerWallet.getId());
-//
-//        //if base wallet issue credentials to itself
-//        boolean isSelfIssued = isSelfIssued(request.getBpn());
-//
-//        VerifiableCredentialSubject subject = new VerifiableCredentialSubject(Map.of(StringPool.TYPE, MIWVerifiableCredentialType.DISMANTLER_CREDENTIAL,
-//                StringPool.ID, holderWallet.getDid(),
-//                StringPool.HOLDER_IDENTIFIER, holderWallet.getBpn(),
-//                StringPool.ACTIVITY_TYPE, request.getActivityType(),
-//                StringPool.ALLOWED_VEHICLE_BRANDS, request.getAllowedVehicleBrands() == null ? Collections.emptySet() : request.getAllowedVehicleBrands()));
-//        List<String> types = List.of(VerifiableCredentialType.VERIFIABLE_CREDENTIAL, MIWVerifiableCredentialType.DISMANTLER_CREDENTIAL);
-//        HoldersCredential holdersCredential = CommonUtils.getHoldersCredential(subject, types, issuerWallet.getDidDocument(), privateKeyBytes, holderWallet.getDid(), miwSettings.vcContexts(), miwSettings.vcExpiryDate(), isSelfIssued);
-//
-//
-//        //save in holder wallet
-//        holdersCredential = holdersCredentialRepository.save(holdersCredential);
-//
-//        //Store Credential in issuers table
-//        IssuersCredential issuersCredential = IssuersCredential.of(holdersCredential);
-//        issuersCredential = create(issuersCredential);
-//
-//        //update summery VC
-//        updateSummeryCredentials(issuerWallet.getDidDocument(), privateKeyBytes, issuerWallet.getDid(), holderWallet.getBpn(), holderWallet.getDid(), MIWVerifiableCredentialType.DISMANTLER_CREDENTIAL);
-//
-//        log.debug("Dismantler VC issued to bpn -> {}", StringEscapeUtils.escapeJava(request.getBpn()));
-//
-//        // Return VC
-//        return issuersCredential.getData();
-        return null;
+        //Fetch Holder Wallet
+        Wallet holderWallet = commonService.getWalletByIdentifier(request.getBpn());
+
+        // Fetch Issuer Wallet
+        Wallet issuerWallet = commonService.getWalletByIdentifier(miwSettings.authorityWalletBpn());
+
+        validateAccess(callerBPN, issuerWallet);
+
+        //check duplicate
+        isCredentialExit(holderWallet.getDid(), MIWVerifiableCredentialType.DISMANTLER_CREDENTIAL);
+
+
+        final String activityType = request.getActivityType();
+        final List<String> allowedVehicleBrands =
+                Optional.ofNullable(request.getAllowedVehicleBrands()).orElse(Set.of())
+                        .stream().toList();
+
+        final org.eclipse.tractusx.managedidentitywallets.models.Wallet wallet =
+                walletService.findById(new WalletId(request.getBpn()))
+                        .orElseThrow(() -> new WalletNotFoundProblem("Wallet not found"));
+        final VerifiableCredential verifiableCredential = dismantlerVerifiableCredentialFactory.createDismantlerVerifiableCredential(wallet, activityType, allowedVehicleBrands);
+
+        verifiableCredentialService.create(verifiableCredential);
+        walletService.storeVerifiableCredential(wallet, verifiableCredential);
+
+        log.debug("Dismantler VC issued to bpn -> {}", StringEscapeUtils.escapeJava(request.getBpn()));
+
+        // Return VC
+        return verifiableCredential;
     }
 
     /**
@@ -260,49 +243,28 @@ public class IssuersCredentialService {
     @Transactional(isolation = Isolation.READ_UNCOMMITTED, propagation = Propagation.REQUIRED)
     public VerifiableCredential issueMembershipCredential(IssueMembershipCredentialRequest issueMembershipCredentialRequest, String callerBPN) {
 
-        //Fetch Holder Wallet
-//        Wallet holderWallet = commonService.getWalletByIdentifier(issueMembershipCredentialRequest.getBpn());
-//
-//        //check duplicate
-//        isCredentialExit(holderWallet.getDid(), VerifiableCredentialType.MEMBERSHIP_CREDENTIAL);
-//
-//        // Fetch Issuer Wallet
-//        Wallet issuerWallet = commonService.getWalletByIdentifier(miwSettings.authorityWalletBpn());
-//
-//        validateAccess(callerBPN, issuerWallet);
-//
-//        byte[] privateKeyBytes = walletKeyService.getPrivateKeyByWalletIdentifierAsBytes(issuerWallet.getId());
-//        List<String> types = List.of(VerifiableCredentialType.VERIFIABLE_CREDENTIAL, VerifiableCredentialType.MEMBERSHIP_CREDENTIAL);
-//
-//        //if base wallet issue credentials to itself
-//        boolean isSelfIssued = isSelfIssued(issueMembershipCredentialRequest.getBpn());
-//
-//        //VC Subject
-//        VerifiableCredentialSubject verifiableCredentialSubject = new VerifiableCredentialSubject(Map.of(StringPool.TYPE, VerifiableCredentialType.MEMBERSHIP_CREDENTIAL,
-//                StringPool.ID, holderWallet.getDid(),
-//                StringPool.HOLDER_IDENTIFIER, holderWallet.getBpn(),
-//                StringPool.MEMBER_OF, issuerWallet.getName(),
-//                StringPool.STATUS, "Active",
-//                StringPool.START_TIME, Instant.now().toString()));
-//        HoldersCredential holdersCredential = CommonUtils.getHoldersCredential(verifiableCredentialSubject, types, issuerWallet.getDidDocument(), privateKeyBytes, holderWallet.getDid(), miwSettings.vcContexts(), miwSettings.vcExpiryDate(), isSelfIssued);
-//
-//
-//        //save in holder wallet
-//        holdersCredential = holdersCredentialRepository.save(holdersCredential);
-//
-//        IssuersCredential issuersCredential = IssuersCredential.of(holdersCredential);
-//
-//        //Store Credential in issuer table
-//        issuersCredential = create(issuersCredential);
-//
-//        //update summery VC
-//        updateSummeryCredentials(issuerWallet.getDidDocument(), privateKeyBytes, issuerWallet.getDid(), holderWallet.getBpn(), holderWallet.getDid(), VerifiableCredentialType.MEMBERSHIP_CREDENTIAL);
-//
-//        log.debug("Membership VC issued to bpn ->{}", StringEscapeUtils.escapeJava(issueMembershipCredentialRequest.getBpn()));
-//
-//        // Return VC
-//        return issuersCredential.getData();
-        return null;
+        // Fetch Holder Wallet
+        Wallet holderWallet = commonService.getWalletByIdentifier(issueMembershipCredentialRequest.getBpn());
+
+        //check duplicate
+        isCredentialExit(holderWallet.getDid(), VerifiableCredentialType.MEMBERSHIP_CREDENTIAL);
+
+        // Fetch Issuer Wallet
+        Wallet issuerWallet = commonService.getWalletByIdentifier(miwSettings.authorityWalletBpn());
+
+        validateAccess(callerBPN, issuerWallet);
+
+        final org.eclipse.tractusx.managedidentitywallets.models.Wallet wallet =
+                walletService.findById(new WalletId(issueMembershipCredentialRequest.getBpn()))
+                        .orElseThrow(() -> new WalletNotFoundProblem("Wallet not found"));
+        final VerifiableCredential verifiableCredential = membershipVerifiableCredentialFactory.createMembershipVerifiableCredential(wallet);
+
+        verifiableCredentialService.create(verifiableCredential);
+        walletService.storeVerifiableCredential(wallet, verifiableCredential);
+
+        log.debug("Membership VC issued to bpn ->{}", StringEscapeUtils.escapeJava(issueMembershipCredentialRequest.getBpn()));
+
+        return verifiableCredential;
     }
 
 
@@ -331,8 +293,6 @@ public class IssuersCredentialService {
         // get issuer Key
         byte[] privateKeyBytes = walletKeyService.getPrivateKeyByWalletIdentifierAsBytes(issuerWallet.getId());
 
-        boolean isSelfIssued = isSelfIssued(holderWallet.getBpn());
-
         // Create Credential
         HoldersCredential holdersCredential = CommonUtils.getHoldersCredential(verifiableCredential.getCredentialSubject().get(0),
                 verifiableCredential.getTypes(), issuerWallet.getDidDocument(),
@@ -340,13 +300,11 @@ public class IssuersCredentialService {
                 holderWallet.getDid(),
                 verifiableCredential.getContext(), Date.from(verifiableCredential.getExpirationDate()));
 
-
         //save in holder wallet
         verifiableCredentialService.create(holdersCredential.getData());
-        var wallet = walletRepository.findById(new WalletId(holderDid))
+        var wallet = walletService.findById(new WalletId(holderDid))
                 .orElseThrow(() -> new WalletNotFoundProblem("Wallet not found"));
-        walletRepository.storeVerifiableCredentialInWallet(wallet, holdersCredential.getData());
-
+        walletService.storeVerifiableCredential(wallet, holdersCredential.getData());
 
         log.debug("VC type of {} issued to bpn ->{}", StringEscapeUtils.escapeJava(verifiableCredential.getTypes().toString()), StringEscapeUtils.escapeJava(holderWallet.getBpn()));
 
@@ -393,7 +351,6 @@ public class IssuersCredentialService {
         return response;
     }
 
-
     private void validateAccess(String callerBpn, Wallet issuerWallet) {
         //validate BPN access, VC must be issued by base wallet
         Validate.isFalse(callerBpn.equals(issuerWallet.getBpn())).launch(new ForbiddenException(BASE_WALLET_BPN_IS_NOT_MATCHING_WITH_REQUEST_BPN_FROM_TOKEN));
@@ -401,8 +358,6 @@ public class IssuersCredentialService {
         //issuer must be base wallet
         Validate.isFalse(issuerWallet.getBpn().equals(miwSettings.authorityWalletBpn())).launch(new ForbiddenException(BASE_WALLET_BPN_IS_NOT_MATCHING_WITH_REQUEST_BPN_FROM_TOKEN));
     }
-
-
     private void isCredentialExit(String holderDid, String credentialType) {
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
                 .holderWalletId(new WalletId(holderDid))
@@ -411,110 +366,5 @@ public class IssuersCredentialService {
         if (verifiableCredentialService.exists(verifiableCredentialQuery)) {
             throw new DuplicateCredentialProblem("Credential of type " + credentialType + " is already exists ");
         }
-    }
-
-    private boolean isSelfIssued(String holderBpn) {
-        return holderBpn.equals(miwSettings.authorityWalletBpn());
-    }
-
-
-    /**
-     * Update summery credentials.
-     *
-     * @param issuerDidDocument the issuer did document
-     * @param issuerPrivateKey  the issuer private key
-     * @param holderBpn         the holder bpn
-     * @param holderDid         the holder did
-     * @param type              the type
-     */
-    public void updateSummeryCredentials(DidDocument issuerDidDocument, byte[] issuerPrivateKey, String issuerDid, String holderBpn, String holderDid, String type) {
-
-        //get last issued summary vc to holder to update items
-        Optional<IssuersCredential> filter = getLastIssuedSummaryCredential(holderBpn);
-        List<String> items;
-        if (filter.isPresent()) {
-            IssuersCredential issuersCredential = filter.get();
-
-            //check if summery VC has subject
-            Validate.isTrue(issuersCredential.getData().getCredentialSubject().isEmpty()).launch(new BadDataException("VC subject not found in existing su,,ery VC"));
-
-            //Check if we have only one subject in summery VC
-            Validate.isTrue(issuersCredential.getData().getCredentialSubject().size() > 1).launch(new BadDataException("VC subjects can more then 1 in case of summery VC"));
-
-            VerifiableCredentialSubject subject = issuersCredential.getData().getCredentialSubject().get(0);
-            if (subject.containsKey(StringPool.ITEMS)) {
-                items = (List<String>) subject.get(StringPool.ITEMS);
-                if (!items.contains(type)) {
-                    items.add(type);
-                }
-            } else {
-                items = List.of(type);
-
-            }
-        } else {
-            items = List.of(type);
-        }
-        log.debug("Issuing summary VC with items ->{}", StringEscapeUtils.escapeJava(items.toString()));
-
-        //get summery VC of holder
-        VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
-                .holderWalletId(new WalletId(holderBpn))
-                .verifiableCredentialTypes(List.of(new org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType(MIWVerifiableCredentialType.SUMMARY_CREDENTIAL)))
-                .build();
-        List<VerifiableCredential> vcs = verifiableCredentialService.findAll(verifiableCredentialQuery).getContent();
-        if (CollectionUtils.isEmpty(vcs)) {
-            log.debug("No summery VC found for did ->{}, checking in issuer", StringEscapeUtils.escapeJava(holderDid));
-        } else {
-            //delete old summery VC from holder table, delete only not stored VC
-            log.debug("Deleting older summary VC fir bpn -{}", holderBpn);
-            vcs.forEach(verifiableCredentialService::delete);
-        }
-
-        //issue new summery VC
-        final VerifiableCredentialSubject subject = new VerifiableCredentialSubject(Map.of(StringPool.ID, holderDid,
-                StringPool.HOLDER_IDENTIFIER, holderBpn,
-                StringPool.ITEMS, items,
-                StringPool.TYPE, MIWVerifiableCredentialType.SUMMARY_CREDENTIAL,
-                StringPool.CONTRACT_TEMPLATE, miwSettings.contractTemplatesUrl()));
-
-        final List<String> types = List.of(VerifiableCredentialType.VERIFIABLE_CREDENTIAL, MIWVerifiableCredentialType.SUMMARY_CREDENTIAL);
-        final HoldersCredential holdersCredential = CommonUtils.getHoldersCredential(subject, types,
-                issuerDidDocument,
-                issuerPrivateKey,
-                holderDid, miwSettings.summaryVcContexts(), miwSettings.vcExpiryDate());
-
-
-        //save in holder wallet
-        var wallet = walletRepository.findById(new WalletId(holderDid))
-                .orElseThrow(() -> new WalletNotFoundProblem("Wallet not found"));
-        verifiableCredentialService.create(holdersCredential.getData());
-        walletRepository.storeVerifiableCredentialInWallet(wallet, holdersCredential.getData());
-
-
-        log.info("Summery VC updated for holder did -> {}", StringEscapeUtils.escapeJava(holderDid));
-    }
-
-    private Optional<IssuersCredential> getLastIssuedSummaryCredential(String holderBpn) {
-
-        final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
-                .holderWalletId(new WalletId(holderBpn))
-                .verifiableCredentialTypes(List.of(new org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType(MIWVerifiableCredentialType.SUMMARY_CREDENTIAL)))
-                .build();
-
-        return verifiableCredentialService
-                .findAll(verifiableCredentialQuery, 0, 1000)
-                .stream().max(Comparator.comparing(VerifiableCredential::getIssuanceDate))
-                .stream().findFirst().map(summaryCredentials -> {
-                    final Did holderDid = DidWebFactory.fromHostnameAndPath(miwSettings.host(), holderBpn);
-
-                    final IssuersCredential issuersCredential = new IssuersCredential();
-                    issuersCredential.setCredentialId(summaryCredentials.getId().toString());
-                    issuersCredential.setData(summaryCredentials);
-                    issuersCredential.setHolderDid(holderDid.toString());
-                    issuersCredential.setIssuerDid(summaryCredentials.getIssuer().toString());
-                    issuersCredential.setType(MIWVerifiableCredentialType.SUMMARY_CREDENTIAL);
-
-                    return issuersCredential;
-                });
     }
 }

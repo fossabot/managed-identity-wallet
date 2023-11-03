@@ -21,6 +21,7 @@
 
 package org.eclipse.tractusx.managedidentitywallets.service;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.tractusx.managedidentitywallets.exception.Ed25519KeyNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
@@ -28,20 +29,17 @@ import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
 import org.eclipse.tractusx.managedidentitywallets.repository.VaultRepository;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Service
 @RequiredArgsConstructor
 public class VaultService {
 
     private final VaultRepository vaultRepository;
 
-    public ResolvedEd25519Key resolveKey(StoredEd25519Key storedEd25519Key) throws Ed25519KeyNotFoundException {
+    public ResolvedEd25519Key resolveKey(@NonNull final StoredEd25519Key storedEd25519Key) throws Ed25519KeyNotFoundException {
         return vaultRepository.resolveKey(storedEd25519Key);
     }
 
-    public StoredEd25519Key storeKey(ResolvedEd25519Key resolvedEd25519Key) {
+    public StoredEd25519Key storeKey(@NonNull final ResolvedEd25519Key resolvedEd25519Key) {
         return vaultRepository.storeKey(resolvedEd25519Key);
     }
 }
