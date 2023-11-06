@@ -19,13 +19,9 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.util.verifiableCredentialFactory;
+package org.eclipse.tractusx.managedidentitywallets.util.verifiableCredential;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
-import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.MIWVerifiableCredentialType;
-import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.exception.Ed25519KeyNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
@@ -47,16 +43,14 @@ import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCreden
 import org.eclipse.tractusx.ssi.lib.proof.LinkedDataProofGenerator;
 import org.eclipse.tractusx.ssi.lib.proof.SignatureType;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import java.net.URI;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import java.util.UUID;
 
-public abstract class VerifiableCredentialFactory {
+public abstract class AbstractVerifiableCredentialFactory {
 
     @Autowired
     private DidFactory didFactory;
@@ -97,7 +91,7 @@ public abstract class VerifiableCredentialFactory {
         return builder.proof(proof).build();
     }
 
-    private Proof generateProof(Wallet issuerWallet, Did issuerDid, VerifiableCredentialBuilder builder) throws Ed25519KeyNotFoundException, UnsupportedSignatureTypeException, InvalidePrivateKeyFormat {
+    protected Proof generateProof(Wallet issuerWallet, Did issuerDid, VerifiableCredentialBuilder builder) throws Ed25519KeyNotFoundException, UnsupportedSignatureTypeException, InvalidePrivateKeyFormat {
         if (issuerWallet.getStoredEd25519Keys().isEmpty()) {
             throw new RuntimeException("No key found for wallet " + issuerWallet.getWalletId());
         }

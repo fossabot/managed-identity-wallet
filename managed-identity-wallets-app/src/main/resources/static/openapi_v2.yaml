@@ -34,7 +34,6 @@ paths:
       parameters:
         - $ref: '#/components/parameters/Query_Page'
         - $ref: '#/components/parameters/Query_Per_Page'
-        - $ref: '#/components/parameters/Query_Verifiable_Credential_Id'
         - $ref: '#/components/parameters/Query_Verifiable_Credential_Type'
         - $ref: '#/components/parameters/Query_Verifiable_Credential_Issuer'
       responses:
@@ -44,7 +43,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VerifiableCredentialListResponsePayload'
-
     post:
       operationId: userCreateVerifiableCredential
       tags:
@@ -100,7 +98,7 @@ paths:
         '404':
           description: Verifiable Credential not found.
 
-  /issue/verifiable-presentation:
+  /issue/verifiable-presentations:
     post:
       operationId: userIssuedVerifiablePresentation
       tags:
@@ -122,7 +120,7 @@ paths:
         '400':
           description: Bad request.
 
-  /issue/verifiable-presentation/jwt:
+  /issue/verifiable-presentations/jwt:
     post:
       operationId: userIssuedVerifiablePresentationJwt
       tags:
@@ -144,8 +142,24 @@ paths:
         '400':
           description: Bad request.
 
-  /issue/verifiable-credential:
-
+  /issue/verifiable-credentials:
+    get:
+      operationId: userGetIssuedVerifiableCredentials
+      tags:
+        - User
+      summary: Get Issued Verifiable Credentials
+      description: Retrieves a list of issued Verifiable Credentials. These Verifiable Credentials may or may not be stored in the wallet.
+      parameters:
+        - $ref: '#/components/parameters/Query_Page'
+        - $ref: '#/components/parameters/Query_Per_Page'
+        - $ref: '#/components/parameters/Query_Verifiable_Credential_Type'
+      responses:
+        '200':
+          description: Successful response with Verifiable Credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifiableCredentialListResponsePayload'
     post:
       operationId: userIssuedVerifiableCredential
       tags:
@@ -209,7 +223,7 @@ paths:
         '400':
           description: Bad Request.
 
-  /validate/1verifiable-presentations/jwt:
+  /validate/verifiable-presentations/jwt:
     post:
       tags:
         - User
@@ -446,14 +460,14 @@ components:
       name: type
       in: query
       required: false
-      description: Verifiable Credential ID
+      description: Verifiable Credential Type
       schema:
         type: string
     Query_Verifiable_Credential_Issuer:
       name: issuer
       in: query
       required: false
-      description: Verifiable Credential ID
+      description: Verifiable Credential Issuer
       schema:
         type: string
     Query_Verifiable_Credential_Holder:
@@ -594,18 +608,18 @@ components:
     IssueVerifiableCredentialRequestPayload:
       description: Verifiable Credential Request Payload
       type: object
-      required: [subject, type]
+      required: [ subject ]
       properties:
-        subject:
+        verifiableCredentialSubject:
           description: Verifiable Credential Subject
           type: object
           additionalProperties: true
-        type:
+        additionalVerifiableCredentialTypes:
           description: Verifiable Credential types to include
           type: array
           items:
             type: string
-        context:
+        additionalVerifiableCredentialContexts:
           description: Json-LD contexts to include
           type: array
           items:
@@ -621,7 +635,7 @@ components:
     IssueVerifiablePresentationRequestPayload:
       description: Verifiable Credential Request Payload
       type: object
-      required: [verifiableCredentials]
+      required: [ verifiableCredentials ]
       properties:
         verifiableCredentials:
           description: Verifiable Credentials
@@ -637,12 +651,11 @@ components:
     IssueVerifiablePresentationResponsePayload:
       description: key value map
       type: object
-      additionalProperties:
-        type: string
+      additionalProperties: true
     IssueVerifiablePresentationJwtRequestPayload:
       description: Verifiable Credential Request Payload
       type: object
-      required: [audience, verifiableCredentials]
+      required: [ audience, verifiableCredentials ]
       properties:
         audience:
           description: The audience for the JWT
@@ -653,8 +666,7 @@ components:
           items:
             description: key value map
             type: string
-            additionalProperties:
-              type: string
+            additionalProperties: true
         expirationDate:
           description: Verifiable Presentation expiration date
           type: string
@@ -669,7 +681,7 @@ components:
     ValidateVerifiableCredentialRequestPayload:
       description: Verifiable Credential Validation Payload
       type: object
-      required: [verifiableCredentials]
+      required: [ verifiableCredentials ]
       properties:
         verifiableCredentials:
           description: Verifiable Credentials
@@ -677,8 +689,7 @@ components:
           items:
             description: key value map
             type: object
-            additionalProperties:
-              type: string
+            additionalProperties: true
     ValidationResult:
       type: object
       properties:
@@ -708,7 +719,7 @@ components:
     ValidateVerifiablePresentationRequestPayload:
       description: Verifiable Presentation Validation Payload
       type: object
-      required: [verifiableCredentials]
+      required: [ verifiableCredentials ]
       properties:
         verifiableCredentials:
           description: Verifiable Credentials
@@ -716,8 +727,7 @@ components:
           items:
             description: key value map
             type: object
-            additionalProperties:
-              type: string
+            additionalProperties: true
     ValidateVerifiablePresentationResponsePayload:
       description: Verifiable Presentation Validation Response
       allOf:
@@ -725,7 +735,7 @@ components:
     ValidateVerifiablePresentationJwtRequestPayload:
       description: JWT Verifiable Presentation Validation Payload
       type: object
-      required: [jwt]
+      required: [ jwt ]
       properties:
         jwt:
           description: JWT Verifiable Presentation

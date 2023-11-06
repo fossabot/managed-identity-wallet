@@ -25,6 +25,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.ssi.lib.did.web.DidWebFactory;
 import org.eclipse.tractusx.ssi.lib.model.did.Did;
 import org.springframework.stereotype.Component;
@@ -37,5 +38,9 @@ public class DidFactory {
 
     public Did generateDid(@NonNull Wallet wallet) {
         return DidWebFactory.fromHostnameAndPath(miwSettings.host(), wallet.getWalletId().getText());
+    }
+
+    public Did generateDid(@NonNull WalletId walletId) {
+        return DidWebFactory.fromHostnameAndPath(miwSettings.host(), walletId.getText());
     }
 }

@@ -23,7 +23,6 @@ package org.eclipse.tractusx.managedidentitywallets.api.v1.service;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.text.StringEscapeUtils;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.MIWVerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
@@ -31,7 +30,6 @@ import org.eclipse.tractusx.managedidentitywallets.api.v1.dto.IssueDismantlerCre
 import org.eclipse.tractusx.managedidentitywallets.api.v1.dto.IssueFrameworkCredentialRequest;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.dto.IssueMembershipCredentialRequest;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.entity.HoldersCredential;
-import org.eclipse.tractusx.managedidentitywallets.api.v1.entity.IssuersCredential;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.entity.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.BadDataException;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.DuplicateCredentialProblem;
@@ -47,18 +45,14 @@ import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableC
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
-import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredentialFactory.DismantlerVerifiableCredentialFactory;
-import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredentialFactory.FrameworkVerifiableCredentialFactory;
-import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredentialFactory.MembershipVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredential.DismantlerAbstractVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredential.FrameworkAbstractVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredential.MembershipAbstractVerifiableCredentialFactory;
 import org.eclipse.tractusx.ssi.lib.did.resolver.DidDocumentResolverRegistry;
 import org.eclipse.tractusx.ssi.lib.did.resolver.DidDocumentResolverRegistryImpl;
 import org.eclipse.tractusx.ssi.lib.did.web.DidWebDocumentResolver;
-import org.eclipse.tractusx.ssi.lib.did.web.DidWebFactory;
 import org.eclipse.tractusx.ssi.lib.did.web.util.DidWebParser;
-import org.eclipse.tractusx.ssi.lib.model.did.Did;
-import org.eclipse.tractusx.ssi.lib.model.did.DidDocument;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
-import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialSubject;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialType;
 import org.eclipse.tractusx.ssi.lib.proof.LinkedDataProofValidation;
 import org.eclipse.tractusx.ssi.lib.proof.SignatureType;
@@ -95,9 +89,9 @@ public class IssuersCredentialService {
     private final CommonService commonService;
 
     private final VerifiableCredentialService verifiableCredentialService;
-    private final MembershipVerifiableCredentialFactory membershipVerifiableCredentialFactory;
-    private final DismantlerVerifiableCredentialFactory dismantlerVerifiableCredentialFactory;
-    private final FrameworkVerifiableCredentialFactory frameworkVerifiableCredentialFactory;
+    private final MembershipAbstractVerifiableCredentialFactory membershipVerifiableCredentialFactory;
+    private final DismantlerAbstractVerifiableCredentialFactory dismantlerVerifiableCredentialFactory;
+    private final FrameworkAbstractVerifiableCredentialFactory frameworkVerifiableCredentialFactory;
 
     /**
      * Gets credentials.
