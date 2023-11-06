@@ -21,10 +21,8 @@
 
 package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate;
 
-import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.managedidentitywallets.annotations.HasSubject;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.map.WalletsApiMapper;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialAlreadyExistsException;
@@ -37,7 +35,7 @@ import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.managedidentitywallets.spring.controllers.v2.UserApiDelegate;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.*;
 import org.eclipse.tractusx.managedidentitywallets.util.DidFactory;
-import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredential.GenericAbstractVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredential.GenericVerifiableCredentialFactory;
 import org.eclipse.tractusx.ssi.lib.model.did.Did;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialSubject;
@@ -45,6 +43,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
@@ -62,7 +61,7 @@ public class UserApiDelegateImpl implements UserApiDelegate {
     private final WalletService walletService;
     private final WalletsApiMapper apiMapper;
     private final MIWSettings miwSettings;
-    private final GenericAbstractVerifiableCredentialFactory genericVerifiableCredentialFactory;
+    private final GenericVerifiableCredentialFactory genericVerifiableCredentialFactory;
     private final DidFactory didFactory;
 
     @Override
@@ -190,14 +189,18 @@ public class UserApiDelegateImpl implements UserApiDelegate {
 
     @Override
     @Transactional
-    @Valid
-    public ResponseEntity<Map<String, Object>> userIssuedVerifiableCredential(@HasSubject IssueVerifiableCredentialRequestPayloadV2 issueVerifiableCredentialRequestPayloadV2) {
+    @Validated
+    public ResponseEntity<Map<String, Object>> userIssuedVerifiableCredential(IssueVerifiableCredentialRequestPayloadV2 issueVerifiableCredentialRequestPayloadV2) {
         if (log.isDebugEnabled()) {
             log.debug("userIssuedVerifiableCredential(issueVerifiableCredentialRequestPayloadV2={})", issueVerifiableCredentialRequestPayloadV2);
         }
 
-        final GenericAbstractVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs.GenericVerifiableCredentialFactoryArgsBuilder factoryArgs =
-                GenericAbstractVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs.builder();
+        if (!isValidSubject(issueVerifiableCredentialRequestPayloadV2)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        final GenericVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs.GenericVerifiableCredentialFactoryArgsBuilder factoryArgs =
+                GenericVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs.builder();
 
         final Wallet wallet = walletService.findById(TMP_WALLET_ID).orElseThrow();
 
@@ -257,5 +260,19 @@ public class UserApiDelegateImpl implements UserApiDelegate {
     @Override
     public ResponseEntity<ValidateVerifiablePresentationResponsePayloadV2> validateVerifiablePresentationsPost(ValidateVerifiablePresentationRequestPayloadV2 validateVerifiablePresentationRequestPayloadV2) {
         return UserApiDelegate.super.validateVerifiablePresentationsPost(validateVerifiablePresentationRequestPayloadV2);
+    }
+
+    private static boolean isValidSubject(IssueVerifiableCredentialRequestPayloadV2 payload) {
+        if (payload == null || payload.getVerifiableCredentialSubject() == null) {
+            return false;
+        }
+
+        try {
+            new VerifiableCredentialSubject(payload.getVerifiableCredentialSubject());
+        } catch (IllegalArgumentException illegalArgumentException) {
+            log.trace("Subject is not a valid Verifiable Credential Subject", illegalArgumentException);
+            return false;
+        }
+        return true;
     }
 }

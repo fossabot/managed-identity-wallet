@@ -23,9 +23,10 @@ package org.eclipse.tractusx.managedidentitywallets.util.verifiableCredential;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.MIWVerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
-import org.eclipse.tractusx.managedidentitywallets.models.*;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
+import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.util.DidFactory;
 import org.eclipse.tractusx.ssi.lib.model.did.Did;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
@@ -36,20 +37,24 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class BusinessPartnerAbstractVerifiableCredentialFactory extends AbstractVerifiableCredentialFactory {
+public class FrameworkVerifiableCredentialFactory extends AbstractVerifiableCredentialFactory {
 
     private final DidFactory didFactory;
 
-    public VerifiableCredential createBusinessPartnerNumberCredential(@NonNull Wallet wallet) {
+    public VerifiableCredential createDismantlerVerifiableCredential(@NonNull Wallet wallet,
+                                                                     @NonNull VerifiableCredentialType verifiableCredentialType,
+                                                                     @NonNull String contractTemplate,
+                                                                     @NonNull String contractVersion) {
         final WalletId walletId = wallet.getWalletId();
         final Did did = didFactory.generateDid(wallet);
 
-        final VerifiableCredentialSubject verifiableCredentialSubject =
-                new VerifiableCredentialSubject(Map.of(
-                        StringPool.TYPE, MIWVerifiableCredentialType.BPN_CREDENTIAL,
-                        StringPool.ID, did.toString(),
-                        StringPool.BPN, walletId.getText()));
+        final VerifiableCredentialSubject verifiableCredentialSubject = new VerifiableCredentialSubject(Map.of(
+                StringPool.TYPE, verifiableCredentialType.getText(),
+                StringPool.ID, did.toString(),
+                StringPool.HOLDER_IDENTIFIER, walletId.getText(),
+                StringPool.CONTRACT_TEMPLATE, contractTemplate,
+                StringPool.CONTRACT_VERSION, contractVersion));
 
-        return createdIssuedCredential(verifiableCredentialSubject, MIWVerifiableCredentialType.BPN_CREDENTIAL);
+        return createdIssuedCredential(verifiableCredentialSubject, verifiableCredentialType.getText());
     }
 }

@@ -21,18 +21,26 @@
 
 package org.eclipse.tractusx.managedidentitywallets.listener;
 
+import com.apicatalog.jsonld.document.JsonDocument;
 import lombok.RequiredArgsConstructor;
+import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
+import org.eclipse.tractusx.managedidentitywallets.util.ApplicationResourceLoader;
 import org.eclipse.tractusx.managedidentitywallets.util.Ed25519KeyFactory;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
+import org.eclipse.tractusx.ssi.lib.model.RemoteDocumentLoader;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
+import java.net.URI;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RequiredArgsConstructor
 @Service
@@ -43,9 +51,11 @@ public class ApplicationStartedEventListener {
     private final WalletService walletService;
     private final Ed25519KeyFactory ed25519KeyFactory;
     private final VaultService vaultService;
+    private final ApplicationResourceLoader applicationResourceLoader;
 
     @EventListener
-    public void onApplicationStartedEvent(ApplicationStartedEvent event) {
+    @Order(20)
+    public void createAuthorityWallet(ApplicationStartedEvent event) {
         final WalletId walletId = new WalletId(miwSettings.authorityWalletBpn());
         final WalletName walletName = new WalletName(miwSettings.authorityWalletName());
 
@@ -66,5 +76,26 @@ public class ApplicationStartedEventListener {
 
         log.info("Creating authority wallet with id {}", walletId.getText());
         walletService.create(wallet);
+    }
+
+
+    @EventListener
+    @SneakyThrows
+    @Order(10) // resources should be loaded before the authority wallet is created
+    public void registerOfflineResources(ApplicationStartedEvent event) {
+        if (log.isTraceEnabled()) {
+            log.trace("Registering offline resources");
+        }
+
+        final RemoteDocumentLoader documentLoader = RemoteDocumentLoader.getInstance();
+        documentLoader.setEnableLocalCache(true);
+
+        final Map<URI, JsonDocument> localCache = new HashMap<>();
+        for (ApplicationResourceLoader.JsonLdResource jsonLdResource : ApplicationResourceLoader.JsonLdResource.values()) {
+            localCache.put(jsonLdResource.getUri(),
+                    JsonDocument.of(applicationResourceLoader.loadJsonLdResource(jsonLdResource)));
+        }
+
+        documentLoader.setLocalCache(localCache);
     }
 }

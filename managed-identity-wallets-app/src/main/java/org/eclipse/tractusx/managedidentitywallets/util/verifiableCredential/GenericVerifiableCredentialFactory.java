@@ -46,7 +46,7 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class GenericAbstractVerifiableCredentialFactory extends AbstractVerifiableCredentialFactory {
+public class GenericVerifiableCredentialFactory extends AbstractVerifiableCredentialFactory {
 
     private final DidFactory didFactory;
     private final MIWSettings miwSettings;
@@ -54,7 +54,7 @@ public class GenericAbstractVerifiableCredentialFactory extends AbstractVerifiab
     @SneakyThrows({UnsupportedSignatureTypeException.class, Ed25519KeyNotFoundException.class, InvalidePrivateKeyFormat.class})
     public VerifiableCredential createVerifiableCredential(GenericVerifiableCredentialFactoryArgs args) {
 
-        final VerifiableCredentialSubject subject = args.getSubject();
+        final List<VerifiableCredentialSubject> subject = args.getSubjects();
         final Wallet issuerWallet = args.getIssuerWallet();
         final Did issuerDid = didFactory.generateDid(issuerWallet);
         final Instant expirationDate = Optional.ofNullable(args.getExpirationDate()).orElse(miwSettings.vcExpiryDate().toInstant());
@@ -97,8 +97,8 @@ public class GenericAbstractVerifiableCredentialFactory extends AbstractVerifiab
     @Value
     public static class GenericVerifiableCredentialFactoryArgs {
         /* Mandatory */
-        @NonNull
-        VerifiableCredentialSubject subject;
+        @Singular
+        List<VerifiableCredentialSubject> subjects;
         @NonNull
         Wallet issuerWallet;
 

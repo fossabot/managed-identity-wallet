@@ -31,7 +31,7 @@ import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
-import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredential.SummaryAbstractVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredential.SummaryVerifiableCredentialFactory;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
@@ -48,7 +48,7 @@ public class VerifiableCredentialStoredInWalletEventEventListener {
     private final WalletService walletService;
     private final MIWSettings miwSettings;
     private final VerifiableCredentialService verifiableCredentialService;
-    private final SummaryAbstractVerifiableCredentialFactory summaryVerifiableCredentialFactory;
+    private final SummaryVerifiableCredentialFactory summaryVerifiableCredentialFactory;
 
     @EventListener
     @Transactional

@@ -29,13 +29,11 @@ import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.dto.IssueDismantlerCredentialRequest;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.dto.IssueFrameworkCredentialRequest;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.dto.IssueMembershipCredentialRequest;
-import org.eclipse.tractusx.managedidentitywallets.api.v1.entity.HoldersCredential;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.entity.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.BadDataException;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.DuplicateCredentialProblem;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.ForbiddenException;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.WalletNotFoundProblem;
-import org.eclipse.tractusx.managedidentitywallets.api.v1.utils.CommonUtils;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.utils.Validate;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
@@ -45,17 +43,16 @@ import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableC
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
-import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredential.DismantlerAbstractVerifiableCredentialFactory;
-import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredential.FrameworkAbstractVerifiableCredentialFactory;
-import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredential.MembershipAbstractVerifiableCredentialFactory;
-import org.eclipse.tractusx.ssi.lib.did.resolver.DidDocumentResolverRegistry;
-import org.eclipse.tractusx.ssi.lib.did.resolver.DidDocumentResolverRegistryImpl;
-import org.eclipse.tractusx.ssi.lib.did.web.DidWebDocumentResolver;
+import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredential.DismantlerVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredential.FrameworkVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredential.GenericVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredential.MembershipVerifiableCredentialFactory;
+import org.eclipse.tractusx.ssi.lib.did.resolver.DidResolver;
+import org.eclipse.tractusx.ssi.lib.did.web.DidWebResolver;
 import org.eclipse.tractusx.ssi.lib.did.web.util.DidWebParser;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialType;
 import org.eclipse.tractusx.ssi.lib.proof.LinkedDataProofValidation;
-import org.eclipse.tractusx.ssi.lib.proof.SignatureType;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
@@ -81,17 +78,16 @@ public class IssuersCredentialService {
 
     private final MIWSettings miwSettings;
 
-
-    private final WalletKeyService walletKeyService;
     private final WalletService walletService;
 
 
     private final CommonService commonService;
 
     private final VerifiableCredentialService verifiableCredentialService;
-    private final MembershipAbstractVerifiableCredentialFactory membershipVerifiableCredentialFactory;
-    private final DismantlerAbstractVerifiableCredentialFactory dismantlerVerifiableCredentialFactory;
-    private final FrameworkAbstractVerifiableCredentialFactory frameworkVerifiableCredentialFactory;
+    private final MembershipVerifiableCredentialFactory membershipVerifiableCredentialFactory;
+    private final DismantlerVerifiableCredentialFactory dismantlerVerifiableCredentialFactory;
+    private final FrameworkVerifiableCredentialFactory frameworkVerifiableCredentialFactory;
+    private final GenericVerifiableCredentialFactory genericVerifiableCredentialFactory;
 
     /**
      * Gets credentials.
@@ -284,26 +280,28 @@ public class IssuersCredentialService {
 
         validateAccess(callerBpn, issuerWallet);
 
-        // get issuer Key
-        byte[] privateKeyBytes = walletKeyService.getPrivateKeyByWalletIdentifierAsBytes(issuerWallet.getId());
+
+        final org.eclipse.tractusx.managedidentitywallets.models.Wallet issuerWalletRealDomain = walletService.findById(new WalletId(callerBpn)).orElseThrow();
+
+        final GenericVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs factoryArgs =
+                GenericVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs.builder()
+                        .subjects(verifiableCredential.getCredentialSubject())
+                        .issuerWallet(issuerWalletRealDomain)
+                        .build();
 
         // Create Credential
-        HoldersCredential holdersCredential = CommonUtils.getHoldersCredential(verifiableCredential.getCredentialSubject().get(0),
-                verifiableCredential.getTypes(), issuerWallet.getDidDocument(),
-                privateKeyBytes,
-                holderWallet.getDid(),
-                verifiableCredential.getContext(), Date.from(verifiableCredential.getExpirationDate()));
+        final VerifiableCredential holdersCredential = genericVerifiableCredentialFactory.createVerifiableCredential(factoryArgs);
 
         //save in holder wallet
-        verifiableCredentialService.create(holdersCredential.getData());
+        verifiableCredentialService.create(holdersCredential);
         var wallet = walletService.findById(new WalletId(holderDid))
                 .orElseThrow(() -> new WalletNotFoundProblem("Wallet not found"));
-        walletService.storeVerifiableCredential(wallet, holdersCredential.getData());
+        walletService.storeVerifiableCredential(wallet, holdersCredential);
 
         log.debug("VC type of {} issued to bpn ->{}", StringEscapeUtils.escapeJava(verifiableCredential.getTypes().toString()), StringEscapeUtils.escapeJava(holderWallet.getBpn()));
 
         // Return VC
-        return holdersCredential.getData();
+        return holdersCredential;
 
     }
 
@@ -315,24 +313,11 @@ public class IssuersCredentialService {
      * @return the map
      */
     public Map<String, Object> credentialsValidation(Map<String, Object> data, boolean withCredentialExpiryDate) {
-        VerifiableCredential verifiableCredential = new VerifiableCredential(data);
+        final VerifiableCredential verifiableCredential = new VerifiableCredential(data);
+        final DidResolver didResolver = new DidWebResolver(HttpClient.newHttpClient(), new DidWebParser(), miwSettings.enforceHttps());
+        final LinkedDataProofValidation proofValidation = LinkedDataProofValidation.newInstance(didResolver);
 
-        // DID Resolver Constracture params
-        DidDocumentResolverRegistry didDocumentResolverRegistry = new DidDocumentResolverRegistryImpl();
-        didDocumentResolverRegistry.register(
-                new DidWebDocumentResolver(HttpClient.newHttpClient(), new DidWebParser(), miwSettings.enforceHttps()));
-
-        String proofTye = verifiableCredential.getProof().get(StringPool.TYPE).toString();
-        LinkedDataProofValidation proofValidation;
-        if (SignatureType.ED21559.toString().equals(proofTye)) {
-            proofValidation = LinkedDataProofValidation.newInstance(SignatureType.ED21559, didDocumentResolverRegistry);
-        } else if (SignatureType.JWS.toString().equals(proofTye)) {
-            proofValidation = LinkedDataProofValidation.newInstance(SignatureType.JWS, didDocumentResolverRegistry);
-        } else {
-            throw new BadDataException(String.format("Invalid proof type: %s", proofTye));
-        }
-
-        boolean valid = proofValidation.verifiyProof(verifiableCredential);
+        boolean valid = proofValidation.verifiy(verifiableCredential);
 
         Map<String, Object> response = new TreeMap<>();
 
@@ -352,6 +337,7 @@ public class IssuersCredentialService {
         //issuer must be base wallet
         Validate.isFalse(issuerWallet.getBpn().equals(miwSettings.authorityWalletBpn())).launch(new ForbiddenException(BASE_WALLET_BPN_IS_NOT_MATCHING_WITH_REQUEST_BPN_FROM_TOKEN));
     }
+
     private void isCredentialExit(String holderDid, String credentialType) {
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
                 .holderWalletId(new WalletId(holderDid))

@@ -41,7 +41,7 @@ import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class MembershipAbstractVerifiableCredentialFactory extends AbstractVerifiableCredentialFactory {
+public class MembershipVerifiableCredentialFactory extends AbstractVerifiableCredentialFactory {
 
     private final DidFactory didFactory;
     private final MIWSettings miwSettings;

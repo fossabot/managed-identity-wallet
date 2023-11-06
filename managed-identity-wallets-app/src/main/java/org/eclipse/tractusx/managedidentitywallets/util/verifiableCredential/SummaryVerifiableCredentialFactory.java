@@ -41,7 +41,7 @@ import java.util.*;
 
 @Component
 @RequiredArgsConstructor
-public class SummaryAbstractVerifiableCredentialFactory extends AbstractVerifiableCredentialFactory {
+public class SummaryVerifiableCredentialFactory extends AbstractVerifiableCredentialFactory {
 
     private final DidFactory didFactory;
     private final MIWSettings miwSettings;

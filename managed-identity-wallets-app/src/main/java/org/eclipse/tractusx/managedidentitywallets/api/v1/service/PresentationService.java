@@ -26,17 +26,21 @@ import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.entity.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.BadDataException;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.utils.Validate;
-import org.eclipse.tractusx.ssi.lib.crypt.ed25519.Ed25519Key;
+import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
+import org.eclipse.tractusx.managedidentitywallets.exception.Ed25519KeyNotFoundException;
+import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
+import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
+import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.ssi.lib.crypt.octet.OctetKeyPairFactory;
 import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559PrivateKey;
-import org.eclipse.tractusx.ssi.lib.did.resolver.DidDocumentResolverRegistry;
-import org.eclipse.tractusx.ssi.lib.did.resolver.DidDocumentResolverRegistryImpl;
-import org.eclipse.tractusx.ssi.lib.did.web.DidWebDocumentResolver;
+import org.eclipse.tractusx.ssi.lib.did.resolver.DidResolver;
+import org.eclipse.tractusx.ssi.lib.did.web.DidWebResolver;
 import org.eclipse.tractusx.ssi.lib.did.web.util.DidWebParser;
 import org.eclipse.tractusx.ssi.lib.exception.InvalidJsonLdException;
 import org.eclipse.tractusx.ssi.lib.exception.InvalidePrivateKeyFormat;
@@ -51,7 +55,6 @@ import org.eclipse.tractusx.ssi.lib.model.verifiable.presentation.VerifiablePres
 import org.eclipse.tractusx.ssi.lib.model.verifiable.presentation.VerifiablePresentationBuilder;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.presentation.VerifiablePresentationType;
 import org.eclipse.tractusx.ssi.lib.proof.LinkedDataProofValidation;
-import org.eclipse.tractusx.ssi.lib.proof.SignatureType;
 import org.eclipse.tractusx.ssi.lib.serialization.jsonLd.JsonLdSerializerImpl;
 import org.eclipse.tractusx.ssi.lib.serialization.jwt.SerializedJwtPresentationFactory;
 import org.eclipse.tractusx.ssi.lib.serialization.jwt.SerializedJwtPresentationFactoryImpl;
@@ -73,7 +76,8 @@ public class PresentationService {
 
     private final CommonService commonService;
 
-    private final WalletKeyService walletKeyService;
+    private final VaultService vaultService;
+    private final WalletService walletService;
 
     private final MIWSettings miwSettings;
 
@@ -86,7 +90,7 @@ public class PresentationService {
      * @param callerBpn the caller bpn
      * @return the map
      */
-    @SneakyThrows({InvalidePrivateKeyFormat.class})
+    @SneakyThrows({InvalidePrivateKeyFormat.class, Ed25519KeyNotFoundException.class})
     public Map<String, Object> createPresentation(Map<String, Object> data, boolean asJwt, String audience, String callerBpn) {
         List<Map<String, Object>> verifiableCredentialList = (List<Map<String, Object>>) data.get(StringPool.VERIFIABLE_CREDENTIALS);
 
@@ -112,8 +116,12 @@ public class PresentationService {
                     new SignedJwtFactory(new OctetKeyPairFactory()), new JsonLdSerializerImpl(), vpIssuerDid);
 
             //Build JWT
-            Ed25519Key ed25519Key = walletKeyService.getPrivateKeyByWalletIdentifier(callerWallet.getBpn());
-            x21559PrivateKey privateKey = new x21559PrivateKey(ed25519Key.getEncoded());
+
+            final org.eclipse.tractusx.managedidentitywallets.models.Wallet domainWallet = walletService.findById(new WalletId(callerBpn)).orElseThrow();
+            final StoredEd25519Key latestKey = domainWallet.getStoredEd25519Keys().stream().max(Comparator.comparing(org.eclipse.tractusx.managedidentitywallets.models.Ed25519Key::getCreatedAt)).orElseThrow();
+            final ResolvedEd25519Key resolvedEd25519Key = vaultService.resolveKey(latestKey);
+
+            x21559PrivateKey privateKey = new x21559PrivateKey(resolvedEd25519Key.getPrivateKey());
             SignedJWT presentation = presentationFactory.createPresentation(vpIssuerDid
                     , verifiableCredentials, audience, privateKey);
 
@@ -205,11 +213,9 @@ public class PresentationService {
     private boolean validateSignature(SignedJWT signedJWT) {
         //validate jwt signature
         try {
-            DidDocumentResolverRegistry didDocumentResolverRegistry = new DidDocumentResolverRegistryImpl();
-            didDocumentResolverRegistry.register(
-                    new DidWebDocumentResolver(HttpClient.newHttpClient(), new DidWebParser(), miwSettings.enforceHttps()));
+            final DidResolver didResolver = new DidWebResolver(HttpClient.newHttpClient(), new DidWebParser(), miwSettings.enforceHttps());
 
-            SignedJwtVerifier jwtVerifier = new SignedJwtVerifier(didDocumentResolverRegistry);
+            SignedJwtVerifier jwtVerifier = new SignedJwtVerifier(didResolver);
             return jwtVerifier.verify(signedJWT);
         } catch (Exception e) {
             log.error("Can not verify signature of jwt", e);
@@ -245,27 +251,10 @@ public class PresentationService {
 
     private boolean validateCredential(VerifiableCredential credential) throws UnsupportedSignatureTypeException {
 
-        DidDocumentResolverRegistry didDocumentResolverRegistry = new DidDocumentResolverRegistryImpl();
-        didDocumentResolverRegistry.register(
-                new DidWebDocumentResolver(HttpClient.newHttpClient(), new DidWebParser(), miwSettings.enforceHttps()));
+        final DidResolver didResolver = new DidWebResolver(HttpClient.newHttpClient(), new DidWebParser(), miwSettings.enforceHttps());
+        final LinkedDataProofValidation linkedDataProofValidation = LinkedDataProofValidation.newInstance(didResolver);
 
-        String proofType = credential.getProof().getType();
-        LinkedDataProofValidation linkedDataProofValidation;
-        if (SignatureType.ED21559.toString().equals(proofType)) {
-            linkedDataProofValidation = LinkedDataProofValidation.newInstance(
-                    SignatureType.ED21559,
-                    didDocumentResolverRegistry
-            );
-        } else if (SignatureType.JWS.toString().equals(proofType)) {
-            linkedDataProofValidation = LinkedDataProofValidation.newInstance(
-                    SignatureType.JWS,
-                    didDocumentResolverRegistry
-            );
-        } else {
-            throw new UnsupportedSignatureTypeException(proofType);
-        }
-
-        boolean isValid = linkedDataProofValidation.verifiyProof(credential);
+        boolean isValid = linkedDataProofValidation.verifiy(credential);
         if (isValid) {
             log.debug("Credential validation result: (valid: {}, credential-id: {})", isValid, credential.getId());
         } else {
