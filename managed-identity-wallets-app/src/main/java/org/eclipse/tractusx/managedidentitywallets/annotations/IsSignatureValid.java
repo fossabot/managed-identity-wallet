@@ -51,15 +51,23 @@ public @interface IsSignatureValid {
 
         @Override
         public boolean isValid(VerifiableCredential verifiableCredential, ConstraintValidatorContext context) {
-
             if (verifiableCredential == null)
                 return false;
 
-            final boolean isProofValid = proofValidation.verifiy(verifiableCredential);
+            boolean isProofValid = false;
+
+            try {
+                isProofValid = proofValidation.verifiy(verifiableCredential);
+            } catch (Exception e) {
+                // if a verifiable credential is not json-ld valid, the verify method will throw an exception
+                if (log.isTraceEnabled()) {
+                    log.error("Verifiable Credential signature validation failed (verifiable credential id: {})", verifiableCredential.getId(), e);
+                }
+            }
+
             if (log.isTraceEnabled()) {
                 log.trace("Verifiable Credential signature validation result: {} (verifiable credential id: {})", isProofValid, verifiableCredential.getId());
             }
-
             return isProofValid;
         }
     }

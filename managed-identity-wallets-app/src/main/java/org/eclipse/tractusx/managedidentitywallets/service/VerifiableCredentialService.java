@@ -101,7 +101,7 @@ public class VerifiableCredentialService {
         return verifiableCredentialRepository.findAll(query, pageable);
     }
 
-    public void create(@NonNull @IsJsonLdValid @IsSignatureValid VerifiableCredential verifiableCredential) {
+    public void create(@IsSignatureValid @IsJsonLdValid @NonNull VerifiableCredential verifiableCredential) {
         verifiableCredentialRepository.create(verifiableCredential);
         applicationEventPublisher.publishEvent(new VerifiableCredentialCreatingEvent(verifiableCredential));
         afterCommit(() -> applicationEventPublisher.publishEvent(new VerifiableCredentialCreatedEvent(verifiableCredential)));
