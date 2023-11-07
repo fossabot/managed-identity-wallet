@@ -60,13 +60,12 @@ public class WalletCreatedEventListener {
             return;
         }
 
+        log.trace("Generating new key for wallet {}", walletId);
         final DidFragment didFragment = new DidFragment("key-1");
         final ResolvedEd25519Key resolvedEd25519Key = ed25519KeyFactory.generateNewEd25519Key(didFragment);
 
-        log.trace("Storing key {} in vault", resolvedEd25519Key.getPublicKey());
         final StoredEd25519Key storedEd25519Key = vaultService.storeKey(resolvedEd25519Key);
 
-        log.trace("Updating wallet {} with key {}", walletId, storedEd25519Key.getId());
         final Wallet updatedWallet = Wallet.builder()
                 .walletId(wallet.getWalletId())
                 .walletName(wallet.getWalletName())
