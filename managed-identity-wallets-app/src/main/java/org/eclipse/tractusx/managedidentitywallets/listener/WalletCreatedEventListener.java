@@ -28,7 +28,7 @@ import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
-import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredential.BusinessPartnerVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.util.verifiableDocuments.BusinessPartnerVerifiableCredentialFactory;
 import org.eclipse.tractusx.managedidentitywallets.util.Ed25519KeyFactory;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.context.event.EventListener;

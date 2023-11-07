@@ -21,10 +21,14 @@
 
 package org.eclipse.tractusx.managedidentitywallets.config;
 
+import lombok.Data;
+import lombok.NonNull;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.stereotype.Component;
 
 import java.net.URI;
+import java.time.Duration;
 import java.util.Date;
 import java.util.List;
 import java.util.Set;
@@ -32,13 +36,14 @@ import java.util.Set;
 /**
  * The type Miw settings.
  */
-@ConfigurationProperties(prefix = "miw")
-public record MIWSettings(String host, String encryptionKey, String authorityWalletBpn, String authorityWalletDid,
-                          String authorityWalletName,
-                          List<URI> vcContexts, List<URI> summaryVcContexts,
-                          @DateTimeFormat(pattern = "dd-MM-yyyy") Date vcExpiryDate,
-                          Set<String> supportedFrameworkVCTypes,
-                          boolean enforceHttps, String contractTemplatesUrl,
-                          List<URI> didDocumentContextUrls,
-                          int apiDefaultPageSize) {
+
+
+@ConfigurationProperties(prefix = "http-client")
+@Data
+@Component
+public class HttpConfigurationProperties {
+
+    public static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofMillis(30000);
+
+    private Duration connectionTimeout;
 }

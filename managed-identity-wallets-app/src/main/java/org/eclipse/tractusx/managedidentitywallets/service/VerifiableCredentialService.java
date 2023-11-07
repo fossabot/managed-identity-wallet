@@ -25,6 +25,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.annotations.IsJsonLdValid;
+import org.eclipse.tractusx.managedidentitywallets.annotations.IsSignatureValid;
 import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialCreatedEvent;
 import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialCreatingEvent;
 import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialDeletedEvent;
@@ -66,6 +67,13 @@ public class VerifiableCredentialService {
         return verifiableCredentialRepository.findOne(query);
     }
 
+    public boolean existsById(@NonNull final VerifiableCredentialId id) {
+        final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
+                .verifiableCredentialId(id)
+                .build();
+        return findOne(query).isPresent();
+    }
+
     public boolean exists(@NonNull final VerifiableCredentialQuery query) {
         return findOne(query).isPresent();
     }
@@ -93,7 +101,7 @@ public class VerifiableCredentialService {
         return verifiableCredentialRepository.findAll(query, pageable);
     }
 
-    public void create(@NonNull @IsJsonLdValid VerifiableCredential verifiableCredential) {
+    public void create(@NonNull @IsJsonLdValid @IsSignatureValid VerifiableCredential verifiableCredential) {
         verifiableCredentialRepository.create(verifiableCredential);
         applicationEventPublisher.publishEvent(new VerifiableCredentialCreatingEvent(verifiableCredential));
         afterCommit(() -> applicationEventPublisher.publishEvent(new VerifiableCredentialCreatedEvent(verifiableCredential)));

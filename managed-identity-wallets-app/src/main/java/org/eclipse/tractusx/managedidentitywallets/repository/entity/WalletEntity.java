@@ -25,6 +25,8 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.apache.commons.lang3.builder.ToStringExclude;
 import org.checkerframework.common.aliasing.qual.Unique;
 
 import java.util.List;
@@ -36,6 +38,7 @@ import java.util.Set;
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Entity(name = WalletEntity.TABLE_NAME)
 @Table(name = WalletEntity.TABLE_NAME)
+@ToString
 public class WalletEntity extends AbstractEntity {
 
     public static final String TABLE_NAME = "wallet";
@@ -43,6 +46,7 @@ public class WalletEntity extends AbstractEntity {
     public static final String COLUMN_NAME = "name";
 
     @Id
+    @ToString.Include
     private String id;
 
     @Unique

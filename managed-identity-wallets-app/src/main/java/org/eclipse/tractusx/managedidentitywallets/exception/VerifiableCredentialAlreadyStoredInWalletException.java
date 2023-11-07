@@ -19,21 +19,21 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.models;
+package org.eclipse.tractusx.managedidentitywallets.exception;
 
-import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
-import lombok.ToString;
-import lombok.Value;
+import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 
-@Value
-@EqualsAndHashCode
-public class WalletId {
-    @NonNull
-    String text;
+@Getter
+public class VerifiableCredentialAlreadyStoredInWalletException extends RuntimeException {
+    private final Wallet wallet;
+    private final VerifiableCredential verifiableCredential;
 
-    @Override
-    public String toString() {
-        return text;
+    public VerifiableCredentialAlreadyStoredInWalletException(@NonNull Wallet wallet, @NonNull VerifiableCredential verifiableCredential) {
+        super(String.format("VerifiableCredential already stored in wallet. (verifiable credential id: %s, wallet id: %s)", verifiableCredential.getId(), wallet.getWalletId()));
+        this.wallet = wallet;
+        this.verifiableCredential = verifiableCredential;
     }
 }

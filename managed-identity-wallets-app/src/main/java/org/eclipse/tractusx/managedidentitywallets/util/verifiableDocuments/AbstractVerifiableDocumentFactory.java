@@ -19,7 +19,7 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.util.verifiableCredential;
+package org.eclipse.tractusx.managedidentitywallets.util.verifiableDocuments;
 
 import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
@@ -36,6 +36,7 @@ import org.eclipse.tractusx.ssi.lib.exception.InvalidePrivateKeyFormat;
 import org.eclipse.tractusx.ssi.lib.exception.UnsupportedSignatureTypeException;
 import org.eclipse.tractusx.ssi.lib.model.did.Did;
 import org.eclipse.tractusx.ssi.lib.model.proof.Proof;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.Verifiable;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialBuilder;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialSubject;
@@ -50,7 +51,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
-public abstract class AbstractVerifiableCredentialFactory {
+public abstract class AbstractVerifiableDocumentFactory {
 
     @Autowired
     private DidFactory didFactory;
@@ -87,14 +88,16 @@ public abstract class AbstractVerifiableCredentialFactory {
                         .issuanceDate(Instant.now())
                         .credentialSubject(subject);
 
-        final Proof proof = generateProof(issuerWallet, issuerDid, builder);
+        final Proof proof = generateProof(issuerWallet, builder.build());
         return builder.proof(proof).build();
     }
 
-    protected Proof generateProof(Wallet issuerWallet, Did issuerDid, VerifiableCredentialBuilder builder) throws Ed25519KeyNotFoundException, UnsupportedSignatureTypeException, InvalidePrivateKeyFormat {
+    protected Proof generateProof(Wallet issuerWallet, Verifiable verifiable) throws Ed25519KeyNotFoundException, UnsupportedSignatureTypeException, InvalidePrivateKeyFormat {
         if (issuerWallet.getStoredEd25519Keys().isEmpty()) {
             throw new RuntimeException("No key found for wallet " + issuerWallet.getWalletId());
         }
+
+        final Did issuerDid = didFactory.generateDid(issuerWallet);
 
         final StoredEd25519Key key = issuerWallet.getStoredEd25519Keys()
                 .stream().max(Comparator.comparing(StoredEd25519Key::getCreatedAt))
@@ -105,7 +108,7 @@ public abstract class AbstractVerifiableCredentialFactory {
         final URI verificationMethod = URI.create(issuerDid + "#" + key.getId());
         final LinkedDataProofGenerator generator = LinkedDataProofGenerator.newInstance(SignatureType.JWS);
 
-        return generator.createProof(builder.build(), verificationMethod, privateKey);
+        return generator.createProof(verifiable, verificationMethod, privateKey);
     }
 
     private Wallet getIssuerWallet() {

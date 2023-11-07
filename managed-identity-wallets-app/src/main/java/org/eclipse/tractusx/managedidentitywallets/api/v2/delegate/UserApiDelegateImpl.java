@@ -35,7 +35,7 @@ import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.managedidentitywallets.spring.controllers.v2.UserApiDelegate;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.*;
 import org.eclipse.tractusx.managedidentitywallets.util.DidFactory;
-import org.eclipse.tractusx.managedidentitywallets.util.verifiableCredential.GenericVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.util.verifiableDocuments.GenericVerifiableCredentialFactory;
 import org.eclipse.tractusx.ssi.lib.model.did.Did;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialSubject;
@@ -65,7 +65,6 @@ public class UserApiDelegateImpl implements UserApiDelegate {
     private final DidFactory didFactory;
 
     @Override
-    @Transactional
     public ResponseEntity<Map<String, Object>> userCreateVerifiableCredential(Map<String, Object> payload) {
         if (log.isDebugEnabled()) {
             log.debug("userCreateVerifiableCredential(payload={})", payload);
@@ -76,14 +75,13 @@ public class UserApiDelegateImpl implements UserApiDelegate {
         final Wallet wallet = walletService.findById(TMP_WALLET_ID)
                 .orElseThrow(() -> new WalletNotFoundException(TMP_WALLET_ID));
 
-        try {
+        final VerifiableCredentialId verifiableCredentialId = new VerifiableCredentialId(verifiableCredential.getId().toString());
+        if (!verifiableCredentialService.existsById(verifiableCredentialId)) {
             verifiableCredentialService.create(verifiableCredential);
-        } catch (VerifiableCredentialAlreadyExistsException e) {
-            // ignore
         }
+
         walletService.storeVerifiableCredential(wallet, verifiableCredential);
 
-        final VerifiableCredentialId verifiableCredentialId = new VerifiableCredentialId(verifiableCredential.getId().toString());
         final VerifiableCredential storedVerifiableCredential =
                 verifiableCredentialService.findById(verifiableCredentialId)
                         .orElseThrow();
@@ -188,7 +186,6 @@ public class UserApiDelegateImpl implements UserApiDelegate {
     }
 
     @Override
-    @Transactional
     @Validated
     public ResponseEntity<Map<String, Object>> userIssuedVerifiableCredential(IssueVerifiableCredentialRequestPayloadV2 issueVerifiableCredentialRequestPayloadV2) {
         if (log.isDebugEnabled()) {
@@ -199,28 +196,28 @@ public class UserApiDelegateImpl implements UserApiDelegate {
             return ResponseEntity.badRequest().build();
         }
 
-        final GenericVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs.GenericVerifiableCredentialFactoryArgsBuilder factoryArgs =
+        final GenericVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs.GenericVerifiableCredentialFactoryArgsBuilder credentialFactoryArgsBuilder =
                 GenericVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs.builder();
 
         final Wallet wallet = walletService.findById(TMP_WALLET_ID).orElseThrow();
 
         /* Subject */
         final VerifiableCredentialSubject subject = new VerifiableCredentialSubject(issueVerifiableCredentialRequestPayloadV2.getVerifiableCredentialSubject());
-        factoryArgs.subject(subject);
+        credentialFactoryArgsBuilder.subject(subject);
 
         /* Wallet */
-        factoryArgs.issuerWallet(wallet);
+        credentialFactoryArgsBuilder.issuerWallet(wallet);
 
         /* Expiration Date */
         Optional.ofNullable(issueVerifiableCredentialRequestPayloadV2.getExpirationDate())
                 .map(OffsetDateTime::toInstant)
-                .ifPresent(factoryArgs::expirationDate);
+                .ifPresent(credentialFactoryArgsBuilder::expirationDate);
 
         /* Verifiable Credential Types */
         Optional.ofNullable(issueVerifiableCredentialRequestPayloadV2.getAdditionalVerifiableCredentialTypes())
                 .ifPresent(types -> types.stream()
                         .map(VerifiableCredentialType::new)
-                        .forEach(factoryArgs::additionalVerifiableCredentialType));
+                        .forEach(credentialFactoryArgsBuilder::additionalVerifiableCredentialType));
 
         /* Verifiable Credential Contexts */
         Optional.ofNullable(issueVerifiableCredentialRequestPayloadV2.getAdditionalVerifiableCredentialContexts())
@@ -228,10 +225,10 @@ public class UserApiDelegateImpl implements UserApiDelegate {
                         .stream()
                         .map(URI::create)
                         .map(VerifiableCredentialContext::new)
-                        .forEach(factoryArgs::additionalContext));
+                        .forEach(credentialFactoryArgsBuilder::additionalContext));
 
-        final VerifiableCredential verifiableCredential = genericVerifiableCredentialFactory.createVerifiableCredential(factoryArgs.build());
-        /* The MIW should remember all issued Verifiable Credentials. It is written to the database but not (yet) linked to any wallet */
+        final VerifiableCredential verifiableCredential = genericVerifiableCredentialFactory.createVerifiableCredential(credentialFactoryArgsBuilder.build());
+        /* As the MIW should remember all issued Verifiable Credentials, it is written to the database but not (yet) linked to any wallet */
         verifiableCredentialService.create(verifiableCredential);
 
         return ResponseEntity.ok(verifiableCredential);

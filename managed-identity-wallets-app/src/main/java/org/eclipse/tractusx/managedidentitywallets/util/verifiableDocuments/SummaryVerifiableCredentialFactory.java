@@ -19,7 +19,7 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.util.verifiableCredential;
+package org.eclipse.tractusx.managedidentitywallets.util.verifiableDocuments;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -41,7 +41,7 @@ import java.util.*;
 
 @Component
 @RequiredArgsConstructor
-public class SummaryVerifiableCredentialFactory extends AbstractVerifiableCredentialFactory {
+public class SummaryVerifiableCredentialFactory extends AbstractVerifiableDocumentFactory {
 
     private final DidFactory didFactory;
     private final MIWSettings miwSettings;

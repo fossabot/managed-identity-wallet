@@ -25,12 +25,14 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Entity(name = Ed25519KeyEntity.TABLE_NAME)
 @Table(name = Ed25519KeyEntity.TABLE_NAME)
+@ToString
 public class Ed25519KeyEntity extends AbstractEntity {
 
     public static final String TABLE_NAME = "key_ed25519";
@@ -41,6 +43,7 @@ public class Ed25519KeyEntity extends AbstractEntity {
     public static final String COLUMN_VAULT_SECRET = "vault_secret";
 
     @Id
+    @ToString.Include
     @Column(name = COLUMN_ID, nullable = false, updatable = false)
     private String id;
 

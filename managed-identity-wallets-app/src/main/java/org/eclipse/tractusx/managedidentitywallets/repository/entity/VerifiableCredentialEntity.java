@@ -25,6 +25,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.util.Set;
 
@@ -33,6 +34,7 @@ import java.util.Set;
 @EqualsAndHashCode(of = {"id"}, callSuper = false)
 @Entity(name = VerifiableCredentialEntity.TABLE_NAME)
 @Table(name = VerifiableCredentialEntity.TABLE_NAME)
+@ToString
 public class VerifiableCredentialEntity extends AbstractEntity {
 
     public static final String TABLE_NAME = "verifiable_credential";
@@ -40,6 +42,7 @@ public class VerifiableCredentialEntity extends AbstractEntity {
     public static final String COLUMN_ID = "id";
 
     @Id
+    @ToString.Include
     @Column(name = COLUMN_ID, nullable = false)
     private String id;
 

@@ -25,6 +25,7 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 import java.io.Serializable;
 
@@ -33,6 +34,7 @@ import java.io.Serializable;
 @EqualsAndHashCode(of = "id", callSuper = false)
 @Entity(name = VerifiableCredentialWalletIntersectionEntity.TABLE_NAME)
 @Table(name = VerifiableCredentialWalletIntersectionEntity.TABLE_NAME)
+@ToString
 public class VerifiableCredentialWalletIntersectionEntity extends AbstractEntity {
 
     public static final String TABLE_NAME = "verifiable_credential_wallet_intersection";
@@ -40,12 +42,14 @@ public class VerifiableCredentialWalletIntersectionEntity extends AbstractEntity
     public static final String COLUMN_VERIFIABLE_CREDENTIAL_ID = "verifiable_credential_id";
 
     @EmbeddedId
+    @ToString.Include
     private VerifiableCredentialIntersectionEntityId id;
 
     @Data
     @NoArgsConstructor
     @EqualsAndHashCode(of = {"wallet", "verifiableCredential"})
     @Embeddable
+    @ToString
     public static class VerifiableCredentialIntersectionEntityId implements Serializable {
 
         @ManyToOne

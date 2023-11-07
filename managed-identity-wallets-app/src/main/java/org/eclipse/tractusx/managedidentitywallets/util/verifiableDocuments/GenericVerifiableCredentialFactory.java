@@ -19,7 +19,7 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.util.verifiableCredential;
+package org.eclipse.tractusx.managedidentitywallets.util.verifiableDocuments;
 
 import lombok.*;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
@@ -46,7 +46,7 @@ import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
-public class GenericVerifiableCredentialFactory extends AbstractVerifiableCredentialFactory {
+public class GenericVerifiableCredentialFactory extends AbstractVerifiableDocumentFactory {
 
     private final DidFactory didFactory;
     private final MIWSettings miwSettings;
@@ -89,7 +89,7 @@ public class GenericVerifiableCredentialFactory extends AbstractVerifiableCreden
                         .issuanceDate(Instant.now())
                         .credentialSubject(subject);
 
-        final Proof proof = generateProof(issuerWallet, issuerDid, builder);
+        final Proof proof = generateProof(issuerWallet, builder.build());
         return builder.proof(proof).build();
     }
 

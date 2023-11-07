@@ -24,13 +24,11 @@ package org.eclipse.tractusx.managedidentitywallets.api;
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialAlreadyExistsException;
-import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialNotFoundException;
-import org.eclipse.tractusx.managedidentitywallets.exception.WalletAlreadyExistsException;
-import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
+import org.eclipse.tractusx.managedidentitywallets.exception.*;
 import org.eclipse.tractusx.managedidentitywallets.spring.controllers.v2.AdministratorApi;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.transaction.UnexpectedRollbackException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.ResponseBody;
@@ -86,6 +84,18 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(409).body(createMessage(ex.getMessage()));
     }
 
+
+    @ExceptionHandler(value = {VerifiableCredentialAlreadyStoredInWalletException.class})
+    @ResponseStatus(value = HttpStatus.CONFLICT)
+    @ResponseBody
+    public ResponseEntity<Object> handleVerifiableCredentialAlreadyStoredInWalletException(VerifiableCredentialAlreadyStoredInWalletException ex) {
+        if (log.isDebugEnabled()) {
+            log.debug("VerifiableCredentialAlreadyStoredInWallet: {}", ex.getMessage(), ex);
+        }
+
+        return ResponseEntity.status(409).body(createMessage(ex.getMessage()));
+    }
+
     @ExceptionHandler(value = {ConstraintViolationException.class})
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @ResponseBody
@@ -104,6 +114,16 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
         }
 
         return ResponseEntity.badRequest().body(createMessage(messages.toString()));
+    }
+
+
+    @ExceptionHandler(value = {UnexpectedRollbackException.class})
+    @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
+    @ResponseBody
+    public ResponseEntity<Object> handleUnexpectedRollbackException(UnexpectedRollbackException ex) {
+        log.error("UnexpectedRollbackException: {}", ex.getMessage(), ex);
+
+        return ResponseEntity.status(409).body(createMessage(ex.getMessage()));
     }
 
     private static Object createMessage(String message) {
