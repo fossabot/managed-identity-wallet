@@ -53,7 +53,7 @@ public class WalletMapV1 {
         var keyId = key.getId().getText();
 
         //create did json
-        Did did = DidWebFactory.fromHostnameAndPath(miwSettings.host(), w.getWalletId().getText());
+        Did did = DidWebFactory.fromHostnameAndPath(miwSettings.getHost(), w.getWalletId().getText());
 
         JsonWebKey jwk = new JsonWebKey(keyId, new x21559PublicKey(key.getPublicKey()), new x21559PrivateKey(key.getPrivateKey()));
         JWKVerificationMethod jwkVerificationMethod =

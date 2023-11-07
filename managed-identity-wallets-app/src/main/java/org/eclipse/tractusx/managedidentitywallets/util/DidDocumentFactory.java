@@ -86,7 +86,7 @@ public class DidDocumentFactory {
         //modify context URLs
         final List<URI> context = didDocument.getContext();
         final List<URI> mutableContext = new ArrayList<>(context);
-        miwSettings.didDocumentContextUrls().forEach(uri -> {
+        miwSettings.getDidDocumentContextUrls().forEach(uri -> {
             if (!mutableContext.contains(uri)) {
                 mutableContext.add(uri);
             }

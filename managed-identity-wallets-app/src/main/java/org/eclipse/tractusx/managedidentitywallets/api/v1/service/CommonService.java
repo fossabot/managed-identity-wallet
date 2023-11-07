@@ -101,7 +101,7 @@ public class CommonService {
     }
 
     public Did getDidByBpn(String bpn) {
-        return DidWebFactory.fromHostnameAndPath(miwSettings.host(), bpn);
+        return DidWebFactory.fromHostnameAndPath(miwSettings.getHost(), bpn);
     }
 
     @SneakyThrows
