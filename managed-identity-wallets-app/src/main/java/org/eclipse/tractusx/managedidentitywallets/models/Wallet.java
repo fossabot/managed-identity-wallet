@@ -24,22 +24,26 @@ package org.eclipse.tractusx.managedidentitywallets.models;
 import lombok.*;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
-@Value
+@Getter
 @Builder
 @AllArgsConstructor
 @ToString
 public class Wallet {
 
+    @NonNull
+    private final WalletId walletId;
 
     @NonNull
-    WalletId walletId;
-
-    @NonNull
-    WalletName walletName;
+    private final WalletName walletName;
 
     @Builder.Default
     @NonNull
-    List<StoredEd25519Key> storedEd25519Keys = new ArrayList<>();
+    private final List<StoredEd25519Key> storedEd25519Keys = Collections.emptyList();
+
+    public List<StoredEd25519Key> getStoredEd25519Keys() {
+        return Collections.unmodifiableList(storedEd25519Keys);
+    }
 }

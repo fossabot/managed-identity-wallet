@@ -25,21 +25,21 @@ import lombok.*;
 
 import java.time.Instant;
 
-@Value
+@Getter
 @AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 @Builder
 @ToString(exclude = {"privateKey"})
 public class ResolvedEd25519Key implements Ed25519Key {
 
     @NonNull
-    Ed25519KeyId id;
+    private final Ed25519KeyId id;
     @NonNull
-    DidFragment didFragment;
+    private final DidFragment didFragment;
     @NonNull
-    VaultSecret vaultSecret;
+    private final VaultSecret vaultSecret;
     @NonNull
-    Instant createdAt;
+    private final Instant createdAt;
 
-    byte @NonNull [] publicKey;
-    byte @NonNull [] privateKey;
+    private final byte @NonNull [] publicKey;
+    private final byte @NonNull [] privateKey;
 }

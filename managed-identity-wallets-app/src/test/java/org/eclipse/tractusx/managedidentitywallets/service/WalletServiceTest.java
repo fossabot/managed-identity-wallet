@@ -32,7 +32,7 @@ import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
-import org.eclipse.tractusx.managedidentitywallets.util.MiwIntegrationTest;
+import org.eclipse.tractusx.managedidentitywallets.factory.MiwIntegrationTest;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

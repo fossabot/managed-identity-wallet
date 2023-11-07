@@ -37,11 +37,12 @@ import lombok.*;
  * <p>
  * Such a did fragment is represented using this class by calling 'new DidFragment("section-1")'.
  */
-@Value
+@Getter
 @EqualsAndHashCode
+@RequiredArgsConstructor
 public class DidFragment {
     @NonNull
-    String text;
+    private final String text;
 
     @Override
     public String toString() {

@@ -21,22 +21,20 @@
 
 package org.eclipse.tractusx.managedidentitywallets.models;
 
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
-import lombok.ToString;
-import lombok.Value;
+import lombok.*;
 
 import java.net.URI;
 import java.security.URIParameter;
 
-@Value
+@Getter
 @EqualsAndHashCode
 @ToString
+@RequiredArgsConstructor
 public class VerifiableCredentialContext {
 
     public static final VerifiableCredentialContext CREDENTIALS_V1 = new VerifiableCredentialContext(URI.create("https://www.w3.org/2018/credentials/v1"));
     public static final VerifiableCredentialContext JWS_2020_V1 = new VerifiableCredentialContext(URI.create("https://w3id.org/security/suites/jws-2020/v1"));
 
     @NonNull
-    URI uri;
+    private final URI uri;
 }

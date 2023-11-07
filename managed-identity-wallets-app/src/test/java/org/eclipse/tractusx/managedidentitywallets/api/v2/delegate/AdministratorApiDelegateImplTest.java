@@ -28,7 +28,7 @@ import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.CreateWalletRequestPayloadV2;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.UpdateWalletRequestPayloadV2;
-import org.eclipse.tractusx.managedidentitywallets.util.MiwIntegrationTest;
+import org.eclipse.tractusx.managedidentitywallets.factory.MiwIntegrationTest;
 import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.junit.jupiter.api.Assertions;

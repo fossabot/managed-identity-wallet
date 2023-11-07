@@ -31,7 +31,7 @@ import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableC
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
-import org.eclipse.tractusx.managedidentitywallets.util.verifiableDocuments.GenericVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.GenericVerifiableCredentialFactory;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.data.domain.*;
 import org.springframework.stereotype.Service;

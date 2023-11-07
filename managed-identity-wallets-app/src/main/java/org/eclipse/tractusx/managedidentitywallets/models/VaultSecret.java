@@ -21,15 +21,13 @@
 
 package org.eclipse.tractusx.managedidentitywallets.models;
 
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
-import lombok.ToString;
-import lombok.Value;
+import lombok.*;
 
-@Value
+@Getter
 @EqualsAndHashCode
 @ToString
+@AllArgsConstructor
 public class VaultSecret {
     @NonNull
-    String text;
+    private final String text;
 }

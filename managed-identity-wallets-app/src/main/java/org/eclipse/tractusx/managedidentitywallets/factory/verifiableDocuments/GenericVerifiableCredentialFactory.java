@@ -19,7 +19,7 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.util.verifiableDocuments;
+package org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments;
 
 import lombok.*;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
@@ -27,7 +27,7 @@ import org.eclipse.tractusx.managedidentitywallets.exception.Ed25519KeyNotFoundE
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialContext;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.util.DidFactory;
+import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
 import org.eclipse.tractusx.ssi.lib.exception.InvalidePrivateKeyFormat;
 import org.eclipse.tractusx.ssi.lib.exception.UnsupportedSignatureTypeException;
 import org.eclipse.tractusx.ssi.lib.model.did.Did;

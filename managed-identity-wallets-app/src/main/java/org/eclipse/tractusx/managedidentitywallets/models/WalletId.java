@@ -21,16 +21,14 @@
 
 package org.eclipse.tractusx.managedidentitywallets.models;
 
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
-import lombok.ToString;
-import lombok.Value;
+import lombok.*;
 
-@Value
+@Getter
 @EqualsAndHashCode
+@RequiredArgsConstructor
 public class WalletId {
     @NonNull
-    String text;
+    private final String text;
 
     @Override
     public String toString() {

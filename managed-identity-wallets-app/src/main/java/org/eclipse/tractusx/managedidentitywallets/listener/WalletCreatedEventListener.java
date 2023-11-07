@@ -28,12 +28,14 @@ import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
-import org.eclipse.tractusx.managedidentitywallets.util.verifiableDocuments.BusinessPartnerVerifiableCredentialFactory;
-import org.eclipse.tractusx.managedidentitywallets.util.Ed25519KeyFactory;
+import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.BusinessPartnerVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.factory.Ed25519KeyFactory;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -65,8 +67,13 @@ public class WalletCreatedEventListener {
         final StoredEd25519Key storedEd25519Key = vaultService.storeKey(resolvedEd25519Key);
 
         log.trace("Updating wallet {} with key {}", walletId, storedEd25519Key.getId());
-        wallet.getStoredEd25519Keys().add(storedEd25519Key);
-        walletService.update(wallet);
+        final Wallet updatedWallet = Wallet.builder()
+                .walletId(wallet.getWalletId())
+                .walletName(wallet.getWalletName())
+                .storedEd25519Keys(List.of(storedEd25519Key))
+                .build();
+
+        walletService.update(updatedWallet);
     }
 
     @EventListener

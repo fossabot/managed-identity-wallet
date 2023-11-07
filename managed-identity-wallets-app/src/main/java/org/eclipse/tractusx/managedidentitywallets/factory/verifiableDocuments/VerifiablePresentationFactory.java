@@ -19,7 +19,7 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.util.verifiableDocuments;
+package org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments;
 
 import com.nimbusds.jwt.SignedJWT;
 import lombok.NonNull;
@@ -28,7 +28,7 @@ import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.exception.Ed25519KeyNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
-import org.eclipse.tractusx.managedidentitywallets.util.DidFactory;
+import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
 import org.eclipse.tractusx.ssi.lib.crypt.octet.OctetKeyPairFactory;
 import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559PrivateKey;
 import org.eclipse.tractusx.ssi.lib.exception.InvalidePrivateKeyFormat;
@@ -37,7 +37,6 @@ import org.eclipse.tractusx.ssi.lib.jwt.SignedJwtFactory;
 import org.eclipse.tractusx.ssi.lib.model.did.Did;
 import org.eclipse.tractusx.ssi.lib.model.proof.Proof;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
-import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialBuilder;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.presentation.VerifiablePresentation;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.presentation.VerifiablePresentationBuilder;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.presentation.VerifiablePresentationType;

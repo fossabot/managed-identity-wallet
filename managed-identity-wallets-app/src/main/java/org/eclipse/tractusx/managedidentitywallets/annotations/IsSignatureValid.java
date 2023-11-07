@@ -26,11 +26,8 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.ssi.lib.did.web.DidWebResolver;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.proof.LinkedDataProofValidation;
-import org.eclipse.tractusx.ssi.lib.validation.JsonLdValidator;
-import org.eclipse.tractusx.ssi.lib.validation.JsonLdValidatorImpl;
 
 import java.lang.annotation.*;
 

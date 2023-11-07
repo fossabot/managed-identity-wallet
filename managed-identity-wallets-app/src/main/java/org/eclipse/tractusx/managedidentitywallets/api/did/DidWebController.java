@@ -24,7 +24,7 @@ package org.eclipse.tractusx.managedidentitywallets.api.did;
 
 import lombok.RequiredArgsConstructor;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
-import org.eclipse.tractusx.managedidentitywallets.util.DidDocumentFactory;
+import org.eclipse.tractusx.managedidentitywallets.factory.DidDocumentFactory;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;

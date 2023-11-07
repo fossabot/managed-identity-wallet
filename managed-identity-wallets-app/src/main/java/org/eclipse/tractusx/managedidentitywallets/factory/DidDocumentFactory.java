@@ -19,7 +19,7 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.util;
+package org.eclipse.tractusx.managedidentitywallets.factory;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;

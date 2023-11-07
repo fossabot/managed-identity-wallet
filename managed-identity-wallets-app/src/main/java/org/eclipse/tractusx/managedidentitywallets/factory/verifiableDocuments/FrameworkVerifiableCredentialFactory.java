@@ -19,50 +19,42 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.util.verifiableDocuments;
+package org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.MIWVerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
-import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
-import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
-import org.eclipse.tractusx.managedidentitywallets.util.DidFactory;
+import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
 import org.eclipse.tractusx.ssi.lib.model.did.Did;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialSubject;
-import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialType;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class MembershipVerifiableCredentialFactory extends AbstractVerifiableDocumentFactory {
+public class FrameworkVerifiableCredentialFactory extends AbstractVerifiableDocumentFactory {
 
     private final DidFactory didFactory;
-    private final MIWSettings miwSettings;
-    private final WalletService walletService;
 
-    public VerifiableCredential createMembershipVerifiableCredential(@NonNull Wallet wallet) {
-
-        final WalletId newMemberWalletId = wallet.getWalletId();
-        final WalletId issuerWalletId = new WalletId(miwSettings.getAuthorityWalletBpn());
-        final Wallet issuerWallet = walletService.findById(issuerWalletId).orElseThrow(() -> new RuntimeException("Issuer wallet not found"));
+    public VerifiableCredential createDismantlerVerifiableCredential(@NonNull Wallet wallet,
+                                                                     @NonNull VerifiableCredentialType verifiableCredentialType,
+                                                                     @NonNull String contractTemplate,
+                                                                     @NonNull String contractVersion) {
+        final WalletId walletId = wallet.getWalletId();
         final Did did = didFactory.generateDid(wallet);
 
-
         final VerifiableCredentialSubject verifiableCredentialSubject = new VerifiableCredentialSubject(Map.of(
-                StringPool.TYPE, VerifiableCredentialType.MEMBERSHIP_CREDENTIAL,
+                StringPool.TYPE, verifiableCredentialType.getText(),
                 StringPool.ID, did.toString(),
-                StringPool.HOLDER_IDENTIFIER, newMemberWalletId.getText(),
-                StringPool.MEMBER_OF, issuerWallet.getWalletName().getText(),
-                StringPool.STATUS, "Active",
-                StringPool.START_TIME, Instant.now().toString()));
+                StringPool.HOLDER_IDENTIFIER, walletId.getText(),
+                StringPool.CONTRACT_TEMPLATE, contractTemplate,
+                StringPool.CONTRACT_VERSION, contractVersion));
 
-        return createdIssuedCredential(verifiableCredentialSubject, MIWVerifiableCredentialType.MEMBERSHIP_CREDENTIAL);
+        return createdIssuedCredential(verifiableCredentialSubject, verifiableCredentialType.getText());
     }
 }

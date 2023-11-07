@@ -43,10 +43,10 @@ import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableC
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
-import org.eclipse.tractusx.managedidentitywallets.util.verifiableDocuments.DismantlerVerifiableCredentialFactory;
-import org.eclipse.tractusx.managedidentitywallets.util.verifiableDocuments.FrameworkVerifiableCredentialFactory;
-import org.eclipse.tractusx.managedidentitywallets.util.verifiableDocuments.GenericVerifiableCredentialFactory;
-import org.eclipse.tractusx.managedidentitywallets.util.verifiableDocuments.MembershipVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.DismantlerVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.FrameworkVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.GenericVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.MembershipVerifiableCredentialFactory;
 import org.eclipse.tractusx.ssi.lib.did.resolver.DidResolver;
 import org.eclipse.tractusx.ssi.lib.did.web.DidWebResolver;
 import org.eclipse.tractusx.ssi.lib.did.web.util.DidWebParser;

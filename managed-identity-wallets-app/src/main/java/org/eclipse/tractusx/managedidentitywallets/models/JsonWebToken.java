@@ -22,16 +22,15 @@
 package org.eclipse.tractusx.managedidentitywallets.models;
 
 
-import lombok.EqualsAndHashCode;
-import lombok.NonNull;
-import lombok.Value;
+import lombok.*;
 
-@Value
+@Getter
 @EqualsAndHashCode
+@RequiredArgsConstructor
 public class JsonWebToken {
 
     @NonNull
-    String text;
+    private final String text;
 
     @Override
     public String toString() {

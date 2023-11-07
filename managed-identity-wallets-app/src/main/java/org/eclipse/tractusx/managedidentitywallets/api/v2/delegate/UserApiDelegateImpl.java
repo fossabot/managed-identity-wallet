@@ -25,7 +25,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.map.WalletsApiMapper;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
-import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
@@ -34,15 +33,14 @@ import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialS
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.managedidentitywallets.spring.controllers.v2.UserApiDelegate;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.*;
-import org.eclipse.tractusx.managedidentitywallets.util.DidFactory;
-import org.eclipse.tractusx.managedidentitywallets.util.verifiableDocuments.GenericVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
+import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.GenericVerifiableCredentialFactory;
 import org.eclipse.tractusx.ssi.lib.model.did.Did;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialSubject;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 

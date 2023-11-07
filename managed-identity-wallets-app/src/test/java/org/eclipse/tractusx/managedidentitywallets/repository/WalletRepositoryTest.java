@@ -24,7 +24,7 @@ package org.eclipse.tractusx.managedidentitywallets.repository;
 import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.ManagedIdentityWalletsApplication;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
-import org.eclipse.tractusx.managedidentitywallets.util.MiwIntegrationTest;
+import org.eclipse.tractusx.managedidentitywallets.factory.MiwIntegrationTest;
 import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletName;

@@ -26,11 +26,11 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
-import org.eclipse.tractusx.managedidentitywallets.models.*;
-import org.eclipse.tractusx.managedidentitywallets.util.ApplicationResourceLoader;
-import org.eclipse.tractusx.managedidentitywallets.util.Ed25519KeyFactory;
-import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
+import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
+import org.eclipse.tractusx.managedidentitywallets.util.ApplicationResourceLoader;
 import org.eclipse.tractusx.ssi.lib.model.RemoteDocumentLoader;
 import org.springframework.boot.context.event.ApplicationStartedEvent;
 import org.springframework.context.event.EventListener;
@@ -49,8 +49,6 @@ public class ApplicationStartedEventListener {
 
     private final MIWSettings miwSettings;
     private final WalletService walletService;
-    private final Ed25519KeyFactory ed25519KeyFactory;
-    private final VaultService vaultService;
     private final ApplicationResourceLoader applicationResourceLoader;
 
     @EventListener
@@ -64,20 +62,14 @@ public class ApplicationStartedEventListener {
             return;
         }
 
-        final DidFragment didFragment = new DidFragment("key-1");
-        final ResolvedEd25519Key resolvedEd25519Key = ed25519KeyFactory.generateNewEd25519Key(didFragment);
-        final StoredEd25519Key storedEd25519Key = vaultService.storeKey(resolvedEd25519Key);
-
         final Wallet wallet = Wallet.builder()
                 .walletId(walletId)
                 .walletName(walletName)
-                .storedEd25519Keys(List.of(storedEd25519Key))
                 .build();
 
         log.info("Creating authority wallet with id {}", walletId.getText());
         walletService.create(wallet);
     }
-
 
     @EventListener
     @SneakyThrows
