@@ -25,6 +25,8 @@ import com.nimbusds.jwt.SignedJWT;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import org.eclipse.tractusx.managedidentitywallets.annotations.IsJsonLdValid;
+import org.eclipse.tractusx.managedidentitywallets.annotations.IsSignatureValid;
 import org.eclipse.tractusx.managedidentitywallets.exception.Ed25519KeyNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
@@ -44,21 +46,25 @@ import org.eclipse.tractusx.ssi.lib.serialization.jsonLd.JsonLdSerializerImpl;
 import org.eclipse.tractusx.ssi.lib.serialization.jwt.SerializedJwtPresentationFactory;
 import org.eclipse.tractusx.ssi.lib.serialization.jwt.SerializedJwtPresentationFactoryImpl;
 import org.springframework.stereotype.Component;
+import org.springframework.validation.annotation.Validated;
 
 import java.net.URI;
+import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
 import java.util.UUID;
 
 @Component
 @RequiredArgsConstructor
+@Validated
 public class VerifiablePresentationFactory extends AbstractVerifiableDocumentFactory {
 
     private final DidFactory didFactory;
     private final VaultService vaultService;
 
     @SneakyThrows({UnsupportedSignatureTypeException.class, Ed25519KeyNotFoundException.class, InvalidePrivateKeyFormat.class})
-    public VerifiablePresentation createPresentation(@NonNull Wallet issuer, @NonNull List<VerifiableCredential> verifiableCredentials) {
+    public VerifiablePresentation createPresentation(@NonNull Wallet issuer,
+                                                     @NonNull @IsJsonLdValid @IsSignatureValid List<VerifiableCredential> verifiableCredentials) {
         final Did issuerDid = didFactory.generateDid(issuer);
 
         final VerifiablePresentationBuilder verifiablePresentationBuilder =
@@ -71,9 +77,9 @@ public class VerifiablePresentationFactory extends AbstractVerifiableDocumentFac
         return verifiablePresentationBuilder.proof(proof).build();
     }
 
-    // TODO Handle Key Vault issues gracefully
+    // TODO Handle Key Vault issues more gracefully
     @SneakyThrows({Ed25519KeyNotFoundException.class, InvalidePrivateKeyFormat.class})
-    public JsonWebToken createPresentationAsJwt(@NonNull Wallet issuer, @NonNull List<VerifiableCredential> credentials, @NonNull JsonWebTokenAudience audience) {
+    public JsonWebToken createPresentationAsJwt(@NonNull Wallet issuer, @NonNull @IsJsonLdValid @IsSignatureValid List<VerifiableCredential> credentials, @NonNull JsonWebTokenAudience audience) {
         final Did issuerDid = didFactory.generateDid(issuer);
         final SerializedJwtPresentationFactory factory = createJwtFactory(issuerDid);
 

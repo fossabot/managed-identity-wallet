@@ -117,6 +117,23 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
     }
 
 
+    @ExceptionHandler(value = {IllegalArgumentException.class})
+    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
+    @ResponseBody
+    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
+        // if invalid json ld objects are passed through the API this method is thrown.
+        if (ex.getMessage().startsWith("Invalid JsonLdObject")) {
+            if (log.isDebugEnabled()) {
+                log.debug("IllegalArgumentException (json-ld): {}", ex.getMessage(), ex);
+            }
+            return ResponseEntity.badRequest().body(createMessage("invalid json-ld object"));
+        } else {
+            log.error("IllegalArgumentException: {}", ex.getMessage(), ex);
+            return ResponseEntity.internalServerError().body("internal server error");
+        }
+    }
+
+
     @ExceptionHandler(value = {UnexpectedRollbackException.class})
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
@@ -125,6 +142,7 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
 
         return ResponseEntity.status(409).body(createMessage(ex.getMessage()));
     }
+
 
     private static Object createMessage(String message) {
         return Map.of("message", message);

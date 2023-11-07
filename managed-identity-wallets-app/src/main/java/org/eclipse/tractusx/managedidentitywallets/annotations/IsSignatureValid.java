@@ -30,11 +30,12 @@ import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCreden
 import org.eclipse.tractusx.ssi.lib.proof.LinkedDataProofValidation;
 
 import java.lang.annotation.*;
+import java.util.List;
 
 @Documented
 @Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = {IsSignatureValid.VerifiableCredentialValidator.class})
+@Constraint(validatedBy = {IsSignatureValid.VerifiableCredentialValidator.class,IsSignatureValid.VerifiableCredentialsValidator.class})
 public @interface IsSignatureValid {
     String message() default "Verifiable Credential signature not valid";
 
@@ -68,6 +69,45 @@ public @interface IsSignatureValid {
             if (log.isTraceEnabled()) {
                 log.trace("Verifiable Credential signature validation result: {} (verifiable credential id: {})", isProofValid, verifiableCredential.getId());
             }
+            return isProofValid;
+        }
+    }
+
+    @Slf4j
+    @RequiredArgsConstructor
+    final class VerifiableCredentialsValidator
+            implements ConstraintValidator<IsSignatureValid, List<VerifiableCredential>> {
+
+        private final LinkedDataProofValidation proofValidation;
+
+        @Override
+        public boolean isValid(List<VerifiableCredential> verifiableCredentials, ConstraintValidatorContext context) {
+            if (verifiableCredentials == null) {
+                return false;
+            }
+            if (verifiableCredentials.isEmpty()) {
+                return true;
+            }
+
+            boolean isProofValid = true;
+
+            for (VerifiableCredential verifiableCredential : verifiableCredentials) {
+                try {
+                    isProofValid = proofValidation.verifiy(verifiableCredential) && isProofValid;
+                } catch (Exception e) {
+                    isProofValid = false;
+                    // if a verifiable credential is not json-ld valid, the signature verification is not possible and will throw an exception
+                    if (log.isTraceEnabled()) {
+                        log.error("Verifiable Credential signature validation failed (verifiable credential id: {})", verifiableCredential.getId(), e);
+                    }
+                }
+
+                if (log.isTraceEnabled()) {
+                    log.trace("Verifiable Credential signature validation result: {} (verifiable credential id: {})", isProofValid, verifiableCredential.getId());
+                }
+
+            }
+
             return isProofValid;
         }
     }

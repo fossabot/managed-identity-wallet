@@ -22,6 +22,7 @@
 package org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments;
 
 import lombok.SneakyThrows;
+import org.eclipse.tractusx.managedidentitywallets.annotations.IsJsonLdValid;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.exception.Ed25519KeyNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;

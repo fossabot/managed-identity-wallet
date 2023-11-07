@@ -57,7 +57,7 @@ public class WalletService {
     }
 
     public void removeVerifiableCredential(@NonNull Wallet wallet, @NonNull VerifiableCredential verifiableCredential) {
-        walletRepository.storeVerifiableCredentialInWallet(wallet, verifiableCredential);
+        walletRepository.removeVerifiableCredentialFromWallet(wallet, verifiableCredential);
         applicationEventPublisher.publishEvent(new VerifiableCredentialRemovingFromWalletEvent(verifiableCredential, wallet));
         afterCommit(() -> applicationEventPublisher.publishEvent(new VerifiableCredentialRemovedFromWalletEvent(verifiableCredential, wallet)));
     }

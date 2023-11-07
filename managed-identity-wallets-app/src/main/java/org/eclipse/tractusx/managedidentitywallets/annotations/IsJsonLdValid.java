@@ -30,11 +30,12 @@ import org.eclipse.tractusx.ssi.lib.validation.JsonLdValidator;
 import org.eclipse.tractusx.ssi.lib.validation.JsonLdValidatorImpl;
 
 import java.lang.annotation.*;
+import java.util.List;
 
 @Documented
 @Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = {IsJsonLdValid.VerifiableCredentialValidator.class})
+@Constraint(validatedBy = {IsJsonLdValid.VerifiableCredentialValidator.class, IsJsonLdValid.VerifiableCredentialsValidator.class})
 public @interface IsJsonLdValid {
     String message() default "Verifiable Credential not JSON-LD valid";
 
@@ -61,6 +62,32 @@ public @interface IsJsonLdValid {
                 }
                 return false;
             }
+            return true;
+        }
+    }
+
+    @Slf4j
+    final class VerifiableCredentialsValidator
+            implements ConstraintValidator<IsJsonLdValid, List<VerifiableCredential>> {
+
+        private static final JsonLdValidator jsonLdValidator = new JsonLdValidatorImpl();
+
+        @Override
+        public boolean isValid(List<VerifiableCredential> verifiableCredentials, ConstraintValidatorContext context) {
+            if (verifiableCredentials == null)
+                return false;
+
+            for (VerifiableCredential verifiableCredential : verifiableCredentials) {
+                try {
+                    jsonLdValidator.validate(verifiableCredential);
+                } catch (Exception e) {
+                    if (log.isTraceEnabled()) {
+                        log.trace("VerifiableCredential is not JSON-LD valid", e);
+                    }
+                    return false;
+                }
+            }
+
             return true;
         }
     }

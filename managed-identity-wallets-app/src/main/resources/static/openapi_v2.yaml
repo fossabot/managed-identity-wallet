@@ -644,10 +644,6 @@ components:
             description: key value map
             type: object
             additionalProperties: true
-        expirationDate:
-          description: Verifiable Presentation expiration date
-          type: string
-          format: date-time
     IssueVerifiablePresentationResponsePayload:
       description: key value map
       type: object
@@ -667,15 +663,11 @@ components:
             description: key value map
             type: string
             additionalProperties: true
-        expirationDate:
-          description: Verifiable Presentation expiration date
-          type: string
-          format: date-time
     IssueVerifiablePresentationJwtResponsePayload:
       description: Verifiable Presentation as JWT
       type: object
       properties:
-        vp:
+        verifiable-presentation:
           description: Verifiable Presentation as JWT
           type: string
     ValidateVerifiableCredentialRequestPayload:
