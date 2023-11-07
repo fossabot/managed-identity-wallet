@@ -155,12 +155,12 @@ public class IssuersCredentialService {
     @Transactional(isolation = Isolation.READ_UNCOMMITTED, propagation = Propagation.REQUIRED)
     public VerifiableCredential issueFrameworkCredential(IssueFrameworkCredentialRequest request, String callerBPN) {
         //validate type
-        Validate.isFalse(miwSettings.supportedFrameworkVCTypes().contains(request.getType())).launch(new BadDataException("Framework credential of type " + request.getType() + " is not supported, supported values are " + miwSettings.supportedFrameworkVCTypes()));
+        Validate.isFalse(miwSettings.getSupportedFrameworkVCTypes().contains(request.getType())).launch(new BadDataException("Framework credential of type " + request.getType() + " is not supported, supported values are " + miwSettings.getSupportedFrameworkVCTypes()));
 
         //Fetch Holder Wallet
         Wallet holderWallet = commonService.getWalletByIdentifier(request.getHolderIdentifier());
 
-        Wallet baseWallet = commonService.getWalletByIdentifier(miwSettings.authorityWalletBpn());
+        Wallet baseWallet = commonService.getWalletByIdentifier(miwSettings.getAuthorityWalletBpn());
 
         validateAccess(callerBPN, baseWallet);
 
@@ -196,7 +196,7 @@ public class IssuersCredentialService {
         Wallet holderWallet = commonService.getWalletByIdentifier(request.getBpn());
 
         // Fetch Issuer Wallet
-        Wallet issuerWallet = commonService.getWalletByIdentifier(miwSettings.authorityWalletBpn());
+        Wallet issuerWallet = commonService.getWalletByIdentifier(miwSettings.getAuthorityWalletBpn());
 
         validateAccess(callerBPN, issuerWallet);
 
@@ -240,7 +240,7 @@ public class IssuersCredentialService {
         isCredentialExit(holderWallet.getDid(), VerifiableCredentialType.MEMBERSHIP_CREDENTIAL);
 
         // Fetch Issuer Wallet
-        Wallet issuerWallet = commonService.getWalletByIdentifier(miwSettings.authorityWalletBpn());
+        Wallet issuerWallet = commonService.getWalletByIdentifier(miwSettings.getAuthorityWalletBpn());
 
         validateAccess(callerBPN, issuerWallet);
 
@@ -314,7 +314,7 @@ public class IssuersCredentialService {
      */
     public Map<String, Object> credentialsValidation(Map<String, Object> data, boolean withCredentialExpiryDate) {
         final VerifiableCredential verifiableCredential = new VerifiableCredential(data);
-        final DidResolver didResolver = new DidWebResolver(HttpClient.newHttpClient(), new DidWebParser(), miwSettings.enforceHttps());
+        final DidResolver didResolver = new DidWebResolver(HttpClient.newHttpClient(), new DidWebParser(), miwSettings.isEnforceHttps());
         final LinkedDataProofValidation proofValidation = LinkedDataProofValidation.newInstance(didResolver);
 
         boolean valid = proofValidation.verifiy(verifiableCredential);
@@ -335,7 +335,7 @@ public class IssuersCredentialService {
         Validate.isFalse(callerBpn.equals(issuerWallet.getBpn())).launch(new ForbiddenException(BASE_WALLET_BPN_IS_NOT_MATCHING_WITH_REQUEST_BPN_FROM_TOKEN));
 
         //issuer must be base wallet
-        Validate.isFalse(issuerWallet.getBpn().equals(miwSettings.authorityWalletBpn())).launch(new ForbiddenException(BASE_WALLET_BPN_IS_NOT_MATCHING_WITH_REQUEST_BPN_FROM_TOKEN));
+        Validate.isFalse(issuerWallet.getBpn().equals(miwSettings.getAuthorityWalletBpn())).launch(new ForbiddenException(BASE_WALLET_BPN_IS_NOT_MATCHING_WITH_REQUEST_BPN_FROM_TOKEN));
     }
 
     private void isCredentialExit(String holderDid, String credentialType) {

@@ -57,7 +57,7 @@ public class GenericVerifiableCredentialFactory extends AbstractVerifiableDocume
         final List<VerifiableCredentialSubject> subject = args.getSubjects();
         final Wallet issuerWallet = args.getIssuerWallet();
         final Did issuerDid = didFactory.generateDid(issuerWallet);
-        final Instant expirationDate = Optional.ofNullable(args.getExpirationDate()).orElse(miwSettings.vcExpiryDate().toInstant());
+        final Instant expirationDate = Optional.ofNullable(args.getExpirationDate()).orElse(miwSettings.getVcExpiryDate().toInstant());
 
         final List<VerifiableCredentialType> verifiableCredentialTypes = new ArrayList<>();
         Optional.ofNullable(args.getAdditionalVerifiableCredentialTypes()).ifPresent(verifiableCredentialTypes::addAll);

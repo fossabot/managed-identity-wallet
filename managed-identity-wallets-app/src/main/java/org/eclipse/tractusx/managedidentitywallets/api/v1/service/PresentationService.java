@@ -134,7 +134,7 @@ public class PresentationService {
             // Build VP
             VerifiablePresentation verifiablePresentation =
                     verifiablePresentationBuilder
-                            .id(URI.create(miwSettings.authorityWalletDid() + "#" + UUID.randomUUID().toString()))
+                            .id(URI.create(miwSettings.getAuthorityWalletDid() + "#" + UUID.randomUUID().toString()))
                             .type(List.of(VerifiablePresentationType.VERIFIABLE_PRESENTATION))
                             .verifiableCredentials(verifiableCredentials)
                             .build();
@@ -213,7 +213,7 @@ public class PresentationService {
     private boolean validateSignature(SignedJWT signedJWT) {
         //validate jwt signature
         try {
-            final DidResolver didResolver = new DidWebResolver(HttpClient.newHttpClient(), new DidWebParser(), miwSettings.enforceHttps());
+            final DidResolver didResolver = new DidWebResolver(HttpClient.newHttpClient(), new DidWebParser(), miwSettings.isEnforceHttps());
 
             SignedJwtVerifier jwtVerifier = new SignedJwtVerifier(didResolver);
             return jwtVerifier.verify(signedJWT);
@@ -251,7 +251,7 @@ public class PresentationService {
 
     private boolean validateCredential(VerifiableCredential credential) throws UnsupportedSignatureTypeException {
 
-        final DidResolver didResolver = new DidWebResolver(HttpClient.newHttpClient(), new DidWebParser(), miwSettings.enforceHttps());
+        final DidResolver didResolver = new DidWebResolver(HttpClient.newHttpClient(), new DidWebParser(), miwSettings.isEnforceHttps());
         final LinkedDataProofValidation linkedDataProofValidation = LinkedDataProofValidation.newInstance(didResolver);
 
         boolean isValid = linkedDataProofValidation.verifiy(credential);

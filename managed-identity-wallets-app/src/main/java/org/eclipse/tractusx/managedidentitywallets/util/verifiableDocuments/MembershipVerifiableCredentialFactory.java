@@ -50,7 +50,7 @@ public class MembershipVerifiableCredentialFactory extends AbstractVerifiableDoc
     public VerifiableCredential createMembershipVerifiableCredential(@NonNull Wallet wallet) {
 
         final WalletId newMemberWalletId = wallet.getWalletId();
-        final WalletId issuerWalletId = new WalletId(miwSettings.authorityWalletBpn());
+        final WalletId issuerWalletId = new WalletId(miwSettings.getAuthorityWalletBpn());
         final Wallet issuerWallet = walletService.findById(issuerWalletId).orElseThrow(() -> new RuntimeException("Issuer wallet not found"));
         final Did did = didFactory.generateDid(wallet);
 

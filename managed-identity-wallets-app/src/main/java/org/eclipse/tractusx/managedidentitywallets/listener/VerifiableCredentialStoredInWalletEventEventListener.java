@@ -71,7 +71,7 @@ public class VerifiableCredentialStoredInWalletEventEventListener {
                         || type.equalsIgnoreCase(MIWVerifiableCredentialType.DISMANTLER_CREDENTIAL)
                         || type.equalsIgnoreCase(MIWVerifiableCredentialType.MEMBERSHIP_CREDENTIAL))
                 &&
-                miwSettings.supportedFrameworkVCTypes().stream().anyMatch(
+                miwSettings.getSupportedFrameworkVCTypes().stream().anyMatch(
                         type -> verifiableCredential.getTypes().stream().anyMatch(type::equalsIgnoreCase));
     }
 

@@ -126,7 +126,7 @@ public class UserApiDelegateImpl implements UserApiDelegate {
         }
 
         page = Optional.ofNullable(page).orElse(0);
-        perPage = Optional.ofNullable(perPage).orElse(miwSettings.apiDefaultPageSize());
+        perPage = Optional.ofNullable(perPage).orElse(miwSettings.getApiDefaultPageSize());
 
         final List<VerifiableCredentialType> verifiableCredentialType = Optional.ofNullable(type)
                 .map(VerifiableCredentialType::new)
@@ -152,7 +152,7 @@ public class UserApiDelegateImpl implements UserApiDelegate {
         }
 
         page = Optional.ofNullable(page).orElse(0);
-        perPage = Optional.ofNullable(perPage).orElse(miwSettings.apiDefaultPageSize());
+        perPage = Optional.ofNullable(perPage).orElse(miwSettings.getApiDefaultPageSize());
 
         final List<VerifiableCredentialType> verifiableCredentialType = Optional.ofNullable(type)
                 .map(VerifiableCredentialType::new)
