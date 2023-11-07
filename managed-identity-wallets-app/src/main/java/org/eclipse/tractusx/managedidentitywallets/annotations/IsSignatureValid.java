@@ -59,7 +59,7 @@ public @interface IsSignatureValid {
             try {
                 isProofValid = proofValidation.verifiy(verifiableCredential);
             } catch (Exception e) {
-                // if a verifiable credential is not json-ld valid, the verify method will throw an exception
+                // if a verifiable credential is not json-ld valid, the signature verification is not possible and will throw an exception
                 if (log.isTraceEnabled()) {
                     log.error("Verifiable Credential signature validation failed (verifiable credential id: {})", verifiableCredential.getId(), e);
                 }
