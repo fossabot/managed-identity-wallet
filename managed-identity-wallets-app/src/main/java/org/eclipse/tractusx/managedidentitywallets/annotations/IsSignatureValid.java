@@ -24,6 +24,7 @@ package org.eclipse.tractusx.managedidentitywallets.annotations;
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.ssi.lib.did.web.DidWebResolver;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
@@ -45,28 +46,24 @@ public @interface IsSignatureValid {
     Class<?>[] payload() default {};
 
     @Slf4j
+    @RequiredArgsConstructor
     final class VerifiableCredentialValidator
             implements ConstraintValidator<IsSignatureValid, VerifiableCredential> {
 
-//        private static final LinkedDataProofValidation proofValidation =  LinkedDataProofValidation.newInstance(new DidWebResolver());
+        private final LinkedDataProofValidation proofValidation;
 
         @Override
         public boolean isValid(VerifiableCredential verifiableCredential, ConstraintValidatorContext context) {
 
+            if (verifiableCredential == null)
+                return false;
 
+            final boolean isProofValid = proofValidation.verifiy(verifiableCredential);
+            if (log.isTraceEnabled()) {
+                log.trace("Verifiable Credential signature validation result: {} (verifiable credential id: {})", isProofValid, verifiableCredential.getId());
+            }
 
-//            if (verifiableCredential == null)
-//                return false;
-//
-//            try {
-//                jsonLdValidator.validate(verifiableCredential);
-//            } catch (Exception e) {
-//                if (log.isTraceEnabled()) {
-//                    log.trace("VerifiableCredential is not JSON-LD valid", e);
-//                }
-//                return false;
-//            }
-            return true;
+            return isProofValid;
         }
     }
 }

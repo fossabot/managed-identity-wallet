@@ -28,8 +28,12 @@ import lombok.Value;
 
 @Value
 @EqualsAndHashCode
-@ToString
 public class Ed25519KeyId {
     @NonNull
     String text;
+
+    @Override
+    public String toString() {
+        return text;
+    }
 }

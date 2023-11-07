@@ -105,7 +105,7 @@ public abstract class AbstractVerifiableDocumentFactory {
         final ResolvedEd25519Key resolvedEd25519Key = vaultService.resolveKey(key);
         final x21559PrivateKey privateKey = new x21559PrivateKey(resolvedEd25519Key.getPrivateKey());
 
-        final URI verificationMethod = URI.create(issuerDid + "#" + key.getId());
+        final URI verificationMethod = URI.create(issuerDid + "#" + key.getDidFragment());
         final LinkedDataProofGenerator generator = LinkedDataProofGenerator.newInstance(SignatureType.JWS);
 
         return generator.createProof(verifiable, verificationMethod, privateKey);

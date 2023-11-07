@@ -29,6 +29,7 @@ import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.ssi.lib.did.resolver.DidResolver;
 import org.eclipse.tractusx.ssi.lib.did.web.DidWebResolver;
 import org.eclipse.tractusx.ssi.lib.did.web.util.DidWebParser;
+import org.eclipse.tractusx.ssi.lib.proof.LinkedDataProofValidation;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -53,8 +54,13 @@ public class SsiLibraryBeans {
     }
 
     @Bean
-    public DidResolver didResolver(HttpClient httpClient, MIWSettings miwSettings) {
+    public DidResolver didResolver(@NonNull HttpClient httpClient, @NonNull MIWSettings miwSettings) {
         final DidWebParser didWebParser = new DidWebParser();
         return new DidWebResolver(httpClient, didWebParser, miwSettings.enforceHttps());
+    }
+
+    @Bean
+    public LinkedDataProofValidation linkedDataProofValidation(@NonNull DidResolver didResolver) {
+        return LinkedDataProofValidation.newInstance(didResolver);
     }
 }

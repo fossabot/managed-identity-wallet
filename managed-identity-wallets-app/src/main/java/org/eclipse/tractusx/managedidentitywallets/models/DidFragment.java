@@ -39,8 +39,12 @@ import lombok.*;
  */
 @Value
 @EqualsAndHashCode
-@ToString
 public class DidFragment {
     @NonNull
     String text;
+
+    @Override
+    public String toString() {
+        return text;
+    }
 }

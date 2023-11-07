@@ -22,7 +22,7 @@ logging:
     root: INFO
 
 miw:
-  host: localhost
+  host: localhost:8080
   encryptionKey: d6aab34fb68e090c2789a9b1a67648d3
   authorityWalletBpn: BPNL000000000000
   authorityWalletName: Test
