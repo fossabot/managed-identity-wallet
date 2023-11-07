@@ -44,6 +44,14 @@ import java.util.Set;
 public class HttpConfigurationProperties {
 
     public static final Duration DEFAULT_CONNECT_TIMEOUT = Duration.ofMillis(30000);
+    public static final FollowRedirect DEFAULT_FOLLOW_REDIRECTS = FollowRedirect.normal;
 
-    private Duration connectionTimeout;
+    private Duration connectionTimeout = DEFAULT_CONNECT_TIMEOUT;
+    private FollowRedirect followRedirects = DEFAULT_FOLLOW_REDIRECTS;
+
+    public enum FollowRedirect {
+        always,
+        never,
+        normal
+    }
 }

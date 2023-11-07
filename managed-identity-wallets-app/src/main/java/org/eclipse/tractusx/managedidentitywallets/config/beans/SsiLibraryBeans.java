@@ -22,6 +22,7 @@
 package org.eclipse.tractusx.managedidentitywallets.config.beans;
 
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.config.HttpConfigurationProperties;
@@ -29,32 +30,54 @@ import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.ssi.lib.did.resolver.DidResolver;
 import org.eclipse.tractusx.ssi.lib.did.web.DidWebResolver;
 import org.eclipse.tractusx.ssi.lib.did.web.util.DidWebParser;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
+import javax.net.ssl.SSLContext;
+import java.net.CookieHandler;
 import java.net.http.HttpClient;
 import java.time.Duration;
 import java.util.Optional;
 
-@Configuration
 @Slf4j
+@Configuration
+@RequiredArgsConstructor
 public class SsiLibraryBeans {
 
+    @NonNull
+    private final HttpConfigurationProperties httpConfigurationProperties;
+
+    @NonNull
+    private final MIWSettings miwSettings;
+
     @Bean
-    @SneakyThrows
-    public HttpClient httpClient(@NonNull HttpConfigurationProperties httpConfigurationProperties) {
+    public HttpClient httpClient() {
+        final HttpClient.Builder builder = HttpClient.newBuilder();
 
-        final Duration connectionTimeout = Optional.ofNullable(httpConfigurationProperties.getConnectionTimeout())
-                .orElse(HttpConfigurationProperties.DEFAULT_CONNECT_TIMEOUT);
+        builder.connectTimeout(Optional.ofNullable(httpConfigurationProperties.getConnectionTimeout())
+                        .orElse(HttpConfigurationProperties.DEFAULT_CONNECT_TIMEOUT));
 
-        return HttpClient.newBuilder()
-                .connectTimeout(connectionTimeout)
-                .build();
+        builder.followRedirects(HttpClient.Redirect.NORMAL);
+
+        final HttpConfigurationProperties.FollowRedirect followRedirect = Optional.ofNullable(httpConfigurationProperties.getFollowRedirects())
+                .orElse(HttpConfigurationProperties.DEFAULT_FOLLOW_REDIRECTS);
+        switch (followRedirect) {
+            case always -> builder.followRedirects(HttpClient.Redirect.ALWAYS);
+            case never -> builder.followRedirects(HttpClient.Redirect.NEVER);
+            case normal -> builder.followRedirects(HttpClient.Redirect.NORMAL);
+            default -> throw new IllegalStateException("Unexpected value: " + followRedirect);
+        }
+
+        return builder.build();
     }
 
+
+
     @Bean
-    public DidResolver didResolver(HttpClient httpClient, MIWSettings miwSettings) {
+    @Autowired
+    public DidResolver didResolver(HttpClient httpClient) {
         final DidWebParser didWebParser = new DidWebParser();
-        return new DidWebResolver(httpClient, didWebParser, miwSettings.enforceHttps());
+        return new DidWebResolver(httpClient, didWebParser, miwSettings.isEnforceHttps());
     }
 }

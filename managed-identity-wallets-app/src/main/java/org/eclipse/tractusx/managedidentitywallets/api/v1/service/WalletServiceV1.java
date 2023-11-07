@@ -117,7 +117,7 @@ public class WalletServiceV1 {
         Wallet wallet = getWalletByIdentifier(identifier);
 
         // authority wallet can see all wallets
-        if (!miwSettings.authorityWalletBpn().equals(callerBpn)) {
+        if (!miwSettings.getAuthorityWalletBpn().equals(callerBpn)) {
             //validate BPN access
             Validate.isFalse(callerBpn.equalsIgnoreCase(wallet.getBpn())).launch(new ForbiddenException("Wallet BPN is not matching with request BPN(from the token)"));
         }
@@ -203,7 +203,7 @@ public class WalletServiceV1 {
 
     private void validateCreateWallet(CreateWalletRequest request, String callerBpn) {
         // check base wallet
-        Validate.isFalse(callerBpn.equalsIgnoreCase(miwSettings.authorityWalletBpn())).launch(new ForbiddenException(BASE_WALLET_BPN_IS_NOT_MATCHING_WITH_REQUEST_BPN_FROM_TOKEN));
+        Validate.isFalse(callerBpn.equalsIgnoreCase(miwSettings.getAuthorityWalletBpn())).launch(new ForbiddenException(BASE_WALLET_BPN_IS_NOT_MATCHING_WITH_REQUEST_BPN_FROM_TOKEN));
 
         // check wallet already exists
         final WalletId walletId = new WalletId(request.getBpn());

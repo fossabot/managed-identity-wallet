@@ -37,10 +37,10 @@ public class DidFactory {
     private final MIWSettings miwSettings;
 
     public Did generateDid(@NonNull Wallet wallet) {
-        return DidWebFactory.fromHostnameAndPath(miwSettings.host(), wallet.getWalletId().getText());
+        return DidWebFactory.fromHostnameAndPath(miwSettings.getHost(), wallet.getWalletId().getText());
     }
 
     public Did generateDid(@NonNull WalletId walletId) {
-        return DidWebFactory.fromHostnameAndPath(miwSettings.host(), walletId.getText());
+        return DidWebFactory.fromHostnameAndPath(miwSettings.getHost(), walletId.getText());
     }
 }

@@ -46,7 +46,7 @@ public class AuthorityWalletHealthIndicator extends AbstractHealthIndicator {
 
     @Override
     protected void doHealthCheck(Health.Builder builder) {
-        final String bpn = Objects.requireNonNull(miwSettings.authorityWalletBpn());
+        final String bpn = Objects.requireNonNull(miwSettings.getAuthorityWalletBpn());
 
         final WalletId walletId = new WalletId(bpn);
         builder.withDetail("authorityWallet-id", walletId.getText());

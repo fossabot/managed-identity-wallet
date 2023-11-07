@@ -113,7 +113,7 @@ public class AdministratorApiDelegateImpl implements AdministratorApiDelegate {
         }
 
         page = Optional.ofNullable(page).orElse(0);
-        perPage = Optional.ofNullable(perPage).orElse(miwSettings.apiDefaultPageSize());
+        perPage = Optional.ofNullable(perPage).orElse(miwSettings.getApiDefaultPageSize());
 
         final Page<Wallet> wallets = walletService.findAll(page, perPage);
         final ListWalletsResponsePayloadV2 response = apiMapper.mapListWalletsResponsePayloadV2(wallets);
@@ -196,7 +196,7 @@ public class AdministratorApiDelegateImpl implements AdministratorApiDelegate {
         }
 
         page = Optional.ofNullable(page).orElse(0);
-        perPage = Optional.ofNullable(perPage).orElse(miwSettings.apiDefaultPageSize());
+        perPage = Optional.ofNullable(perPage).orElse(miwSettings.getApiDefaultPageSize());
 
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
                 .verifiableCredentialIssuer(Optional.ofNullable(issuer).map(VerifiableCredentialIssuer::new).orElse(null))

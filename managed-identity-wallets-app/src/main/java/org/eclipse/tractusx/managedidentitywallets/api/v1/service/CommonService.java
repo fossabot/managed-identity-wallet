@@ -132,7 +132,7 @@ public class CommonService {
         //modify context URLs
         List<URI> context = didDocument.getContext();
         List<URI> mutableContext = new ArrayList<>(context);
-        miwSettings.didDocumentContextUrls().forEach(uri -> {
+        miwSettings.getDidDocumentContextUrls().forEach(uri -> {
             if (!mutableContext.contains(uri)) {
                 mutableContext.add(uri);
             }

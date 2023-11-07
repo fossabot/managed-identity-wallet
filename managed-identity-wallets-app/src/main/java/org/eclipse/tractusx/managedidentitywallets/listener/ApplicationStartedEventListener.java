@@ -56,8 +56,8 @@ public class ApplicationStartedEventListener {
     @EventListener
     @Order(20)
     public void createAuthorityWallet(ApplicationStartedEvent event) {
-        final WalletId walletId = new WalletId(miwSettings.authorityWalletBpn());
-        final WalletName walletName = new WalletName(miwSettings.authorityWalletName());
+        final WalletId walletId = new WalletId(miwSettings.getAuthorityWalletBpn());
+        final WalletName walletName = new WalletName(miwSettings.getAuthorityWalletName());
 
         if (walletService.existsById(walletId)) {
             log.trace("Authority wallet already exists, skipping creation");

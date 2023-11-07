@@ -63,13 +63,13 @@ public abstract class AbstractVerifiableDocumentFactory {
     private VaultService vaultService;
 
     protected VerifiableCredential createdIssuedCredential(VerifiableCredentialSubject subject, String type) {
-        return createdIssuedCredential(subject, type, miwSettings.vcExpiryDate().toInstant());
+        return createdIssuedCredential(subject, type, miwSettings.getVcExpiryDate().toInstant());
     }
 
     @SneakyThrows({UnsupportedSignatureTypeException.class, Ed25519KeyNotFoundException.class, InvalidePrivateKeyFormat.class})
     protected VerifiableCredential createdIssuedCredential(VerifiableCredentialSubject subject, String type, Instant expiryDate) {
 
-        final List<URI> contexts = miwSettings.vcContexts();
+        final List<URI> contexts = miwSettings.getVcContexts();
         final Wallet issuerWallet = getIssuerWallet();
         final Did issuerDid = didFactory.generateDid(issuerWallet);
 
@@ -112,7 +112,7 @@ public abstract class AbstractVerifiableDocumentFactory {
     }
 
     private Wallet getIssuerWallet() {
-        final WalletId walletId = new WalletId(miwSettings.authorityWalletBpn());
+        final WalletId walletId = new WalletId(miwSettings.getAuthorityWalletBpn());
         return walletService.findById(walletId)
                 .orElseThrow(() -> new RuntimeException("Authority Wallet not found: " + walletId));
     }

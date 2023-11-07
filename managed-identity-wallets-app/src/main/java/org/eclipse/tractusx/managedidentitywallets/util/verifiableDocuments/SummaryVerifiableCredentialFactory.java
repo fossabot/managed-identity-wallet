@@ -58,14 +58,14 @@ public class SummaryVerifiableCredentialFactory extends AbstractVerifiableDocume
                 StringPool.HOLDER_IDENTIFIER, wallet.getWalletId(),
                 StringPool.ITEMS, items,
                 StringPool.TYPE, MIWVerifiableCredentialType.SUMMARY_CREDENTIAL,
-                StringPool.CONTRACT_TEMPLATE, miwSettings.contractTemplatesUrl()));
+                StringPool.CONTRACT_TEMPLATE, miwSettings.getContractTemplatesUrl()));
 
         return createdIssuedCredential(subject, MIWVerifiableCredentialType.SUMMARY_CREDENTIAL, expirationDate);
     }
 
     private List<String> getFrameworkVcItems(@NonNull Wallet wallet) {
         final WalletId walletId = wallet.getWalletId();
-        final Set<String> frameworkVcTypes = miwSettings.supportedFrameworkVCTypes();
+        final Set<String> frameworkVcTypes = miwSettings.getSupportedFrameworkVCTypes();
         final List<String> vcItems = new ArrayList<>();
 
         for (var vcType : frameworkVcTypes) {
@@ -87,7 +87,7 @@ public class SummaryVerifiableCredentialFactory extends AbstractVerifiableDocume
     private Instant getExpirationDate(@NonNull Wallet wallet) {
         final WalletId walletId = wallet.getWalletId();
         Instant expirationDate = Instant.now();
-        final Set<String> frameworkVcTypes = miwSettings.supportedFrameworkVCTypes();
+        final Set<String> frameworkVcTypes = miwSettings.getSupportedFrameworkVCTypes();
 
         for (var vcType : frameworkVcTypes) {
             final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
