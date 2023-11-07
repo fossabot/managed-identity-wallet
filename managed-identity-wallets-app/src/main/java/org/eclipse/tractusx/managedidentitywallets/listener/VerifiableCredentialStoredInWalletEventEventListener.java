@@ -60,6 +60,10 @@ public class VerifiableCredentialStoredInWalletEventEventListener {
             return;
         }
 
+        if (log.isTraceEnabled()) {
+            log.trace("Updating summary verifiable credential for wallet {}", wallet.getWalletId());
+        }
+
         removeAllSummaryCredentialsFromWallet(wallet);
         issueNewSummaryCredential(wallet);
     }
