@@ -60,7 +60,10 @@ public class WalletCreatedEventListener {
             return;
         }
 
-        log.trace("Generating new key for wallet {}", walletId);
+        if (log.isTraceEnabled()) {
+            log.trace("Generating new key for wallet {}", walletId);
+        }
+
         final DidFragment didFragment = new DidFragment("key-1");
         final ResolvedEd25519Key resolvedEd25519Key = ed25519KeyFactory.generateNewEd25519Key(didFragment);
 
