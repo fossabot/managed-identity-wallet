@@ -588,6 +588,22 @@ components:
       description: key value map
       type: object
       additionalProperties: true
+    WalletKey:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the key.
+        didFragment:
+          type: string
+          description: The DID fragment of the key.
+        vaultSecret:
+          type: string
+          description: The vault secret of the key.
+        created:
+          type: string
+          format: date-time
+          description: The date and time the key was created.
     Wallet:
       type: object
       properties:
@@ -597,6 +613,14 @@ components:
         name:
           type: string
           description: The name of the wallet.
+        keys:
+          type: array
+          items:
+              $ref: '#/components/schemas/WalletKey'
+        created:
+          type: string
+          format: date-time
+          description: The date and time the wallet was created.
     VerifiableCredential:
       description: key value map
       type: object

@@ -21,13 +21,11 @@
 
 package org.eclipse.tractusx.managedidentitywallets.models;
 
-import lombok.NonNull;
-
-import java.time.Instant;
+import java.time.OffsetDateTime;
 
 public interface Ed25519Key {
     Ed25519KeyId getId();
     DidFragment getDidFragment();
     VaultSecret getVaultSecret();
-    Instant getCreatedAt();
+    OffsetDateTime getCreatedAt();
 }

@@ -41,6 +41,8 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
+import java.time.OffsetDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -59,12 +61,18 @@ public class AdministratorApiDelegateImpl implements AdministratorApiDelegate {
     private final VerifiableCredentialsMapper verifiableCredentialsMapper;
 
     @Override
-    public ResponseEntity<CreateWalletResponsePayloadV2> adminCreateWallet(@NonNull CreateWalletRequestPayloadV2 createWalletResponsePayloadV2) {
+    public ResponseEntity<CreateWalletResponsePayloadV2> adminCreateWallet(@NonNull CreateWalletRequestPayloadV2 createWalletRequestPayloadV2) {
         if (log.isDebugEnabled()) {
-            log.debug("createWallet(wallet={})", createWalletResponsePayloadV2);
+            log.debug("createWallet(wallet={})", createWalletRequestPayloadV2);
         }
 
-        final Wallet wallet = apiMapper.mapCreateWalletResponsePayloadV2(createWalletResponsePayloadV2);
+        // set non-nullable fields
+        createWalletRequestPayloadV2.setCreated(OffsetDateTime.now());
+        if (createWalletRequestPayloadV2.getKeys() == null) {
+            createWalletRequestPayloadV2.setKeys(Collections.emptyList());
+        }
+
+        final Wallet wallet = apiMapper.mapCreateWalletResponsePayloadV2(createWalletRequestPayloadV2);
 
         walletService.create(wallet);
         final Optional<Wallet> createdWallet = walletService.findById(wallet.getWalletId());

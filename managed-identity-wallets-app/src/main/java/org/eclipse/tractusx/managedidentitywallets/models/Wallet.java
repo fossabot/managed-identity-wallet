@@ -23,6 +23,8 @@ package org.eclipse.tractusx.managedidentitywallets.models;
 
 import lombok.*;
 
+import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -38,6 +40,9 @@ public class Wallet {
 
     @NonNull
     private final WalletName walletName;
+
+    @NonNull
+    private final OffsetDateTime createdAt;
 
     @Builder.Default
     @NonNull

@@ -73,6 +73,7 @@ public class WalletCreatedEventListener {
                 .walletId(wallet.getWalletId())
                 .walletName(wallet.getWalletName())
                 .storedEd25519Keys(List.of(storedEd25519Key))
+                .createdAt(wallet.getCreatedAt())
                 .build();
 
         walletService.update(updatedWallet);

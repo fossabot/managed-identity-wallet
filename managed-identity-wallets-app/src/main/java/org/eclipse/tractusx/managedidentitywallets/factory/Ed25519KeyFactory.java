@@ -34,6 +34,7 @@ import org.eclipse.tractusx.ssi.lib.exception.KeyGenerationException;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.UUID;
 
 @Component
@@ -58,7 +59,7 @@ public class Ed25519KeyFactory {
                 .privateKey(keyPair.getPrivateKey().asByte())
                 .publicKey(keyPair.getPublicKey().asByte())
                 .didFragment(didFragment)
-                .createdAt(Instant.now())
+                .createdAt(OffsetDateTime.now())
                 .build();
     }
 

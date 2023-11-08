@@ -24,6 +24,7 @@ package org.eclipse.tractusx.managedidentitywallets.models;
 import lombok.*;
 
 import java.time.Instant;
+import java.time.OffsetDateTime;
 
 @Getter
 @AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
@@ -38,7 +39,7 @@ public class ResolvedEd25519Key implements Ed25519Key {
     @NonNull
     private final VaultSecret vaultSecret;
     @NonNull
-    private final Instant createdAt;
+    private final OffsetDateTime createdAt;
 
     private final byte @NonNull [] publicKey;
     private final byte @NonNull [] privateKey;

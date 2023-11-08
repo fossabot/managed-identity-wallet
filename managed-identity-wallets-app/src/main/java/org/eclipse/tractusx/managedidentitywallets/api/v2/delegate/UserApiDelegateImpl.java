@@ -280,7 +280,7 @@ public class UserApiDelegateImpl implements UserApiDelegate {
 
         final JsonWebToken jwt = verifiablePresentationFactory.createPresentationAsJwt(wallet, verifiableCredentials, audience);
         final IssueVerifiablePresentationJwtResponsePayloadV2 response = new IssueVerifiablePresentationJwtResponsePayloadV2();
-        response.setVp(jwt.getText());
+        response.setVerifiablePresentation(jwt.getText());
 
         return ResponseEntity.ok(response);
     }

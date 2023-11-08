@@ -38,6 +38,7 @@ import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
 
 import java.net.URI;
+import java.time.OffsetDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -65,6 +66,7 @@ public class ApplicationStartedEventListener {
         final Wallet wallet = Wallet.builder()
                 .walletId(walletId)
                 .walletName(walletName)
+                .createdAt(OffsetDateTime.now())
                 .build();
 
         log.info("Creating authority wallet with id {}", walletId.getText());

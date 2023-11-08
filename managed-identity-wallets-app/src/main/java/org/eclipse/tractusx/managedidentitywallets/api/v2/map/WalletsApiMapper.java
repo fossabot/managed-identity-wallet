@@ -21,6 +21,7 @@
 
 package org.eclipse.tractusx.managedidentitywallets.api.v2.map;
 
+import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.*;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
@@ -31,32 +32,58 @@ import org.springframework.data.domain.Page;
 @Mapper(componentModel = "spring")
 public interface WalletsApiMapper {
 
+    @Mapping(target = "id.text", source = "id")
+    @Mapping(target = "vaultSecret.text", source = "vaultSecret")
+    @Mapping(target = "didFragment.text", source = "didFragment")
+    @Mapping(target = "createdAt", source = "created")
+    StoredEd25519Key mapStoredEd25519Key(WalletKeyV2 walletKeyV2);
+
+    @Mapping(target = "id", source = "id.text")
+    @Mapping(target = "vaultSecret", source = "vaultSecret.text")
+    @Mapping(target = "didFragment", source = "didFragment.text")
+    @Mapping(target = "created", source = "createdAt")
+    WalletKeyV2 mapWalletKey(StoredEd25519Key key);
+
     @Mapping(target = "walletId.text", source = "id")
     @Mapping(target = "walletName.text", source = "name")
+    @Mapping(target = "createdAt", source = "created")
+    @Mapping(target = "storedEd25519Keys", source = "keys")
     Wallet mapWallet(WalletV2 walletV2);
 
     @Mapping(target = "id", source = "walletId.text")
     @Mapping(target = "name", source = "walletName.text")
+    @Mapping(target = "created", source = "createdAt")
+    @Mapping(target = "keys", source = "storedEd25519Keys")
     WalletV2 mapWalletV2(Wallet wallet);
 
     @Mapping(target = "id", source = "walletId.text")
     @Mapping(target = "name", source = "walletName.text")
+    @Mapping(target = "created", source = "createdAt")
+    @Mapping(target = "keys", source = "storedEd25519Keys")
     WalletResponsePayloadV2 mapWalletResponsePayloadV2(Wallet wallet);
 
     @Mapping(target = "id", source = "walletId.text")
     @Mapping(target = "name", source = "walletName.text")
+    @Mapping(target = "created", source = "createdAt")
+    @Mapping(target = "keys", source = "storedEd25519Keys")
     CreateWalletResponsePayloadV2 mapCreateWalletResponsePayloadV2(Wallet wallet);
 
     @Mapping(target = "walletId.text", source = "id")
     @Mapping(target = "walletName.text", source = "name")
+    @Mapping(target = "createdAt", source = "created")
+    @Mapping(target = "storedEd25519Keys", source = "keys")
     Wallet mapCreateWalletResponsePayloadV2(CreateWalletRequestPayloadV2 wallet);
 
     @Mapping(target = "walletId.text", source = "id")
     @Mapping(target = "walletName.text", source = "name")
+    @Mapping(target = "createdAt", source = "created")
+    @Mapping(target = "storedEd25519Keys", source = "keys")
     Wallet mapUpdateWalletRequestPayloadV2(UpdateWalletRequestPayloadV2 wallet);
 
     @Mapping(target = "id", source = "walletId.text")
     @Mapping(target = "name", source = "walletName.text")
+    @Mapping(target = "created", source = "createdAt")
+    @Mapping(target = "keys", source = "storedEd25519Keys")
     UpdateWalletResponsePayloadV2 mapUpdateWalletResponsePayloadV2(Wallet wallet);
 
     @Mapping(target = "size", source = "numberOfElements")

@@ -27,6 +27,7 @@ import lombok.*;
 @Getter
 @RequiredArgsConstructor
 @EqualsAndHashCode
+@Builder
 public class Ed25519KeyId {
     @NonNull
     private final String text;
