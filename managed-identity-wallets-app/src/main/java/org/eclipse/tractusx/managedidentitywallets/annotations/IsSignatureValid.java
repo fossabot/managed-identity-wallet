@@ -26,6 +26,7 @@ import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.service.ValidationService;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.proof.LinkedDataProofValidation;
 
@@ -48,28 +49,12 @@ public @interface IsSignatureValid {
     final class VerifiableCredentialValidator
             implements ConstraintValidator<IsSignatureValid, VerifiableCredential> {
 
-        private final LinkedDataProofValidation proofValidation;
+        private final ValidationService validationService;
+
 
         @Override
         public boolean isValid(VerifiableCredential verifiableCredential, ConstraintValidatorContext context) {
-            if (verifiableCredential == null)
-                return false;
-
-            boolean isProofValid = false;
-
-            try {
-                isProofValid = proofValidation.verifiy(verifiableCredential);
-            } catch (Exception e) {
-                // if a verifiable credential is not json-ld valid, the signature verification is not possible and will throw an exception
-                if (log.isTraceEnabled()) {
-                    log.error("Verifiable Credential signature validation failed (verifiable credential id: {})", verifiableCredential.getId(), e);
-                }
-            }
-
-            if (log.isTraceEnabled()) {
-                log.trace("Verifiable Credential signature validation result: {} (verifiable credential id: {})", isProofValid, verifiableCredential.getId());
-            }
-            return isProofValid;
+            return verifiableCredential != null && validationService.isSignatureValid(verifiableCredential);
         }
     }
 
@@ -77,38 +62,13 @@ public @interface IsSignatureValid {
     @RequiredArgsConstructor
     final class VerifiableCredentialsValidator
             implements ConstraintValidator<IsSignatureValid, List<VerifiableCredential>> {
+        private final ValidationService validationService;
 
-        private final LinkedDataProofValidation proofValidation;
 
         @Override
         public boolean isValid(List<VerifiableCredential> verifiableCredentials, ConstraintValidatorContext context) {
-            if (verifiableCredentials == null) {
-                return false;
-            }
-            if (verifiableCredentials.isEmpty()) {
-                return true;
-            }
+            return verifiableCredentials != null && validationService.isSignatureValid(verifiableCredentials);
 
-            boolean isProofValid = true;
-
-            for (VerifiableCredential verifiableCredential : verifiableCredentials) {
-                try {
-                    isProofValid = proofValidation.verifiy(verifiableCredential) && isProofValid;
-                } catch (Exception e) {
-                    isProofValid = false;
-                    // if a verifiable credential is not json-ld valid, the signature verification is not possible and will throw an exception
-                    if (log.isTraceEnabled()) {
-                        log.error("Verifiable Credential signature validation failed (verifiable credential id: {})", verifiableCredential.getId(), e);
-                    }
-                }
-
-                if (log.isTraceEnabled()) {
-                    log.trace("Verifiable Credential signature validation result: {} (verifiable credential id: {})", isProofValid, verifiableCredential.getId());
-                }
-
-            }
-
-            return isProofValid;
         }
     }
 }

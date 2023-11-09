@@ -22,15 +22,31 @@
 package org.eclipse.tractusx.managedidentitywallets.api.v2.map;
 
 import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialValidationResult;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialValidationResultViolation;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.*;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
+import org.mapstruct.ValueMapping;
 import org.springframework.data.domain.Page;
 
 @Mapper(componentModel = "spring")
 public interface WalletsApiMapper {
+
+    @ValueMapping(target = "INCORRECT_JSON_LD_FORMAT", source = "INVALID_JSONLD_FORMAT")
+    @ValueMapping(target = "INCORRECT_SIGNATURE", source = "INVALID_SIGNATURE")
+    @ValueMapping(target = "EXPIRED", source = "EXPIRED")
+    VerifiableCredentialValidationResultViolationsInnerV2.TypeEnum getVerifiableCredentialValidationResultViolationsInnerV2(VerifiableCredentialValidationResultViolation.Type type);
+
+    @Mapping(target = "id", source = "verifiableCredentialId.text")
+    @Mapping(target = "type", source = "types")
+    VerifiableCredentialValidationResultViolationsInnerV2 mapVerifiableCredentialValidationResultViolationsInnerV2(VerifiableCredentialValidationResultViolation verifiableCredentialValidationResult);
+
+    @Mapping(target = "isValid", source = "valid")
+    @Mapping(target = "violations", source = "verifiableCredentialViolations")
+    ValidateVerifiableCredentialResponsePayloadV2 mapValidateVerifiableCredentialResponsePayloadV2(VerifiableCredentialValidationResult verifiableCredentialValidationResult);
 
     @Mapping(target = "id.text", source = "id")
     @Mapping(target = "vaultSecret.text", source = "vaultSecret")

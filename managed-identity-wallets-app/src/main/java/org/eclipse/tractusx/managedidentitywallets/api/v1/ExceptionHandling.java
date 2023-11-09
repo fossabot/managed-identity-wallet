@@ -19,11 +19,12 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.config;
+package org.eclipse.tractusx.managedidentitywallets.api.v1;
 
 import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.api.v1.controller.*;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.*;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
@@ -40,7 +41,7 @@ import java.util.Map;
 /**
  * The type Exception handling.
  */
-@RestControllerAdvice
+@RestControllerAdvice(basePackageClasses = {DidDocumentController.class, HoldersCredentialController.class, IssuersCredentialController.class, PresentationController.class, WalletController.class})
 @Slf4j
 public class ExceptionHandling {
 
@@ -190,3 +191,4 @@ public class ExceptionHandling {
         return messages;
     }
 }
+

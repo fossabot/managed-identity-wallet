@@ -149,7 +149,6 @@ public class WalletRepository {
         walletJpaRepository.deleteById(walletId.getText());
     }
 
-    @Transactional
     public void deleteAll(@NonNull WalletQuery query) {
         final Predicate predicate = WalletPredicate.fromQuery(query);
         if (log.isTraceEnabled()) {
@@ -158,7 +157,6 @@ public class WalletRepository {
         final Iterable<WalletEntity> wallets = walletJpaRepository.findAll(predicate);
         walletJpaRepository.deleteAll(wallets);
     }
-
 
     public long count() {
         return count(WalletQuery.builder().build());

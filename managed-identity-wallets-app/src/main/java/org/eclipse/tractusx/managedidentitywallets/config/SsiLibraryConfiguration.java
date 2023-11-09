@@ -19,7 +19,7 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.config.beans;
+package org.eclipse.tractusx.managedidentitywallets.config;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +30,8 @@ import org.eclipse.tractusx.ssi.lib.did.resolver.DidResolver;
 import org.eclipse.tractusx.ssi.lib.did.web.DidWebResolver;
 import org.eclipse.tractusx.ssi.lib.did.web.util.DidWebParser;
 import org.eclipse.tractusx.ssi.lib.proof.LinkedDataProofValidation;
+import org.eclipse.tractusx.ssi.lib.validation.JsonLdValidator;
+import org.eclipse.tractusx.ssi.lib.validation.JsonLdValidatorImpl;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -39,7 +41,7 @@ import java.util.Optional;
 @Slf4j
 @Configuration
 @RequiredArgsConstructor
-public class SsiLibraryBeans {
+public class SsiLibraryConfiguration {
 
     @NonNull
     private final HttpConfigurationProperties httpConfigurationProperties;
@@ -75,4 +77,10 @@ public class SsiLibraryBeans {
     public LinkedDataProofValidation linkedDataProofValidation(@NonNull DidResolver didResolver) {
         return LinkedDataProofValidation.newInstance(didResolver);
     }
+
+    @Bean
+    public JsonLdValidator jsonLdValidator() {
+        return new JsonLdValidatorImpl();
+    }
+
 }

@@ -24,7 +24,9 @@ package org.eclipse.tractusx.managedidentitywallets.annotations;
 import jakarta.validation.Constraint;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.service.ValidationService;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.validation.JsonLdValidator;
 import org.eclipse.tractusx.ssi.lib.validation.JsonLdValidatorImpl;
@@ -44,51 +46,28 @@ public @interface IsJsonLdValid {
     Class<?>[] payload() default {};
 
     @Slf4j
+    @RequiredArgsConstructor
     final class VerifiableCredentialValidator
             implements ConstraintValidator<IsJsonLdValid, VerifiableCredential> {
 
-        private static final JsonLdValidator jsonLdValidator = new JsonLdValidatorImpl();
+        private final ValidationService validationService;
 
         @Override
         public boolean isValid(VerifiableCredential verifiableCredential, ConstraintValidatorContext context) {
-            if (verifiableCredential == null)
-                return false;
-
-            try {
-                jsonLdValidator.validate(verifiableCredential);
-            } catch (Exception e) {
-                if (log.isTraceEnabled()) {
-                    log.trace("VerifiableCredential is not JSON-LD valid", e);
-                }
-                return false;
-            }
-            return true;
+            return verifiableCredential != null && validationService.isJsonLdValid(verifiableCredential);
         }
     }
 
     @Slf4j
+    @RequiredArgsConstructor
     final class VerifiableCredentialsValidator
             implements ConstraintValidator<IsJsonLdValid, List<VerifiableCredential>> {
 
-        private static final JsonLdValidator jsonLdValidator = new JsonLdValidatorImpl();
+        private final ValidationService validationService;
 
         @Override
         public boolean isValid(List<VerifiableCredential> verifiableCredentials, ConstraintValidatorContext context) {
-            if (verifiableCredentials == null)
-                return false;
-
-            for (VerifiableCredential verifiableCredential : verifiableCredentials) {
-                try {
-                    jsonLdValidator.validate(verifiableCredential);
-                } catch (Exception e) {
-                    if (log.isTraceEnabled()) {
-                        log.trace("VerifiableCredential is not JSON-LD valid", e);
-                    }
-                    return false;
-                }
-            }
-
-            return true;
+            return verifiableCredentials != null && validationService.isJsonLdValid(verifiableCredentials);
         }
     }
 }

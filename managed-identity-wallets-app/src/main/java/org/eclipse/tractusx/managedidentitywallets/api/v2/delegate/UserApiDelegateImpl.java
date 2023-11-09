@@ -31,6 +31,7 @@ import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundExcep
 import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.VerifiablePresentationFactory;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
+import org.eclipse.tractusx.managedidentitywallets.service.ValidationService;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.managedidentitywallets.spring.controllers.v2.UserApiDelegate;
@@ -59,6 +60,7 @@ public class UserApiDelegateImpl implements UserApiDelegate {
     private static final WalletId TMP_WALLET_ID = new WalletId("BPNL000000000000");
 
     private final VerifiableCredentialService verifiableCredentialService;
+    private final ValidationService validationService;
     private final WalletService walletService;
     private final WalletsApiMapper apiMapper;
     private final MIWSettings miwSettings;
@@ -71,7 +73,7 @@ public class UserApiDelegateImpl implements UserApiDelegate {
         if (log.isDebugEnabled()) {
             log.debug("userCreateVerifiableCredential(payload={})", payload);
         }
-        if (!isValidVerifiableCredential(payload)) {
+        if (!isVerifiableCredential(payload)) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -247,7 +249,7 @@ public class UserApiDelegateImpl implements UserApiDelegate {
         if (log.isDebugEnabled()) {
             log.debug("userIssuedVerifiablePresentation(issueVerifiablePresentationRequestPayloadV2={})", issueVerifiablePresentationRequestPayloadV2);
         }
-        if (!isValidVerifiableCredential(issueVerifiablePresentationRequestPayloadV2.getVerifiableCredentials())) {
+        if (!isVerifiableCredential(issueVerifiablePresentationRequestPayloadV2.getVerifiableCredentials())) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -268,7 +270,7 @@ public class UserApiDelegateImpl implements UserApiDelegate {
         }
 
         if (issueVerifiablePresentationJwtRequestPayloadV2.getAudience() == null ||
-                !isValidVerifiableCredential(issueVerifiablePresentationJwtRequestPayloadV2.getVerifiableCredentials())) {
+                !isVerifiableCredential(issueVerifiablePresentationJwtRequestPayloadV2.getVerifiableCredentials())) {
             return ResponseEntity.badRequest().build();
         }
 
@@ -286,18 +288,27 @@ public class UserApiDelegateImpl implements UserApiDelegate {
     }
 
     @Override
-    public ResponseEntity<ValidateVerifiablePresentationJwtResponsePayloadV2> validateVerifiablePresentationsJwtPost(ValidateVerifiablePresentationJwtRequestPayloadV2 validateVerifiablePresentationJwtRequestPayloadV2) {
-        return UserApiDelegate.super.validateVerifiablePresentationsJwtPost(validateVerifiablePresentationJwtRequestPayloadV2);
+    public ResponseEntity<ValidateVerifiableCredentialResponsePayloadV2> validatedVerifiableCredentialsPost(@NonNull ValidateVerifiableCredentialRequestPayloadV2 validateVerifiableCredentialRequestPayloadV2) {
+
+        if (!isVerifiableCredential(validateVerifiableCredentialRequestPayloadV2.getVerifiableCredentials())) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        final List<VerifiableCredential> verifiableCredentials = validateVerifiableCredentialRequestPayloadV2.getVerifiableCredentials()
+                .stream().map(VerifiableCredential::new).toList();
+        final VerifiableCredentialValidationResult result = validationService.validate(verifiableCredentials);
+
+        return ResponseEntity.ok(apiMapper.mapValidateVerifiableCredentialResponsePayloadV2(result));
     }
 
     @Override
-    public ResponseEntity<ValidateVerifiableCredentialResponsePayloadV2> validateVerifiableCredentialsPost(ValidateVerifiableCredentialRequestPayloadV2 validateVerifiableCredentialRequestPayloadV2) {
-        return UserApiDelegate.super.validateVerifiableCredentialsPost(validateVerifiableCredentialRequestPayloadV2);
+    public ResponseEntity<ValidateVerifiablePresentationJwtResponsePayloadV2> validatedVerifiablePresentationsJwtPost(ValidateVerifiablePresentationJwtRequestPayloadV2 validateVerifiablePresentationJwtRequestPayloadV2) {
+        return UserApiDelegate.super.validatedVerifiablePresentationsJwtPost(validateVerifiablePresentationJwtRequestPayloadV2);
     }
 
     @Override
-    public ResponseEntity<ValidateVerifiablePresentationResponsePayloadV2> validateVerifiablePresentationsPost(ValidateVerifiablePresentationRequestPayloadV2 validateVerifiablePresentationRequestPayloadV2) {
-        return UserApiDelegate.super.validateVerifiablePresentationsPost(validateVerifiablePresentationRequestPayloadV2);
+    public ResponseEntity<ValidateVerifiablePresentationResponsePayloadV2> validatedVerifiablePresentationsPost(ValidateVerifiablePresentationRequestPayloadV2 validateVerifiablePresentationRequestPayloadV2) {
+        return UserApiDelegate.super.validatedVerifiablePresentationsPost(validateVerifiablePresentationRequestPayloadV2);
     }
 
     private static boolean isValidSubject(IssueVerifiableCredentialRequestPayloadV2 payload) {
@@ -315,16 +326,16 @@ public class UserApiDelegateImpl implements UserApiDelegate {
     }
 
 
-    private static boolean isValidVerifiableCredential(List<Map<String, Object>> payload) {
+    private static boolean isVerifiableCredential(List<Map<String, Object>> payload) {
         if (payload == null) {
             return false;
         }
 
         return payload.stream()
-                .allMatch(UserApiDelegateImpl::isValidVerifiableCredential);
+                .allMatch(UserApiDelegateImpl::isVerifiableCredential);
     }
 
-    private static boolean isValidVerifiableCredential(Map<String, Object> payload) {
+    private static boolean isVerifiableCredential(Map<String, Object> payload) {
         if (payload == null) {
             return false;
         }

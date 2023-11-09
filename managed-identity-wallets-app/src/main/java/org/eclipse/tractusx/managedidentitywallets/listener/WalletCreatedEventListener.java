@@ -49,7 +49,6 @@ public class WalletCreatedEventListener {
     private final VaultService vaultService;
 
     @EventListener
-    @Transactional
     public void generateEd25519Key(WalletCreatedEvent event) {
 
         final Wallet wallet = event.getWallet();
@@ -67,12 +66,12 @@ public class WalletCreatedEventListener {
         final DidFragment didFragment = new DidFragment("key-1");
         final ResolvedEd25519Key resolvedEd25519Key = ed25519KeyFactory.generateNewEd25519Key(didFragment);
 
-        final StoredEd25519Key storedEd25519Key = vaultService.storeKey(resolvedEd25519Key);
+        final StoredEd25519Key newEd25519Key = vaultService.storeKey(resolvedEd25519Key);
 
         final Wallet updatedWallet = Wallet.builder()
                 .walletId(wallet.getWalletId())
                 .walletName(wallet.getWalletName())
-                .storedEd25519Keys(List.of(storedEd25519Key))
+                .storedEd25519Keys(List.of(newEd25519Key))
                 .createdAt(wallet.getCreatedAt())
                 .build();
 
@@ -80,7 +79,6 @@ public class WalletCreatedEventListener {
     }
 
     @EventListener
-    @Transactional
     public void issueBusinessPartnerCredential(WalletCreatedEvent event) {
         final Wallet wallet = event.getWallet();
         final VerifiableCredential bpnCredential = businessPartnerVerifiableCredentialFactory

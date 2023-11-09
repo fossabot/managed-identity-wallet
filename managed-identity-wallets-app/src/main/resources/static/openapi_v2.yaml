@@ -98,7 +98,7 @@ paths:
         '404':
           description: Verifiable Credential not found.
 
-  /issue/verifiable-presentations:
+  /signed-verifiable-presentations:
     post:
       operationId: userIssuedVerifiablePresentation
       tags:
@@ -120,7 +120,7 @@ paths:
         '400':
           description: Bad request.
 
-  /issue/verifiable-presentations/jwt:
+  /signed-verifiable-presentations/jwt:
     post:
       operationId: userIssuedVerifiablePresentationJwt
       tags:
@@ -142,7 +142,7 @@ paths:
         '400':
           description: Bad request.
 
-  /issue/verifiable-credentials:
+  /signed-verifiable-credentials:
     get:
       operationId: userGetIssuedVerifiableCredentials
       tags:
@@ -181,7 +181,7 @@ paths:
         '400':
           description: Bad request.
 
-  /validate/verifiable-credentials:
+  /validated-verifiable-credentials:
     post:
       tags:
         - User
@@ -202,7 +202,7 @@ paths:
         '400':
           description: Bad Request.
 
-  /validate/verifiable-presentations:
+  /validated-verifiable-presentations:
     post:
       tags:
         - User
@@ -223,7 +223,7 @@ paths:
         '400':
           description: Bad Request.
 
-  /validate/verifiable-presentations/jwt:
+  /validated-verifiable-presentations/jwt:
     post:
       tags:
         - User
@@ -616,7 +616,7 @@ components:
         keys:
           type: array
           items:
-              $ref: '#/components/schemas/WalletKey'
+            $ref: '#/components/schemas/WalletKey'
         created:
           type: string
           format: date-time
@@ -706,7 +706,7 @@ components:
             description: key value map
             type: object
             additionalProperties: true
-    ValidationResult:
+    VerifiableCredentialValidationResult:
       type: object
       properties:
         isValid:
@@ -719,7 +719,29 @@ components:
             properties:
               id:
                 type: string
-                description: Verifiable Credential ID
+                description: ID
+              type:
+                type: array
+                items:
+                  type: string
+                  enum:
+                    - incorrect_json_ld_format
+                    - incorrect_signature
+                    - expired
+    VerifiablePresentationValidationResult:
+      type: object
+      properties:
+        isValid:
+          description: Whether all Verifiable Presentations are valid.
+          type: boolean
+        violations:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: ID
               type:
                 type: array
                 items:
@@ -731,7 +753,7 @@ components:
     ValidateVerifiableCredentialResponsePayload:
       description: Verifiable Credential Validation Response
       allOf:
-        - $ref: '#/components/schemas/ValidationResult'
+        - $ref: '#/components/schemas/VerifiableCredentialValidationResult'
     ValidateVerifiablePresentationRequestPayload:
       description: Verifiable Presentation Validation Payload
       type: object
@@ -747,7 +769,7 @@ components:
     ValidateVerifiablePresentationResponsePayload:
       description: Verifiable Presentation Validation Response
       allOf:
-        - $ref: '#/components/schemas/ValidationResult'
+        - $ref: '#/components/schemas/VerifiablePresentationValidationResult'
     ValidateVerifiablePresentationJwtRequestPayload:
       description: JWT Verifiable Presentation Validation Payload
       type: object
@@ -759,7 +781,7 @@ components:
     ValidateVerifiablePresentationJwtResponsePayload:
       description: JWT Verifiable Presentation Validation Response
       allOf:
-        - $ref: '#/components/schemas/ValidationResult'
+        - $ref: '#/components/schemas/VerifiablePresentationValidationResult'
 
   securitySchemes:
     OAuth2:

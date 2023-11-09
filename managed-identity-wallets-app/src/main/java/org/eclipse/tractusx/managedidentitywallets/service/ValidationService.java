@@ -1,0 +1,131 @@
+/*
+ * *******************************************************************************
+ *  Copyright (c) 2021,2023 Contributors to the Eclipse Foundation
+ *
+ *  See the NOTICE file(s) distributed with this work for additional
+ *  information regarding copyright ownership.
+ *
+ *  This program and the accompanying materials are made available under the
+ *  terms of the Apache License, Version 2.0 which is available at
+ *  https://www.apache.org/licenses/LICENSE-2.0.
+ *
+ *  Unless required by applicable law or agreed to in writing, software
+ *  distributed under the License is distributed on an "AS IS" BASIS, WITHOUT
+ *  WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+ *  License for the specific language governing permissions and limitations
+ *  under the License.
+ *
+ *  SPDX-License-Identifier: Apache-2.0
+ * ******************************************************************************
+ */
+
+package org.eclipse.tractusx.managedidentitywallets.service;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialValidationResult;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialValidationResultViolation;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
+import org.eclipse.tractusx.ssi.lib.proof.LinkedDataProofValidation;
+import org.eclipse.tractusx.ssi.lib.validation.JsonLdValidator;
+import org.springframework.stereotype.Service;
+
+import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
+
+@Slf4j
+@Service
+@RequiredArgsConstructor
+public class ValidationService {
+
+    private final LinkedDataProofValidation proofValidation;
+    private final JsonLdValidator jsonLdValidator;
+
+    public VerifiableCredentialValidationResult validate(List<VerifiableCredential> verifiableCredentials) {
+        final List<VerifiableCredentialValidationResultViolation> violations = new ArrayList<>();
+
+
+        for (final VerifiableCredential verifiableCredential : verifiableCredentials) {
+            final VerifiableCredentialId id = new VerifiableCredentialId(verifiableCredential.getId().toString());
+            final List<VerifiableCredentialValidationResultViolation.Type> types = new ArrayList<>();
+
+            if (isExpired(verifiableCredential)) {
+                types.add(VerifiableCredentialValidationResultViolation.Type.EXPIRED);
+            }
+            if (!isJsonLdValid(verifiableCredential)) {
+                types.add(VerifiableCredentialValidationResultViolation.Type.INVALID_JSONLD_FORMAT);
+            }
+            if (!isSignatureValid(verifiableCredential)) {
+                types.add(VerifiableCredentialValidationResultViolation.Type.INVALID_SIGNATURE);
+            }
+
+            if (!types.isEmpty()) {
+                violations.add(new VerifiableCredentialValidationResultViolation(id, types));
+            }
+        }
+
+        return VerifiableCredentialValidationResult.builder()
+                .isValid(violations.isEmpty())
+                .verifiableCredentialViolations(violations)
+                .build();
+    }
+
+    public boolean isExpired(List<VerifiableCredential> verifiableCredentials) {
+        return verifiableCredentials.stream().allMatch(this::isExpired);
+    }
+
+    public boolean isExpired(VerifiableCredential verifiableCredential) {
+        if (verifiableCredential.getExpirationDate() == null) {
+            return false;
+        }
+
+        boolean isExpired = verifiableCredential.getExpirationDate().isBefore(Instant.now());
+        if (log.isTraceEnabled()) {
+            log.trace(isExpired ? "VerifiableCredential is expired. (id={})" : "VerifiableCredential is not expired. (id={})", verifiableCredential.getId());
+        }
+        return isExpired;
+    }
+
+    public boolean isJsonLdValid(List<VerifiableCredential> verifiableCredentials) {
+        return verifiableCredentials.stream().allMatch(this::isJsonLdValid);
+    }
+
+    public boolean isJsonLdValid(VerifiableCredential verifiableCredential) {
+        boolean result;
+        try {
+            jsonLdValidator.validate(verifiableCredential);
+            result = true;
+        } catch (Exception e) {
+            result = false;
+        }
+
+        if (log.isTraceEnabled()) {
+            log.trace(result ? "VerifiableCredential is JSON-LD valid. (id={})" : "VerifiableCredential is not JSON-LD valid. (id={})", verifiableCredential.getId());
+        }
+
+        return result;
+    }
+
+    public boolean isSignatureValid(List<VerifiableCredential> verifiableCredentials) {
+        return verifiableCredentials.stream().allMatch(this::isSignatureValid);
+    }
+
+    public boolean isSignatureValid(VerifiableCredential verifiableCredential) {
+        boolean isSignatureValid = false;
+
+        try {
+            isSignatureValid = proofValidation.verifiy(verifiableCredential);
+        } catch (Exception e) {
+            // if a verifiable credential is not json-ld valid, the signature verification is not possible and will throw an exception
+            // which results in 'isSignatureValid=false', which is somewhat true.
+        }
+
+        if (log.isTraceEnabled()) {
+            log.trace(isSignatureValid ? "VerifiableCredential signature is valid. (id={})" : "VerifiableCredential signature is not valid. (id={})", verifiableCredential.getId());
+        }
+
+        return isSignatureValid;
+    }
+}
