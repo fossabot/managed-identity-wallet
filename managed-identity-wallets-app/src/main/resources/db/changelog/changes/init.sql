@@ -38,7 +38,6 @@ CREATE TABLE IF NOT EXISTS key_ed25519
     id             varchar(255) NOT NULL,
     version        varchar(8)               DEFAULT 'v1',
     did_fragment varchar(255) NOT NULL,
-    vault_secret   varchar(255) NOT NULL,
     wallet_id      varchar(255) NOT NULL,
     created_at     timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     modified_at    timestamp with time zone DEFAULT CURRENT_TIMESTAMP,

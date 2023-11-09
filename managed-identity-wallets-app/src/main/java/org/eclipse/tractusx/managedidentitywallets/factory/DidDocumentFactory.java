@@ -70,7 +70,7 @@ public class DidDocumentFactory {
 
         for (var key : wallet.getStoredEd25519Keys()) {
 
-            final Optional<ResolvedEd25519Key> resolvedEd25519Key = vaultService.resolveKey(key);
+            final Optional<ResolvedEd25519Key> resolvedEd25519Key = vaultService.resolveKey(wallet, key);
             if (resolvedEd25519Key.isEmpty()) {
                 log.warn("Key {} not found in vault. WalletId={}", key, wallet.getWalletId());
                 continue;

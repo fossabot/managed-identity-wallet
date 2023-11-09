@@ -22,8 +22,9 @@
 package org.eclipse.tractusx.managedidentitywallets.health;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
-import org.eclipse.tractusx.managedidentitywallets.exception.Ed25519KeyNotFoundException;
+import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
 import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
 @Component
 @RequiredArgsConstructor
 public class AuthorityWalletHealthIndicator extends AbstractHealthIndicator {
@@ -65,15 +67,21 @@ public class AuthorityWalletHealthIndicator extends AbstractHealthIndicator {
             return;
         }
 
-        for (StoredEd25519Key key : keys) {
-            try {
-                vaultService.resolveKey(key);
-            } catch (Ed25519KeyNotFoundException e) {
-                builder.down(e);
-                return;
+        boolean allKeysPresent = true;
+        for (final StoredEd25519Key key : keys) {
+            final Optional<ResolvedEd25519Key> resolvedKey = vaultService.resolveKey(wallet.get(), key);
+            if (resolvedKey.isEmpty()) {
+                final String msg = String.format("Authority wallet key not found in vault: %s", key);
+                builder.withDetail("authorityWallet-key-presence", msg);
+                log.error(msg);
+                allKeysPresent = false;
             }
         }
 
-        builder.up();
+        if (allKeysPresent) {
+            builder.up();
+        } else {
+            builder.down();
+        }
     }
 }

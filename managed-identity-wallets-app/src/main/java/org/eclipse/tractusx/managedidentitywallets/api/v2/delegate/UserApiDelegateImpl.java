@@ -288,7 +288,7 @@ public class UserApiDelegateImpl implements UserApiDelegate {
     }
 
     @Override
-    public ResponseEntity<ValidateVerifiableCredentialResponsePayloadV2> validatedVerifiableCredentialsPost(@NonNull ValidateVerifiableCredentialRequestPayloadV2 validateVerifiableCredentialRequestPayloadV2) {
+    public ResponseEntity<ValidateVerifiableCredentialResponsePayloadV2> verifiableCredentialsValidationPost(@NonNull ValidateVerifiableCredentialRequestPayloadV2 validateVerifiableCredentialRequestPayloadV2) {
 
         if (!isVerifiableCredential(validateVerifiableCredentialRequestPayloadV2.getVerifiableCredentials())) {
             return ResponseEntity.badRequest().build();
@@ -302,13 +302,13 @@ public class UserApiDelegateImpl implements UserApiDelegate {
     }
 
     @Override
-    public ResponseEntity<ValidateVerifiablePresentationJwtResponsePayloadV2> validatedVerifiablePresentationsJwtPost(ValidateVerifiablePresentationJwtRequestPayloadV2 validateVerifiablePresentationJwtRequestPayloadV2) {
-        return UserApiDelegate.super.validatedVerifiablePresentationsJwtPost(validateVerifiablePresentationJwtRequestPayloadV2);
+    public ResponseEntity<ValidateVerifiablePresentationJwtResponsePayloadV2> verifiablePresentationsJwtValidationPost(ValidateVerifiablePresentationJwtRequestPayloadV2 validateVerifiablePresentationJwtRequestPayloadV2) {
+        return UserApiDelegate.super.verifiablePresentationsJwtValidationPost(validateVerifiablePresentationJwtRequestPayloadV2);
     }
 
     @Override
-    public ResponseEntity<ValidateVerifiablePresentationResponsePayloadV2> validatedVerifiablePresentationsPost(ValidateVerifiablePresentationRequestPayloadV2 validateVerifiablePresentationRequestPayloadV2) {
-        return UserApiDelegate.super.validatedVerifiablePresentationsPost(validateVerifiablePresentationRequestPayloadV2);
+    public ResponseEntity<ValidateVerifiablePresentationResponsePayloadV2> verifiablePresentationsValidationPost(ValidateVerifiablePresentationRequestPayloadV2 validateVerifiablePresentationRequestPayloadV2) {
+        return UserApiDelegate.super.verifiablePresentationsValidationPost(validateVerifiablePresentationRequestPayloadV2);
     }
 
     private static boolean isValidSubject(IssueVerifiableCredentialRequestPayloadV2 payload) {

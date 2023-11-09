@@ -21,34 +21,20 @@
 
 package org.eclipse.tractusx.managedidentitywallets.repository.entity;
 
-import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
+import org.eclipse.tractusx.managedidentitywallets.models.Ed25519KeyId;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 
-@Data
-@NoArgsConstructor
-@EqualsAndHashCode(of = "id", callSuper = false)
-@Entity(name = Ed25519KeyEntity.TABLE_NAME)
-@Table(name = Ed25519KeyEntity.TABLE_NAME)
+@Getter
 @ToString
-public class Ed25519KeyEntity extends AbstractEntity {
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class VaultPath {
 
-    public static final String TABLE_NAME = "key_ed25519";
-    public static final String COLUMN_ID = "id";
-    public static final String COLUMN_WALLET_ID = "wallet_id";
-    public static final String COLUMN_DID_FRAGMENT = "did_fragment";
+    public VaultPath(WalletId walletId, Ed25519KeyId keyId) {
+        this.path = String.format("%s/%s", walletId, keyId);
+    }
 
-    @Id
-    @ToString.Include
-    @Column(name = COLUMN_ID, nullable = false, updatable = false)
-    private String id;
-
-    @Column(name = COLUMN_DID_FRAGMENT, nullable = false, updatable = false)
-    private String didFragment;
-
-    @ManyToOne
-    @JoinColumn(name = COLUMN_WALLET_ID, nullable = false, updatable = false)
-    private WalletEntity wallet;
+    @NonNull
+    @EqualsAndHashCode.Include
+    private final String path;
 }

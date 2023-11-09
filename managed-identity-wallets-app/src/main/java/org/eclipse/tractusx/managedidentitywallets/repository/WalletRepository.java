@@ -28,6 +28,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialAlreadyStoredInWalletException;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
+import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.Ed25519KeyEntity;
@@ -43,6 +44,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -55,7 +57,6 @@ public class WalletRepository {
 
     private final WalletJpaRepository walletJpaRepository;
     private final VerifiableCredentialWalletIntersectionJpaRepository verifiableCredentialWalletIntersectionJpaRepository;
-    private final VerifiableCredentialJpaRepository verifiableCredentialJpaRepository;
     private final Ed25519KeyJpaRepository ed25519KeyJpaRepository;
     private final WalletMap walletMap;
 
@@ -74,7 +75,6 @@ public class WalletRepository {
                 .map(k -> {
                     final Ed25519KeyEntity keyEntity = new Ed25519KeyEntity();
                     keyEntity.setId(UUID.randomUUID().toString());
-                    keyEntity.setVaultSecret(k.getVaultSecret().getText());
                     keyEntity.setWallet(walletEntity);
                     keyEntity.setDidFragment(k.getDidFragment().getText());
                     return keyEntity;
@@ -99,26 +99,32 @@ public class WalletRepository {
     public void update(@NonNull Wallet wallet) {
 
         /* Assert Wallet Exists*/
-        WalletQuery walletQuery = WalletQuery.builder()
+        final WalletQuery walletQuery = WalletQuery.builder()
                 .walletId(wallet.getWalletId())
                 .build();
         final Predicate predicate = WalletPredicate.fromQuery(walletQuery);
-        WalletEntity walletEntity = walletJpaRepository.findOne(predicate)
+        final WalletEntity walletEntity = walletJpaRepository.findOne(predicate)
                 .orElseThrow(() -> new WalletNotFoundException(wallet.getWalletId()));
 
         /* Update Wallet */
-        final String walletName = wallet.getWalletName().getText();
-        walletEntity.setName(walletName);
+        final String newWalletName = wallet.getWalletName().getText();
+        walletEntity.setName(newWalletName);
 
-        final List<Ed25519KeyEntity> ed25519KeyEntities = wallet.getStoredEd25519Keys().stream()
-                .map(k -> {
-                    final Ed25519KeyEntity keyEntity = new Ed25519KeyEntity();
-                    keyEntity.setId(k.getId().getText());
-                    keyEntity.setVaultSecret(k.getVaultSecret().getText());
-                    keyEntity.setWallet(walletEntity);
-                    keyEntity.setDidFragment(k.getDidFragment().getText());
-                    return keyEntity;
-                }).collect(Collectors.toList());
+        final List<Ed25519KeyEntity> ed25519KeyEntities = new ArrayList<>();
+        for (final StoredEd25519Key storedEd25519Key : wallet.getStoredEd25519Keys()) {
+            // keep keys that are already in db or generate new ones
+            walletEntity.getEd25519Keys().stream().filter(
+                            k -> k.getId().equals(storedEd25519Key.getId().getText())
+                    ).findFirst()
+                    .ifPresentOrElse(ed25519KeyEntities::add, () -> {
+                        final Ed25519KeyEntity keyEntity = new Ed25519KeyEntity();
+                        keyEntity.setId(storedEd25519Key.getId().getText());
+                        keyEntity.setWallet(walletEntity);
+                        keyEntity.setDidFragment(storedEd25519Key.getDidFragment().getText());
+                        keyEntity.setCreatedAt(storedEd25519Key.getCreatedAt());
+                        ed25519KeyEntities.add(keyEntity);
+                    });
+        }
 
         walletEntity.getEd25519Keys().clear();
         walletEntity.getEd25519Keys().addAll(ed25519KeyEntities);

@@ -22,9 +22,7 @@
 package org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments;
 
 import lombok.SneakyThrows;
-import org.eclipse.tractusx.managedidentitywallets.annotations.IsJsonLdValid;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
-import org.eclipse.tractusx.managedidentitywallets.exception.Ed25519KeyNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
 import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
@@ -68,7 +66,7 @@ public abstract class AbstractVerifiableDocumentFactory {
         return createdIssuedCredential(subject, type, miwSettings.getVcExpiryDate().toInstant());
     }
 
-    @SneakyThrows({UnsupportedSignatureTypeException.class, Ed25519KeyNotFoundException.class, InvalidePrivateKeyFormat.class})
+    @SneakyThrows({UnsupportedSignatureTypeException.class, InvalidePrivateKeyFormat.class})
     protected VerifiableCredential createdIssuedCredential(VerifiableCredentialSubject subject, String type, Instant expiryDate) {
 
         final List<URI> contexts = miwSettings.getVcContexts();
@@ -104,7 +102,7 @@ public abstract class AbstractVerifiableDocumentFactory {
         final ResolvedEd25519Key key = issuerWallet.getStoredEd25519Keys()
                 .stream()
                 .max(Comparator.comparing(StoredEd25519Key::getCreatedAt))
-                .map(vaultService::resolveKey)
+                .map(k -> vaultService.resolveKey(issuerWallet, k))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .orElseThrow();

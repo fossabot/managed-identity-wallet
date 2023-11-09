@@ -46,10 +46,10 @@ public class WalletMapV1 {
 
     @SneakyThrows
     public org.eclipse.tractusx.managedidentitywallets.api.v1.entity.Wallet
-        map(org.eclipse.tractusx.managedidentitywallets.models.Wallet w) {
+    map(org.eclipse.tractusx.managedidentitywallets.models.Wallet w) {
 
-        final var key = vaultService.resolveKey(
-                w.getStoredEd25519Keys().stream().findFirst().orElseThrow());
+        final var key = vaultService.resolveKey(w,
+                w.getStoredEd25519Keys().stream().findFirst().orElseThrow()).orElseThrow();
         var keyId = key.getId().getText();
 
         //create did json

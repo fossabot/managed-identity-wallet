@@ -181,7 +181,7 @@ paths:
         '400':
           description: Bad request.
 
-  /validated-verifiable-credentials:
+  /verifiable-credentials-validation:
     post:
       tags:
         - User
@@ -202,7 +202,7 @@ paths:
         '400':
           description: Bad Request.
 
-  /validated-verifiable-presentations:
+  /verifiable-presentations-validation:
     post:
       tags:
         - User
@@ -223,7 +223,7 @@ paths:
         '400':
           description: Bad Request.
 
-  /validated-verifiable-presentations/jwt:
+  /verifiable-presentations-jwt-validation:
     post:
       tags:
         - User
@@ -517,11 +517,21 @@ components:
       allOf:
         - $ref: '#/components/schemas/Wallet'
     CreateWalletRequestPayload:
-      allOf:
-        - $ref: '#/components/schemas/Wallet'
+      properties:
+        id:
+          type: string
+          description: The ID of the wallet.
+        name:
+          type: string
+          description: The name of the wallet.
     UpdateWalletRequestPayload:
-      allOf:
-        - $ref: '#/components/schemas/Wallet'
+      properties:
+        id:
+          type: string
+          description: The ID of the wallet.
+        name:
+          type: string
+          description: The name of the wallet.
     UpdateWalletResponsePayload:
       allOf:
         - $ref: '#/components/schemas/Wallet'
@@ -597,9 +607,6 @@ components:
         didFragment:
           type: string
           description: The DID fragment of the key.
-        vaultSecret:
-          type: string
-          description: The vault secret of the key.
         created:
           type: string
           format: date-time

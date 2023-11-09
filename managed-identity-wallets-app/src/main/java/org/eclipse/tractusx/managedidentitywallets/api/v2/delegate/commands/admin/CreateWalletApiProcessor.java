@@ -49,12 +49,6 @@ public class CreateWalletApiProcessor extends AbstractApiCommand {
     public ResponseEntity<CreateWalletResponsePayloadV2> execute(CreateWalletRequestPayloadV2 request) {
         logInvocationIfDebug("adminCreateWallet(request={})", request);
 
-        // set non-nullable fields from domain model
-        request.setCreated(OffsetDateTime.now());
-        if (request.getKeys() == null) {
-            request.setKeys(Collections.emptyList());
-        }
-
         final Wallet wallet = apiMapper.mapCreateWalletResponsePayloadV2(request);
 
         walletService.create(wallet);

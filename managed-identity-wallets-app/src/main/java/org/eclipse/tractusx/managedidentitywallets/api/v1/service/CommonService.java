@@ -113,7 +113,7 @@ public class CommonService {
 
         for (var key : wallet.getStoredEd25519Keys()) {
 
-            final ResolvedEd25519Key resolvedEd25519Key = vaultService.resolveKey(key).orElseThrow();
+            final ResolvedEd25519Key resolvedEd25519Key = vaultService.resolveKey(wallet, key).orElseThrow();
             final byte[] privateKey = resolvedEd25519Key.getPrivateKey();
             IPrivateKey x21559PrivateKey = new x21559PrivateKey(privateKey);
 

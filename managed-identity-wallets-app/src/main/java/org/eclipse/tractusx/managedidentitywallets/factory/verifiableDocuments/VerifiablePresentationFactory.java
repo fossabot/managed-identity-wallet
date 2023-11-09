@@ -27,7 +27,6 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.annotations.IsJsonLdValid;
 import org.eclipse.tractusx.managedidentitywallets.annotations.IsSignatureValid;
-import org.eclipse.tractusx.managedidentitywallets.exception.Ed25519KeyNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
 import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
@@ -86,7 +85,7 @@ public class VerifiablePresentationFactory extends AbstractVerifiableDocumentFac
         final ResolvedEd25519Key key = issuer.getStoredEd25519Keys()
                 .stream()
                 .max(Comparator.comparing(StoredEd25519Key::getCreatedAt))
-                .map(vaultService::resolveKey)
+                .map(k -> vaultService.resolveKey(issuer, k))
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .orElseThrow();

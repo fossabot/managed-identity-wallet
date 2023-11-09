@@ -30,6 +30,7 @@ import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.commands.admi
 import org.eclipse.tractusx.managedidentitywallets.api.v2.map.VerifiableCredentialsMapper;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.map.WalletsApiMapper;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
+import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
@@ -106,8 +107,21 @@ public class AdministratorApiDelegateImpl implements AdministratorApiDelegate {
         if (log.isDebugEnabled()) {
             log.debug("updateWalletById(updateWalletRequestPayloadV2={})", updateWalletRequestPayloadV2);
         }
-        final Wallet wallet = apiMapper.mapUpdateWalletRequestPayloadV2(updateWalletRequestPayloadV2);
-        walletService.update(wallet);
+        if (updateWalletRequestPayloadV2.getName() == null || updateWalletRequestPayloadV2.getId() == null) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        final WalletId walletId = new WalletId(updateWalletRequestPayloadV2.getId());
+        final WalletName newName = new WalletName(updateWalletRequestPayloadV2.getName());
+        final Wallet wallet = walletService.findById(walletId).orElseThrow(() -> new WalletNotFoundException(walletId));
+
+        final Wallet.WalletBuilder builder = Wallet.builder()
+                .walletId(walletId)
+                .walletName(newName)
+                .storedEd25519Keys(wallet.getStoredEd25519Keys())
+                .createdAt(wallet.getCreatedAt());
+        walletService.update(builder.build());
+        
         final Optional<Wallet> updatedWallet = walletService.findById(wallet.getWalletId());
         if (updatedWallet.isPresent()) {
             final UpdateWalletResponsePayloadV2 response = apiMapper.mapUpdateWalletResponsePayloadV2(updatedWallet.get());
@@ -179,14 +193,13 @@ public class AdministratorApiDelegateImpl implements AdministratorApiDelegate {
         page = Optional.ofNullable(page).orElse(0);
         perPage = Optional.ofNullable(perPage).orElse(miwSettings.getApiDefaultPageSize());
 
-        final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
-                .verifiableCredentialIssuer(Optional.ofNullable(issuer).map(VerifiableCredentialIssuer::new).orElse(null))
-                .verifiableCredentialId(Optional.ofNullable(id).map(VerifiableCredentialId::new).orElse(null))
-                .verifiableCredentialTypes(Optional.ofNullable(type).map(VerifiableCredentialType::new).map(List::of).orElse(null))
-                .holderWalletId(Optional.ofNullable(holder).map(WalletId::new).orElse(null))
-                .build();
+        final VerifiableCredentialQuery.VerifiableCredentialQueryBuilder builder = VerifiableCredentialQuery.builder();
+        Optional.ofNullable(issuer).map(VerifiableCredentialIssuer::new).ifPresent(builder::verifiableCredentialIssuer);
+        Optional.ofNullable(id).map(VerifiableCredentialId::new).ifPresent(builder::verifiableCredentialId);
+        Optional.ofNullable(type).map(VerifiableCredentialType::new).map(List::of).ifPresent(builder::verifiableCredentialTypes);
+        Optional.ofNullable(holder).map(WalletId::new).ifPresent(builder::holderWalletId);
 
-        final Page<VerifiableCredential> verifiableCredentials = verifiableCredentialService.findAll(verifiableCredentialQuery, page, perPage);
+        final Page<VerifiableCredential> verifiableCredentials = verifiableCredentialService.findAll(builder.build(), page, perPage);
         final VerifiableCredentialListResponsePayloadV2 payload = apiMapper.mapVerifiableCredentialListResponsePayloadV2(verifiableCredentials);
 
         return ResponseEntity.ok(payload);

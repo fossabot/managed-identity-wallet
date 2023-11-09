@@ -23,7 +23,6 @@ package org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments;
 
 import lombok.*;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
-import org.eclipse.tractusx.managedidentitywallets.exception.Ed25519KeyNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialContext;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
@@ -51,7 +50,7 @@ public class GenericVerifiableCredentialFactory extends AbstractVerifiableDocume
     private final DidFactory didFactory;
     private final MIWSettings miwSettings;
 
-    @SneakyThrows({UnsupportedSignatureTypeException.class, Ed25519KeyNotFoundException.class, InvalidePrivateKeyFormat.class})
+    @SneakyThrows({UnsupportedSignatureTypeException.class, InvalidePrivateKeyFormat.class})
     public VerifiableCredential createVerifiableCredential(GenericVerifiableCredentialFactoryArgs args) {
 
         final List<VerifiableCredentialSubject> subject = args.getSubjects();

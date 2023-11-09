@@ -26,6 +26,5 @@ import java.time.OffsetDateTime;
 public interface Ed25519Key {
     Ed25519KeyId getId();
     DidFragment getDidFragment();
-    VaultSecret getVaultSecret();
     OffsetDateTime getCreatedAt();
 }

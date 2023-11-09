@@ -24,38 +24,38 @@ package org.eclipse.tractusx.managedidentitywallets.repository;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.managedidentitywallets.exception.Ed25519KeyNotFoundException;
+import org.eclipse.tractusx.managedidentitywallets.models.Ed25519KeyId;
 import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
 import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.VaultPath;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
 public class VaultRepository {
 
-    private final List<ResolvedEd25519Key> keys = new ArrayList<>();
+    private final Map<VaultPath, ResolvedEd25519Key> keys = new HashMap<>();
 
-    public Optional<ResolvedEd25519Key> resolveKey(@NonNull final StoredEd25519Key storedEd25519Key) {
+    public Optional<ResolvedEd25519Key> resolveKey(@NonNull final WalletId walletId, Ed25519KeyId keyId) {
         if (log.isTraceEnabled()) {
-            log.trace("resolveKey: {}", storedEd25519Key);
+            log.trace("resolveKey {}: {}", walletId, keyId);
         }
 
-        return keys.stream()
-                .filter(k -> k.getVaultSecret().equals(storedEd25519Key.getVaultSecret()))
-                .findFirst();
+        final VaultPath vaultPath = new VaultPath(walletId, keyId);
+        return Optional.ofNullable(keys.getOrDefault(vaultPath, null));
     }
 
-    public StoredEd25519Key storeKey(@NonNull final ResolvedEd25519Key resolvedEd25519Key) {
+    public StoredEd25519Key storeKey(@NonNull final WalletId walletId, @NonNull final ResolvedEd25519Key resolvedEd25519Key) {
         if (log.isTraceEnabled()) {
-            log.trace("storeKey: {}", resolvedEd25519Key);
+            log.trace("storeKey {}: {}", walletId, resolvedEd25519Key);
         }
 
-        keys.add(resolvedEd25519Key);
+        final VaultPath vaultPath = new VaultPath(walletId, resolvedEd25519Key.getId());
+        keys.put(vaultPath, resolvedEd25519Key);
         return mapToStoredKey(resolvedEd25519Key);
     }
 
@@ -64,7 +64,6 @@ public class VaultRepository {
                 .id(resolvedEd25519Key.getId())
                 .createdAt(resolvedEd25519Key.getCreatedAt())
                 .didFragment(resolvedEd25519Key.getDidFragment())
-                .vaultSecret(resolvedEd25519Key.getVaultSecret())
                 .build();
     }
 }

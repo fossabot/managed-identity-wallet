@@ -45,7 +45,6 @@ public class WalletMap extends AbstractMap<Wallet, WalletEntity> {
                         key -> StoredEd25519Key.builder()
                                 .id(new Ed25519KeyId(key.getId()))
                                 .didFragment(new DidFragment(key.getDidFragment()))
-                                .vaultSecret(new VaultSecret(key.getVaultSecret()))
                                 .createdAt(key.getCreatedAt())
                                 .build()
                 ).collect(Collectors.toList());

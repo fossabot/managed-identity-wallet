@@ -49,13 +49,11 @@ public interface WalletsApiMapper {
     ValidateVerifiableCredentialResponsePayloadV2 mapValidateVerifiableCredentialResponsePayloadV2(VerifiableCredentialValidationResult verifiableCredentialValidationResult);
 
     @Mapping(target = "id.text", source = "id")
-    @Mapping(target = "vaultSecret.text", source = "vaultSecret")
     @Mapping(target = "didFragment.text", source = "didFragment")
     @Mapping(target = "createdAt", source = "created")
     StoredEd25519Key mapStoredEd25519Key(WalletKeyV2 walletKeyV2);
 
     @Mapping(target = "id", source = "id.text")
-    @Mapping(target = "vaultSecret", source = "vaultSecret.text")
     @Mapping(target = "didFragment", source = "didFragment.text")
     @Mapping(target = "created", source = "createdAt")
     WalletKeyV2 mapWalletKey(StoredEd25519Key key);
@@ -86,15 +84,7 @@ public interface WalletsApiMapper {
 
     @Mapping(target = "walletId.text", source = "id")
     @Mapping(target = "walletName.text", source = "name")
-    @Mapping(target = "createdAt", source = "created")
-    @Mapping(target = "storedEd25519Keys", source = "keys")
     Wallet mapCreateWalletResponsePayloadV2(CreateWalletRequestPayloadV2 wallet);
-
-    @Mapping(target = "walletId.text", source = "id")
-    @Mapping(target = "walletName.text", source = "name")
-    @Mapping(target = "createdAt", source = "created")
-    @Mapping(target = "storedEd25519Keys", source = "keys")
-    Wallet mapUpdateWalletRequestPayloadV2(UpdateWalletRequestPayloadV2 wallet);
 
     @Mapping(target = "id", source = "walletId.text")
     @Mapping(target = "name", source = "walletName.text")

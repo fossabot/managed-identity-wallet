@@ -118,7 +118,7 @@ public class PresentationService {
 
             final org.eclipse.tractusx.managedidentitywallets.models.Wallet domainWallet = walletService.findById(new WalletId(callerBpn)).orElseThrow();
             final StoredEd25519Key latestKey = domainWallet.getStoredEd25519Keys().stream().max(Comparator.comparing(org.eclipse.tractusx.managedidentitywallets.models.Ed25519Key::getCreatedAt)).orElseThrow();
-            final ResolvedEd25519Key resolvedEd25519Key = vaultService.resolveKey(latestKey).orElseThrow();
+            final ResolvedEd25519Key resolvedEd25519Key = vaultService.resolveKey(domainWallet, latestKey).orElseThrow();
 
             x21559PrivateKey privateKey = new x21559PrivateKey(resolvedEd25519Key.getPrivateKey());
             SignedJWT presentation = presentationFactory.createPresentation(vpIssuerDid

@@ -29,7 +29,7 @@ import java.time.OffsetDateTime;
 @Getter
 @AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 @Builder
-@ToString(exclude = {"privateKey"})
+@ToString
 public class ResolvedEd25519Key implements Ed25519Key {
 
     @NonNull
@@ -37,10 +37,10 @@ public class ResolvedEd25519Key implements Ed25519Key {
     @NonNull
     private final DidFragment didFragment;
     @NonNull
-    private final VaultSecret vaultSecret;
-    @NonNull
     private final OffsetDateTime createdAt;
 
     private final byte @NonNull [] publicKey;
+
+    @ToString.Exclude
     private final byte @NonNull [] privateKey;
 }

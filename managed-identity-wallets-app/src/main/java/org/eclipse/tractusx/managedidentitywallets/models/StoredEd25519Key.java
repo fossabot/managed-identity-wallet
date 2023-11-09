@@ -37,8 +37,6 @@ public class StoredEd25519Key implements Ed25519Key {
     @NonNull
     private final DidFragment didFragment;
     @NonNull
-    private final VaultSecret vaultSecret;
-    @NonNull
     private final OffsetDateTime createdAt;
 }
 

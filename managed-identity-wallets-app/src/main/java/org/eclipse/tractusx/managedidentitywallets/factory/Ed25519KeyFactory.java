@@ -26,14 +26,12 @@ import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.models.DidFragment;
 import org.eclipse.tractusx.managedidentitywallets.models.Ed25519KeyId;
 import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
-import org.eclipse.tractusx.managedidentitywallets.models.VaultSecret;
 import org.eclipse.tractusx.ssi.lib.crypt.IKeyGenerator;
 import org.eclipse.tractusx.ssi.lib.crypt.KeyPair;
 import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559Generator;
 import org.eclipse.tractusx.ssi.lib.exception.KeyGenerationException;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.time.OffsetDateTime;
 import java.util.UUID;
 
@@ -51,11 +49,9 @@ public class Ed25519KeyFactory {
         final KeyPair keyPair = keyGenerator.generateKey();
 
         final Ed25519KeyId keyId = new Ed25519KeyId(UUID.randomUUID().toString());
-        final VaultSecret vaultSecret = new VaultSecret(keyId.getText());
 
         return ResolvedEd25519Key.builder()
                 .id(keyId)
-                .vaultSecret(vaultSecret)
                 .privateKey(keyPair.getPrivateKey().asByte())
                 .publicKey(keyPair.getPublicKey().asByte())
                 .didFragment(didFragment)

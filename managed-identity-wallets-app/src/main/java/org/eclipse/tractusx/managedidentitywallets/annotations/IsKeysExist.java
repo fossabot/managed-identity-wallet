@@ -52,7 +52,7 @@ public @interface IsKeysExist {
 
         @Override
         public boolean isValid(Wallet wallet, ConstraintValidatorContext context) {
-            return wallet.getStoredEd25519Keys().stream().allMatch(key -> vaultService.resolveKey(key).isPresent());
+            return wallet.getStoredEd25519Keys().stream().allMatch(key -> vaultService.resolveKey(wallet, key.getId()).isPresent());
         }
     }
 }

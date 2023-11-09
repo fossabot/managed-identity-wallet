@@ -31,7 +31,6 @@ import java.util.List;
 
 @Getter
 @Builder
-@AllArgsConstructor
 @ToString
 public class Wallet {
 
@@ -42,10 +41,11 @@ public class Wallet {
     private final WalletName walletName;
 
     @NonNull
-    private final OffsetDateTime createdAt;
-
     @Builder.Default
+    private final OffsetDateTime createdAt = OffsetDateTime.now();
+
     @NonNull
+    @Builder.Default
     private final List<StoredEd25519Key> storedEd25519Keys = Collections.emptyList();
 
     public List<StoredEd25519Key> getStoredEd25519Keys() {
