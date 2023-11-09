@@ -52,6 +52,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Component
@@ -62,7 +63,7 @@ public class VerifiablePresentationFactory extends AbstractVerifiableDocumentFac
     private final DidFactory didFactory;
     private final VaultService vaultService;
 
-    @SneakyThrows({UnsupportedSignatureTypeException.class, Ed25519KeyNotFoundException.class, InvalidePrivateKeyFormat.class})
+    @SneakyThrows({UnsupportedSignatureTypeException.class, InvalidePrivateKeyFormat.class})
     public VerifiablePresentation createPresentation(@NonNull Wallet issuer,
                                                      @NonNull @IsJsonLdValid @IsSignatureValid List<VerifiableCredential> verifiableCredentials) {
         final Did issuerDid = didFactory.generateDid(issuer);
@@ -77,15 +78,20 @@ public class VerifiablePresentationFactory extends AbstractVerifiableDocumentFac
         return verifiablePresentationBuilder.proof(proof).build();
     }
 
-    // TODO Handle Key Vault issues more gracefully
-    @SneakyThrows({Ed25519KeyNotFoundException.class, InvalidePrivateKeyFormat.class})
+    @SneakyThrows({InvalidePrivateKeyFormat.class})
     public JsonWebToken createPresentationAsJwt(@NonNull Wallet issuer, @NonNull @IsJsonLdValid @IsSignatureValid List<VerifiableCredential> credentials, @NonNull JsonWebTokenAudience audience) {
         final Did issuerDid = didFactory.generateDid(issuer);
         final SerializedJwtPresentationFactory factory = createJwtFactory(issuerDid);
 
-        final StoredEd25519Key latestKey = issuer.getStoredEd25519Keys().stream().max(Comparator.comparing(Ed25519Key::getCreatedAt)).orElseThrow();
-        final ResolvedEd25519Key resolvedEd25519Key = vaultService.resolveKey(latestKey);
-        final x21559PrivateKey privateKey = new x21559PrivateKey(resolvedEd25519Key.getPrivateKey());
+        final ResolvedEd25519Key key = issuer.getStoredEd25519Keys()
+                .stream()
+                .max(Comparator.comparing(StoredEd25519Key::getCreatedAt))
+                .map(vaultService::resolveKey)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
+                .orElseThrow();
+
+        final x21559PrivateKey privateKey = new x21559PrivateKey(key.getPrivateKey());
 
         final SignedJWT signedJwt = factory.createPresentation(issuerDid, credentials, audience.getText(), privateKey);
         return new JsonWebToken(signedJwt.serialize());

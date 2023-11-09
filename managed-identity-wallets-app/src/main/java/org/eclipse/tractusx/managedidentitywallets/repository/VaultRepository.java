@@ -31,6 +31,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Component
 @Slf4j
@@ -39,15 +40,14 @@ public class VaultRepository {
 
     private final List<ResolvedEd25519Key> keys = new ArrayList<>();
 
-    public ResolvedEd25519Key resolveKey(@NonNull final StoredEd25519Key storedEd25519Key) throws Ed25519KeyNotFoundException {
+    public Optional<ResolvedEd25519Key> resolveKey(@NonNull final StoredEd25519Key storedEd25519Key) {
         if (log.isTraceEnabled()) {
             log.trace("resolveKey: {}", storedEd25519Key);
         }
 
         return keys.stream()
                 .filter(k -> k.getVaultSecret().equals(storedEd25519Key.getVaultSecret()))
-                .findFirst()
-                .orElseThrow();
+                .findFirst();
     }
 
     public StoredEd25519Key storeKey(@NonNull final ResolvedEd25519Key resolvedEd25519Key) {

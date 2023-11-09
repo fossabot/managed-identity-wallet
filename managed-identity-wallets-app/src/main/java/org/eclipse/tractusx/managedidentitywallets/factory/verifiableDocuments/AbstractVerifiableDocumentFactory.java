@@ -50,6 +50,7 @@ import java.net.URI;
 import java.time.Instant;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public abstract class AbstractVerifiableDocumentFactory {
@@ -93,19 +94,22 @@ public abstract class AbstractVerifiableDocumentFactory {
         return builder.proof(proof).build();
     }
 
-    protected Proof generateProof(Wallet issuerWallet, Verifiable verifiable) throws Ed25519KeyNotFoundException, UnsupportedSignatureTypeException, InvalidePrivateKeyFormat {
+    protected Proof generateProof(Wallet issuerWallet, Verifiable verifiable) throws UnsupportedSignatureTypeException, InvalidePrivateKeyFormat {
         if (issuerWallet.getStoredEd25519Keys().isEmpty()) {
             throw new RuntimeException("No key found for wallet " + issuerWallet.getWalletId());
         }
 
         final Did issuerDid = didFactory.generateDid(issuerWallet);
 
-        final StoredEd25519Key key = issuerWallet.getStoredEd25519Keys()
-                .stream().max(Comparator.comparing(StoredEd25519Key::getCreatedAt))
+        final ResolvedEd25519Key key = issuerWallet.getStoredEd25519Keys()
+                .stream()
+                .max(Comparator.comparing(StoredEd25519Key::getCreatedAt))
+                .map(vaultService::resolveKey)
+                .filter(Optional::isPresent)
+                .map(Optional::get)
                 .orElseThrow();
-        final ResolvedEd25519Key resolvedEd25519Key = vaultService.resolveKey(key);
-        final x21559PrivateKey privateKey = new x21559PrivateKey(resolvedEd25519Key.getPrivateKey());
 
+        final x21559PrivateKey privateKey = new x21559PrivateKey(key.getPrivateKey());
         final URI verificationMethod = URI.create(issuerDid + "#" + key.getDidFragment());
         final LinkedDataProofGenerator generator = LinkedDataProofGenerator.newInstance(SignatureType.JWS);
 

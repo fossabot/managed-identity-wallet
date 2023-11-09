@@ -25,6 +25,8 @@ package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.commands.admin.CreateWalletApiProcessor;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.commands.admin.DeleteWalletApiProcessor;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.map.VerifiableCredentialsMapper;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.map.WalletsApiMapper;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
@@ -41,8 +43,6 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.time.OffsetDateTime;
-import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -60,44 +60,17 @@ public class AdministratorApiDelegateImpl implements AdministratorApiDelegate {
     private final VerifiableCredentialService verifiableCredentialService;
     private final VerifiableCredentialsMapper verifiableCredentialsMapper;
 
+    private final CreateWalletApiProcessor createWalletApiProcessor;
+    private final DeleteWalletApiProcessor deleteWalletApiProcessor;
+
     @Override
     public ResponseEntity<CreateWalletResponsePayloadV2> adminCreateWallet(@NonNull CreateWalletRequestPayloadV2 createWalletRequestPayloadV2) {
-        if (log.isDebugEnabled()) {
-            log.debug("createWallet(wallet={})", createWalletRequestPayloadV2);
-        }
-
-        // set non-nullable fields
-        createWalletRequestPayloadV2.setCreated(OffsetDateTime.now());
-        if (createWalletRequestPayloadV2.getKeys() == null) {
-            createWalletRequestPayloadV2.setKeys(Collections.emptyList());
-        }
-
-        final Wallet wallet = apiMapper.mapCreateWalletResponsePayloadV2(createWalletRequestPayloadV2);
-
-        walletService.create(wallet);
-        final Optional<Wallet> createdWallet = walletService.findById(wallet.getWalletId());
-        if (createdWallet.isPresent()) {
-            final CreateWalletResponsePayloadV2 response = apiMapper.mapCreateWalletResponsePayloadV2(createdWallet.get());
-            final URI location = ServletUriComponentsBuilder
-                    .fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(wallet.getWalletId().getText())
-                    .toUri();
-            return ResponseEntity.created(location).body(response);
-        } else {
-            log.error("Wallet {} was not created", wallet.getWalletId());
-            return ResponseEntity.internalServerError().build();
-        }
+        return createWalletApiProcessor.execute(createWalletRequestPayloadV2);
     }
 
     @Override
     public ResponseEntity<Void> adminDeleteWalletById(@NonNull String walletId) {
-        if (log.isDebugEnabled()) {
-            log.debug("deleteWalletById(walletId={})", walletId);
-        }
-
-        walletService.findById(new WalletId(walletId)).ifPresent(walletService::delete);
-        return ResponseEntity.noContent().build();
+        return deleteWalletApiProcessor.execute(walletId);
     }
 
     @Override

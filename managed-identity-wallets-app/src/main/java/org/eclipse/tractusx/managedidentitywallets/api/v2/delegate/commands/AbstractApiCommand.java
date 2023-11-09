@@ -19,18 +19,15 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.exception;
+package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.commands;
 
-import lombok.Getter;
-import org.eclipse.tractusx.managedidentitywallets.models.Ed25519KeyId;
+import lombok.extern.slf4j.Slf4j;
 
-public class Ed25519KeyNotFoundException extends Exception {
-    @Getter
-    private final Ed25519KeyId keyId;
-
-
-    public Ed25519KeyNotFoundException(Ed25519KeyId keyId) {
-        super("Key not found: " + keyId);
-        this.keyId = keyId;
+@Slf4j
+public class AbstractApiCommand {
+    protected void logInvocationIfDebug(String string, Object arg) {
+        if (log.isDebugEnabled()) {
+            log.debug(string, arg);
+        }
     }
 }

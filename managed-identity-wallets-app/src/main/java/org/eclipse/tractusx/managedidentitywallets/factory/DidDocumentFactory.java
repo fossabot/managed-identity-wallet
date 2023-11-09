@@ -23,6 +23,7 @@ package org.eclipse.tractusx.managedidentitywallets.factory;
 
 import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
+import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
@@ -41,9 +42,11 @@ import org.springframework.stereotype.Component;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @RequiredArgsConstructor
 @Component
+@Slf4j
 public class DidDocumentFactory {
 
     private final DidFactory didFactory;
@@ -67,11 +70,16 @@ public class DidDocumentFactory {
 
         for (var key : wallet.getStoredEd25519Keys()) {
 
-            final ResolvedEd25519Key resolvedEd25519Key = vaultService.resolveKey(key);
-            final byte[] privateKey = resolvedEd25519Key.getPrivateKey();
+            final Optional<ResolvedEd25519Key> resolvedEd25519Key = vaultService.resolveKey(key);
+            if (resolvedEd25519Key.isEmpty()) {
+                log.warn("Key {} not found in vault. WalletId={}", key, wallet.getWalletId());
+                continue;
+            }
+
+            final byte[] privateKey = resolvedEd25519Key.get().getPrivateKey();
             final IPrivateKey x21559PrivateKey = new x21559PrivateKey(privateKey);
 
-            final byte[] publicKey = resolvedEd25519Key.getPublicKey();
+            final byte[] publicKey = resolvedEd25519Key.get().getPublicKey();
             final IPublicKey x21559PublicKey = new x21559PublicKey(publicKey);
 
             final String keyId = key.getDidFragment().getText();

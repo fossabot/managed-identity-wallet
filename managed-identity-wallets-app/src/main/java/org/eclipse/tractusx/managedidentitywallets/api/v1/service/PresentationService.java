@@ -31,7 +31,6 @@ import org.eclipse.tractusx.managedidentitywallets.api.v1.entity.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.BadDataException;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.utils.Validate;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
-import org.eclipse.tractusx.managedidentitywallets.exception.Ed25519KeyNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
 import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
@@ -90,7 +89,7 @@ public class PresentationService {
      * @param callerBpn the caller bpn
      * @return the map
      */
-    @SneakyThrows({InvalidePrivateKeyFormat.class, Ed25519KeyNotFoundException.class})
+    @SneakyThrows({InvalidePrivateKeyFormat.class})
     public Map<String, Object> createPresentation(Map<String, Object> data, boolean asJwt, String audience, String callerBpn) {
         List<Map<String, Object>> verifiableCredentialList = (List<Map<String, Object>>) data.get(StringPool.VERIFIABLE_CREDENTIALS);
 
@@ -119,7 +118,7 @@ public class PresentationService {
 
             final org.eclipse.tractusx.managedidentitywallets.models.Wallet domainWallet = walletService.findById(new WalletId(callerBpn)).orElseThrow();
             final StoredEd25519Key latestKey = domainWallet.getStoredEd25519Keys().stream().max(Comparator.comparing(org.eclipse.tractusx.managedidentitywallets.models.Ed25519Key::getCreatedAt)).orElseThrow();
-            final ResolvedEd25519Key resolvedEd25519Key = vaultService.resolveKey(latestKey);
+            final ResolvedEd25519Key resolvedEd25519Key = vaultService.resolveKey(latestKey).orElseThrow();
 
             x21559PrivateKey privateKey = new x21559PrivateKey(resolvedEd25519Key.getPrivateKey());
             SignedJWT presentation = presentationFactory.createPresentation(vpIssuerDid

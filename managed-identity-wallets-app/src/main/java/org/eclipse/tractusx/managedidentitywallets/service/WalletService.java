@@ -24,6 +24,7 @@ package org.eclipse.tractusx.managedidentitywallets.service;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.annotations.IsKeysExist;
 import org.eclipse.tractusx.managedidentitywallets.event.*;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
@@ -88,13 +89,13 @@ public class WalletService {
         return walletRepository.findAll(query, pageable);
     }
 
-    public void create(@NonNull Wallet wallet) {
+    public void create(@NonNull @IsKeysExist Wallet wallet) {
         walletRepository.create(wallet);
         applicationEventPublisher.publishEvent(new WalletCreatingEvent(wallet));
         afterCommit(() -> applicationEventPublisher.publishEvent(new WalletCreatedEvent(wallet)));
     }
 
-    public void update(@NonNull Wallet wallet) {
+    public void update(@NonNull @IsKeysExist Wallet wallet) {
         walletRepository.update(wallet);
         applicationEventPublisher.publishEvent(new WalletUpdatingEvent(wallet));
         afterCommit(() -> applicationEventPublisher.publishEvent(new WalletUpdatedEvent(wallet)));

@@ -19,28 +19,26 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.service;
+package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.commands.admin;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
-import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
-import org.eclipse.tractusx.managedidentitywallets.repository.VaultRepository;
-import org.springframework.stereotype.Service;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.commands.AbstractApiCommand;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
-@Service
 @RequiredArgsConstructor
-public class VaultService {
+@Component
+public class DeleteWalletApiProcessor extends AbstractApiCommand {
 
-    private final VaultRepository vaultRepository;
+    private final WalletService walletService;
 
-    public Optional<ResolvedEd25519Key> resolveKey(@NonNull final StoredEd25519Key storedEd25519Key) {
-        return vaultRepository.resolveKey(storedEd25519Key);
-    }
+    public ResponseEntity<Void> execute(@NonNull String walletId) {
+        logInvocationIfDebug("deleteWalletById(walletId={})", walletId);
 
-    public StoredEd25519Key storeKey(@NonNull final ResolvedEd25519Key resolvedEd25519Key) {
-        return vaultRepository.storeKey(resolvedEd25519Key);
+        walletService.findById(new WalletId(walletId)).ifPresent(walletService::delete);
+        return ResponseEntity.noContent().build();
     }
 }
