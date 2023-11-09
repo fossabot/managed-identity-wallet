@@ -45,7 +45,7 @@ import static org.hamcrest.Matchers.equalTo;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {ManagedIdentityWalletsApplication.class})
 @ContextConfiguration(initializers = {TestContextInitializer.class})
-public class AdministratorApiDelegateImplTest extends MiwIntegrationTest {
+public class AdminApiDelegateImplTest extends MiwIntegrationTest {
 
     @Autowired
     private WalletRepository walletRepository;
@@ -59,7 +59,6 @@ public class AdministratorApiDelegateImplTest extends MiwIntegrationTest {
         final CreateWalletRequestPayloadV2 payload = new CreateWalletRequestPayloadV2();
         payload.id(UUID.randomUUID().toString());
         payload.name("foo");
-        payload.description("bar");
 
         given()
                 .contentType("application/json")
@@ -89,7 +88,6 @@ public class AdministratorApiDelegateImplTest extends MiwIntegrationTest {
         final UpdateWalletRequestPayloadV2 payload = new UpdateWalletRequestPayloadV2();
         payload.id(wallet.getWalletId().getText());
         payload.name("foo");
-        payload.description("bar");
 
         given()
                 .contentType("application/json")

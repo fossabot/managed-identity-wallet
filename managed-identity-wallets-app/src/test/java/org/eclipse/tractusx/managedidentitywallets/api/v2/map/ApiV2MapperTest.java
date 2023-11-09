@@ -27,9 +27,9 @@ import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
-public class WalletsApiMapperTest {
+public class ApiV2MapperTest {
 
-    private final WalletsApiMapper walletsApiMapper = new WalletsApiMapperImpl();
+    private final ApiV2Mapper apiV2Mapper = new ApiV2MapperImpl();
 
     @Test
     public void testMapper() {
@@ -40,7 +40,7 @@ public class WalletsApiMapperTest {
                 .walletName(walletName)
                 .build();
 
-        final Wallet mappedWallet = walletsApiMapper.mapWallet(walletsApiMapper.mapWalletV2(originalWallet));
+        final Wallet mappedWallet = apiV2Mapper.mapWallet(apiV2Mapper.mapWalletV2(originalWallet));
 
         Assertions.assertEquals(mappedWallet.getWalletId(), walletId, "WalletId should be the same");
         Assertions.assertEquals(mappedWallet.getWalletName(), walletName, "WalletName should be the same");

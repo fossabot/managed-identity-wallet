@@ -19,12 +19,12 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.commands.admin;
+package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.commands.AbstractApiCommand;
-import org.eclipse.tractusx.managedidentitywallets.api.v2.map.WalletsApiMapper;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiCommand;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.map.ApiV2Mapper;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.CreateWalletRequestPayloadV2;
@@ -34,16 +34,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
-import java.time.OffsetDateTime;
-import java.util.Collections;
 import java.util.Optional;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
-public class CreateWalletApiProcessor extends AbstractApiCommand {
+class PostWalletApiProcessor extends AbstractApiCommand {
 
-    private final WalletsApiMapper apiMapper;
+    private final ApiV2Mapper apiMapper;
     private final WalletService walletService;
 
     public ResponseEntity<CreateWalletResponsePayloadV2> execute(CreateWalletRequestPayloadV2 request) {

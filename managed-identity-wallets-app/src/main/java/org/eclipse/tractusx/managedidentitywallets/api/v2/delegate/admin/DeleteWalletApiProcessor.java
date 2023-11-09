@@ -19,15 +19,26 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.commands;
+package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
 
-import lombok.extern.slf4j.Slf4j;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiCommand;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Component;
 
-@Slf4j
-public class AbstractApiCommand {
-    protected void logInvocationIfDebug(String string, Object arg) {
-        if (log.isDebugEnabled()) {
-            log.debug(string, arg);
-        }
+@RequiredArgsConstructor
+@Component
+class DeleteWalletApiProcessor extends AbstractApiCommand {
+
+    private final WalletService walletService;
+
+    public ResponseEntity<Void> execute(@NonNull String walletId) {
+        logInvocationIfDebug("deleteWalletById(walletId={})", walletId);
+
+        walletService.findById(new WalletId(walletId)).ifPresent(walletService::delete);
+        return ResponseEntity.noContent().build();
     }
 }

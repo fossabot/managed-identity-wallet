@@ -25,7 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.MIWVerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
-import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialStoredInWalletEvent;
+import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialStoringInWalletEvent;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
@@ -43,7 +43,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @Service
 @Slf4j
-public class VerifiableCredentialStoredInWalletEventEventListener {
+public class VerifiableCredentialStoringInWalletEventEventListener {
 
     private final WalletService walletService;
     private final MIWSettings miwSettings;
@@ -52,7 +52,7 @@ public class VerifiableCredentialStoredInWalletEventEventListener {
 
     @EventListener
     @Transactional
-    public void updateSummaryVerifiableCredential(VerifiableCredentialStoredInWalletEvent event) {
+    public void updateSummaryVerifiableCredential(VerifiableCredentialStoringInWalletEvent event) {
 
         final Wallet wallet = event.getWallet();
         final VerifiableCredential verifiableCredential = event.getVerifiableCredential();

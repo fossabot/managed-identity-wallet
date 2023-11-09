@@ -19,12 +19,12 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate;
+package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.user;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.managedidentitywallets.api.v2.map.WalletsApiMapper;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.map.ApiV2Mapper;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
@@ -62,7 +62,7 @@ public class UserApiDelegateImpl implements UserApiDelegate {
     private final VerifiableCredentialService verifiableCredentialService;
     private final ValidationService validationService;
     private final WalletService walletService;
-    private final WalletsApiMapper apiMapper;
+    private final ApiV2Mapper apiMapper;
     private final MIWSettings miwSettings;
     private final GenericVerifiableCredentialFactory genericVerifiableCredentialFactory;
     private final VerifiablePresentationFactory verifiablePresentationFactory;

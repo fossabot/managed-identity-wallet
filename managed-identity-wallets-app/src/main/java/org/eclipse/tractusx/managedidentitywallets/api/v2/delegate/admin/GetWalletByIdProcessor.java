@@ -19,26 +19,38 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.commands.admin;
+package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.commands.AbstractApiCommand;
+import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiCommand;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.map.ApiV2Mapper;
+import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
+import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.WalletResponsePayloadV2;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-@RequiredArgsConstructor
-@Component
-public class DeleteWalletApiProcessor extends AbstractApiCommand {
+import java.util.Optional;
 
+@Component
+@Slf4j
+@RequiredArgsConstructor
+class GetWalletByIdProcessor extends AbstractApiCommand {
+
+    private final ApiV2Mapper apiMapper;
     private final WalletService walletService;
 
-    public ResponseEntity<Void> execute(@NonNull String walletId) {
-        logInvocationIfDebug("deleteWalletById(walletId={})", walletId);
+    public ResponseEntity<WalletResponsePayloadV2> execute(@NonNull String walletId) {
+        logInvocationIfDebug("getWalletById(walletId={})", walletId);
 
-        walletService.findById(new WalletId(walletId)).ifPresent(walletService::delete);
-        return ResponseEntity.noContent().build();
+        final Optional<Wallet> wallet = walletService.findById(new WalletId(walletId));
+        if (wallet.isPresent()) {
+            final WalletResponsePayloadV2 payloadV2 = apiMapper.mapWalletResponsePayloadV2(wallet.get());
+            return ResponseEntity.ok(payloadV2);
+        }
+        return ResponseEntity.notFound().build();
     }
 }

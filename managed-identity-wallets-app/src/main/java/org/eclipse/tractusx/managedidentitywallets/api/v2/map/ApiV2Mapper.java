@@ -33,7 +33,7 @@ import org.mapstruct.ValueMapping;
 import org.springframework.data.domain.Page;
 
 @Mapper(componentModel = "spring")
-public interface WalletsApiMapper {
+public interface ApiV2Mapper {
 
     @ValueMapping(target = "INCORRECT_JSON_LD_FORMAT", source = "INVALID_JSONLD_FORMAT")
     @ValueMapping(target = "INCORRECT_SIGNATURE", source = "INVALID_SIGNATURE")

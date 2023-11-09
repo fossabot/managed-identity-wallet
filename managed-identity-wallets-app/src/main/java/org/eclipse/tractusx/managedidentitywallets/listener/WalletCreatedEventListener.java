@@ -24,6 +24,7 @@ package org.eclipse.tractusx.managedidentitywallets.listener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.event.WalletCreatedEvent;
+import org.eclipse.tractusx.managedidentitywallets.event.WalletCreatingEvent;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
@@ -49,7 +50,7 @@ public class WalletCreatedEventListener {
     private final VaultService vaultService;
 
     @EventListener
-    public void generateEd25519Key(WalletCreatedEvent event) {
+    public void generateEd25519Key(WalletCreatingEvent event) {
 
         final Wallet wallet = event.getWallet();
         final WalletId walletId = event.getWallet().getWalletId();
