@@ -27,14 +27,14 @@ import java.util.List;
 
 @Getter
 @EqualsAndHashCode
-@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
+@RequiredArgsConstructor
 public class VerifiablePresentationValidationResultViolation {
 
     @NonNull
-    private final VerifiablePresentationId verifiableCredentialId;
+    private final VerifiablePresentationId verifiablePresentationId;
 
     @NonNull
-    private final List<Type> types;
+    private final List<VerifiablePresentationValidationResultViolation.Type> types;
 
     public enum Type {
         INVALID_JSONLD_FORMAT,

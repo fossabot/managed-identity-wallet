@@ -41,7 +41,6 @@ public class VerifiablePresentationValidationResult {
     @NonNull
     private final List<VerifiablePresentationValidationResultViolation> verifiablePresentationViolations;
 
-
     public List<VerifiableCredentialValidationResultViolation> getVerifiableCredentialViolations() {
         return Collections.unmodifiableList(verifiableCredentialViolations);
     }
