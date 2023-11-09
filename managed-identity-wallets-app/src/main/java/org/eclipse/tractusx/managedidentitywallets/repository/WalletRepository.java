@@ -113,6 +113,7 @@ public class WalletRepository {
         final List<Ed25519KeyEntity> ed25519KeyEntities = new ArrayList<>();
         for (final StoredEd25519Key storedEd25519Key : wallet.getStoredEd25519Keys()) {
             // keep keys that are already in db or generate new ones
+            // it should not be possible to update the key itself
             walletEntity.getEd25519Keys().stream().filter(
                             k -> k.getId().equals(storedEd25519Key.getId().getText())
                     ).findFirst()
