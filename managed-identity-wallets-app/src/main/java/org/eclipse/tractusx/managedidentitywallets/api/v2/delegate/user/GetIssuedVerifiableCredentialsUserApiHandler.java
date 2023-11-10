@@ -19,20 +19,20 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
+package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiCommand;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.map.ApiV2Mapper;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
-import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
+import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.VerifiableCredentialListResponsePayloadV2;
+import org.eclipse.tractusx.ssi.lib.model.did.Did;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
@@ -44,30 +44,36 @@ import java.util.Optional;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-class GetVerifiableCredentialsProcessor extends AbstractApiCommand {
+class GetIssuedVerifiableCredentialsUserApiHandler extends AbstractApiCommand {
 
     private final VerifiableCredentialService verifiableCredentialService;
+
     private final MIWSettings miwSettings;
+    private final DidFactory didFactory;
     private final ApiV2Mapper apiMapper;
 
-    public ResponseEntity<VerifiableCredentialListResponsePayloadV2> execute
-            (Integer page, Integer perPage, String id, String type, String issuer, String holder) {
-
-        logInvocationIfDebug("getWallets(page={}, perPage={})", page, perPage);
+    public ResponseEntity<VerifiableCredentialListResponsePayloadV2> execute(Integer page, Integer perPage, String type) {
+        logInvocationIfDebug("userGetIssuedVerifiableCredentials(walletId={}, page={}, perPage={}, type={})", TMP_WALLET_ID, page, perPage, type);
 
         page = Optional.ofNullable(page).orElse(0);
         perPage = Optional.ofNullable(perPage).orElse(miwSettings.getApiDefaultPageSize());
 
-        final VerifiableCredentialQuery.VerifiableCredentialQueryBuilder builder = VerifiableCredentialQuery.builder();
-        Optional.ofNullable(issuer).map(VerifiableCredentialIssuer::new).ifPresent(builder::verifiableCredentialIssuer);
-        Optional.ofNullable(id).map(VerifiableCredentialId::new).ifPresent(builder::verifiableCredentialId);
-        Optional.ofNullable(type).map(VerifiableCredentialType::new).map(List::of).ifPresent(builder::verifiableCredentialTypes);
-        Optional.ofNullable(holder).map(WalletId::new).ifPresent(builder::holderWalletId);
+        final List<VerifiableCredentialType> verifiableCredentialType = Optional.ofNullable(type)
+                .map(VerifiableCredentialType::new)
+                .stream().toList();
 
-        final Page<VerifiableCredential> verifiableCredentials = verifiableCredentialService.findAll(builder.build(), page, perPage);
-        final VerifiableCredentialListResponsePayloadV2 payload = apiMapper.mapVerifiableCredentialListResponsePayloadV2(verifiableCredentials);
+        final Did issuerDid = didFactory.generateDid(TMP_WALLET_ID);
+        final VerifiableCredentialIssuer verifiableCredentialIssuer = new VerifiableCredentialIssuer(issuerDid.toString());
+        final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
+                .verifiableCredentialTypes(verifiableCredentialType)
+                .verifiableCredentialIssuer(verifiableCredentialIssuer)
+                .build();
 
-        return ResponseEntity.ok(payload);
+        final Page<VerifiableCredential> verifiableCredentialPage = verifiableCredentialService.findAll(verifiableCredentialQuery, page, perPage);
+
+        final VerifiableCredentialListResponsePayloadV2 response = apiMapper.mapVerifiableCredentialListResponsePayloadV2(verifiableCredentialPage);
+        return ResponseEntity.ok(response);
     }
+
 
 }

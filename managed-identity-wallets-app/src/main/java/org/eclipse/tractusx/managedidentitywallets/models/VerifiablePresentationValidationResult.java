@@ -39,13 +39,20 @@ public class VerifiablePresentationValidationResult {
 
     @Singular
     @NonNull
-    private final List<VerifiablePresentationValidationResultViolation> verifiablePresentationViolations;
+    private final List<VerifiablePresentationValidationResult.Type> verifiablePresentationViolations;
+
+    public enum Type {
+        INVALID_JSONLD_FORMAT,
+        INVALID_SIGNATURE,
+        EXPIRED
+    }
+
 
     public List<VerifiableCredentialValidationResultViolation> getVerifiableCredentialViolations() {
         return Collections.unmodifiableList(verifiableCredentialViolations);
     }
 
-    public List<VerifiablePresentationValidationResultViolation> getVerifiablePresentationViolations() {
+    public List<VerifiablePresentationValidationResult.Type> getVerifiablePresentationViolations() {
         return Collections.unmodifiableList(verifiablePresentationViolations);
     }
 }

@@ -40,6 +40,7 @@ import java.util.Map;
 @Slf4j
 @ControllerAdvice(basePackageClasses = {AdministratorApi.class})
 public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
+
     @ExceptionHandler(value = {WalletNotFoundException.class})
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     @ResponseBody
@@ -84,7 +85,6 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(409).body(createMessage(ex.getMessage()));
     }
 
-
     @ExceptionHandler(value = {VerifiableCredentialAlreadyStoredInWalletException.class})
     @ResponseStatus(value = HttpStatus.CONFLICT)
     @ResponseBody
@@ -96,43 +96,15 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(409).body(createMessage(ex.getMessage()));
     }
 
-    @ExceptionHandler(value = {ConstraintViolationException.class})
-    @ResponseStatus(value = HttpStatus.BAD_REQUEST)
-    @ResponseBody
-    public ResponseEntity<Object> handleValidationFailure(ConstraintViolationException ex) {
-        if (log.isDebugEnabled()) {
-            log.debug("ConstraintViolationException: {}", ex.getMessage(), ex);
-        }
-
-        StringBuilder messages = new StringBuilder();
-
-        for (ConstraintViolation<?> violation : ex.getConstraintViolations()) {
-            if (!messages.isEmpty()) {
-                messages.append(", ");
-            }
-            messages.append(violation.getMessage());
-        }
-
-        return ResponseEntity.badRequest().body(createMessage(messages.toString()));
-    }
-
-
     @ExceptionHandler(value = {IllegalArgumentException.class})
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
-        // if invalid json ld objects are passed through the API this method is thrown.
-        if (ex.getMessage().startsWith("Invalid JsonLdObject")) {
-            if (log.isDebugEnabled()) {
-                log.debug("IllegalArgumentException (json-ld): {}", ex.getMessage(), ex);
-            }
-            return ResponseEntity.badRequest().body(createMessage("invalid json-ld object"));
-        } else {
-            log.error("IllegalArgumentException: {}", ex.getMessage(), ex);
-            return ResponseEntity.internalServerError().body("internal server error");
+        if (log.isDebugEnabled()) {
+            log.debug("IllegalArgumentException: {}", ex.getMessage(), ex);
         }
+        return ResponseEntity.badRequest().body(createMessage(ex.getMessage()));
     }
-
 
     @ExceptionHandler(value = {UnexpectedRollbackException.class})
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
@@ -143,9 +115,7 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(409).body(createMessage(ex.getMessage()));
     }
 
-
     private static Object createMessage(String message) {
         return Map.of("message", message);
     }
-
 }

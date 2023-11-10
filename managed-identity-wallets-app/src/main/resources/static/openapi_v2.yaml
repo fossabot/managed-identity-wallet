@@ -744,19 +744,11 @@ components:
         violations:
           type: array
           items:
-            type: object
-            properties:
-              id:
-                type: string
-                description: ID
-              type:
-                type: array
-                items:
-                  type: string
-                  enum:
-                    - incorrect_json_ld_format
-                    - incorrect_signature
-                    - expired
+            type: string
+            enum:
+              - incorrect_json_ld_format
+              - incorrect_signature
+              - expired
     ValidateVerifiableCredentialResponsePayload:
       description: Verifiable Credential Validation Response
       allOf:

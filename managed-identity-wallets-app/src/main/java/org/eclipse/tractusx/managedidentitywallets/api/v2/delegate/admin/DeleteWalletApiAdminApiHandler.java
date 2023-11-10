@@ -21,37 +21,24 @@
 
 package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiCommand;
-import org.eclipse.tractusx.managedidentitywallets.api.v2.map.ApiV2Mapper;
-import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
-import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
-import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.ListWalletsResponsePayloadV2;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
-import java.util.Optional;
-
-@Component
-@Slf4j
 @RequiredArgsConstructor
-class GetWalletsProcessor extends AbstractApiCommand {
+@Component
+class DeleteWalletApiAdminApiHandler extends AbstractApiCommand {
 
-    private final ApiV2Mapper apiMapper;
     private final WalletService walletService;
-    private final MIWSettings miwSettings;
 
-    public ResponseEntity<ListWalletsResponsePayloadV2> execute(Integer page, Integer perPage) {
-        logInvocationIfDebug("getWallets(page={}, perPage={})", page, perPage);
+    public ResponseEntity<Void> execute(@NonNull String walletId) {
+        logInvocationIfDebug("deleteWalletById(walletId={})", walletId);
 
-        page = Optional.ofNullable(page).orElse(0);
-        perPage = Optional.ofNullable(perPage).orElse(miwSettings.getApiDefaultPageSize());
-
-        final Page<Wallet> wallets = walletService.findAll(page, perPage);
-        final ListWalletsResponsePayloadV2 response = apiMapper.mapListWalletsResponsePayloadV2(wallets);
-        return ResponseEntity.ok(response);
+        walletService.findById(new WalletId(walletId)).ifPresent(walletService::delete);
+        return ResponseEntity.noContent().build();
     }
 }

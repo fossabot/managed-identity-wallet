@@ -39,17 +39,34 @@ import java.util.Optional;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-class GetVerifiableCredentialByIdProcessor extends AbstractApiCommand {
+class PostVerifiableCredentialAdminApiHandler extends AbstractApiCommand {
 
+    private final VerifiableCredentialsMapper verifiableCredentialsMapper;
     private final VerifiableCredentialService verifiableCredentialService;
 
-    public ResponseEntity<Map<String, Object>> execute(String verifiableCredentialId) {
-        logInvocationIfDebug("deleteVerifiableCredentialById(verifiableCredentialId={})", verifiableCredentialId);
+    public ResponseEntity<Map<String, Object>> execute(Map<String, Object> requestBody) {
+        logInvocationIfDebug("createVerifiableCredential(requestBody={})", requestBody);
 
-        final Optional<VerifiableCredential> wallet = verifiableCredentialService.findById(new VerifiableCredentialId(verifiableCredentialId));
-        return wallet
-                .<ResponseEntity<Map<String, Object>>>map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+        if (!verifiableCredentialsMapper.isVerifiableCredential(requestBody)) {
+            return ResponseEntity.badRequest().build();
+        }
+
+        final VerifiableCredential verifiableCredential = verifiableCredentialsMapper.map(requestBody);
+        verifiableCredentialService.create(verifiableCredential);
+
+        final VerifiableCredentialId verifiableCredentialId = new VerifiableCredentialId(verifiableCredential.getId().toString());
+        final Optional<VerifiableCredential> createdVerifiableCredential = verifiableCredentialService.findById(verifiableCredentialId);
+        if (createdVerifiableCredential.isPresent()) {
+            final URI location = ServletUriComponentsBuilder
+                    .fromCurrentRequest()
+                    .path("/{id}")
+                    .buildAndExpand(verifiableCredentialId.getText())
+                    .toUri();
+            return ResponseEntity.created(location).body(createdVerifiableCredential.get());
+        } else {
+            log.error("Verifiable Credential {} was not created", verifiableCredential.getId());
+            return ResponseEntity.internalServerError().build();
+        }
     }
 
 }

@@ -41,7 +41,7 @@ import java.util.Optional;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-class PutWalletProcessor extends AbstractApiCommand {
+class PutWalletAdminApiHandler extends AbstractApiCommand {
 
     private final ApiV2Mapper apiMapper;
     private final WalletService walletService;

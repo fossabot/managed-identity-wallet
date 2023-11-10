@@ -37,60 +37,59 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AdminApiDelegateImpl implements AdministratorApiDelegate {
 
-    private final PostWalletApiProcessor postWalletApiProcessor;
-    private final DeleteWalletApiProcessor deleteWalletApiProcessor;
-    private final GetWalletByIdProcessor getWalletByIdProcessor;
-    private final GetWalletsProcessor getWalletsProcessor;
-    private final PutWalletProcessor putWalletProcessor;
-    private final PostVerifiableCredentialProcessor postVerifiableCredentialProcessor;
-    private final GetVerifiableCredentialByIdProcessor getVerifiableCredentialByIdProcessor;
-    private final DeleteVerifiableCredentialByIdProcessor deleteVerifiableCredentialByIdProcessor;
-    private final GetVerifiableCredentialsProcessor getVerifiableCredentialsProcessor;
+    private final PostWalletApiAdminApiHandler postWalletApiCommand;
+    private final DeleteWalletApiAdminApiHandler deleteWalletApiAdminApiHandler;
+    private final GetWalletByIdAdminApiHandler getWalletByIdAdminApiHandler;
+    private final GetWalletsAdminApiHandler getWalletsAdminApiHandler;
+    private final PutWalletAdminApiHandler putWalletAdminApiHandler;
+    private final PostVerifiableCredentialAdminApiHandler postVerifiableCredentialAdminApiHandler;
+    private final GetVerifiableCredentialByIdAdminApiHandler getVerifiableCredentialByIdAdminApiHandler;
+    private final DeleteVerifiableCredentialByIdAdminApiHandler deleteVerifiableCredentialByIdAdminApiHandler;
+    private final GetVerifiableCredentialsAdminApiHandler getVerifiableCredentialsAdminApiHandler;
 
     @Override
     public ResponseEntity<CreateWalletResponsePayloadV2> adminCreateWallet(@NonNull CreateWalletRequestPayloadV2 createWalletRequestPayloadV2) {
-        return postWalletApiProcessor.execute(createWalletRequestPayloadV2);
+        return postWalletApiCommand.execute(createWalletRequestPayloadV2);
     }
 
     @Override
     public ResponseEntity<Void> adminDeleteWalletById(@NonNull String walletId) {
-        return deleteWalletApiProcessor.execute(walletId);
+        return deleteWalletApiAdminApiHandler.execute(walletId);
     }
 
     @Override
     public ResponseEntity<WalletResponsePayloadV2> adminGetWalletById(@NonNull String walletId) {
-        return getWalletByIdProcessor.execute(walletId);
+        return getWalletByIdAdminApiHandler.execute(walletId);
     }
 
     @Override
     public ResponseEntity<ListWalletsResponsePayloadV2> adminGetWallets(Integer page, Integer perPage) {
-        return getWalletsProcessor.execute(page, perPage);
+        return getWalletsAdminApiHandler.execute(page, perPage);
     }
 
     @Override
     public ResponseEntity<UpdateWalletResponsePayloadV2> adminUpdateWallet(@NonNull UpdateWalletRequestPayloadV2 updateWalletRequestPayloadV2) {
-        return putWalletProcessor.execute(updateWalletRequestPayloadV2);
+        return putWalletAdminApiHandler.execute(updateWalletRequestPayloadV2);
     }
 
     @Override
     public ResponseEntity<Map<String, Object>> adminCreateVerifiableCredential(Map<String, Object> requestBody) {
-        return postVerifiableCredentialProcessor.execute(requestBody);
+        return postVerifiableCredentialAdminApiHandler.execute(requestBody);
     }
 
     @Override
     public ResponseEntity<Map<String, Object>> adminGetVerifiableCredentialById(String verifiableCredentialId) {
-        return getVerifiableCredentialByIdProcessor.execute(verifiableCredentialId);
+        return getVerifiableCredentialByIdAdminApiHandler.execute(verifiableCredentialId);
     }
 
     @Override
     public ResponseEntity<Void> adminDeleteVerifiableCredentialById(String verifiableCredentialId) {
-        return deleteVerifiableCredentialByIdProcessor.execute(verifiableCredentialId);
+        return deleteVerifiableCredentialByIdAdminApiHandler.execute(verifiableCredentialId);
     }
 
     @Override
     public ResponseEntity<VerifiableCredentialListResponsePayloadV2> adminGetVerifiableCredentials
             (Integer page, Integer perPage, String id, String type, String issuer, String holder) {
-
-        return getVerifiableCredentialsProcessor.execute(page, perPage, id, type, issuer, holder);
+        return getVerifiableCredentialsAdminApiHandler.execute(page, perPage, id, type, issuer, holder);
     }
 }

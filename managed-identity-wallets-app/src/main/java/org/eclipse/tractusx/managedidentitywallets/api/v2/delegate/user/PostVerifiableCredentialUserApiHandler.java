@@ -19,14 +19,16 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
+package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiCommand;
-import org.eclipse.tractusx.managedidentitywallets.api.v2.map.VerifiableCredentialsMapper;
+import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
+import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
+import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -39,34 +41,40 @@ import java.util.Optional;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-class PostVerifiableCredentialProcessor extends AbstractApiCommand {
+class PostVerifiableCredentialUserApiHandler extends AbstractApiCommand {
 
-    private final VerifiableCredentialsMapper verifiableCredentialsMapper;
+    private final WalletService walletService;
     private final VerifiableCredentialService verifiableCredentialService;
 
-    public ResponseEntity<Map<String, Object>> execute(Map<String, Object> requestBody) {
-        logInvocationIfDebug("createVerifiableCredential(requestBody={})", requestBody);
+    public ResponseEntity<Map<String, Object>> execute(Map<String, Object> payload) {
+        logInvocationIfDebug("userCreateVerifiableCredential(payload={})", payload);
 
-        if (!verifiableCredentialsMapper.isVerifiableCredential(requestBody)) {
+        final Optional<VerifiableCredential> verifiableCredentialOptional = readVerifiableCredentialArg(payload);
+        if (verifiableCredentialOptional.isEmpty()) {
             return ResponseEntity.badRequest().build();
         }
+        final VerifiableCredential verifiableCredential = verifiableCredentialOptional.get();
 
-        final VerifiableCredential verifiableCredential = verifiableCredentialsMapper.map(requestBody);
-        verifiableCredentialService.create(verifiableCredential);
+        final Wallet wallet = walletService.findById(TMP_WALLET_ID)
+                .orElseThrow(() -> new WalletNotFoundException(TMP_WALLET_ID));
 
         final VerifiableCredentialId verifiableCredentialId = new VerifiableCredentialId(verifiableCredential.getId().toString());
-        final Optional<VerifiableCredential> createdVerifiableCredential = verifiableCredentialService.findById(verifiableCredentialId);
-        if (createdVerifiableCredential.isPresent()) {
-            final URI location = ServletUriComponentsBuilder
-                    .fromCurrentRequest()
-                    .path("/{id}")
-                    .buildAndExpand(verifiableCredentialId.getText())
-                    .toUri();
-            return ResponseEntity.created(location).body(createdVerifiableCredential.get());
-        } else {
-            log.error("Verifiable Credential {} was not created", verifiableCredential.getId());
-            return ResponseEntity.internalServerError().build();
+        if (!verifiableCredentialService.existsById(verifiableCredentialId)) {
+            verifiableCredentialService.create(verifiableCredential);
         }
+
+        walletService.storeVerifiableCredential(wallet, verifiableCredential);
+
+        final VerifiableCredential storedVerifiableCredential =
+                verifiableCredentialService.findById(verifiableCredentialId)
+                        .orElseThrow();
+        final URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(storedVerifiableCredential.getId().toString())
+                .toUri();
+
+        return ResponseEntity.created(location).body(storedVerifiableCredential);
     }
 
 }

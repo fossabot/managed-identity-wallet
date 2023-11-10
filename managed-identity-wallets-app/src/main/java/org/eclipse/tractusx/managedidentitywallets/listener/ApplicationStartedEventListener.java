@@ -77,6 +77,9 @@ public class ApplicationStartedEventListener {
     @SneakyThrows
     @Order(10) // resources should be loaded before the authority wallet is created
     public void registerOfflineResources(ApplicationStartedEvent event) {
+
+        // TODO Make configurable
+
         if (log.isTraceEnabled()) {
             log.trace("Registering offline resources");
         }

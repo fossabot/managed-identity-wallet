@@ -22,9 +22,21 @@
 package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate;
 
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialSubject;
+
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Slf4j
 public class AbstractApiCommand {
+
+    /* Used as long as there is no authentication */
+    protected static final WalletId TMP_WALLET_ID = new WalletId("BPNL000000000000");
+
     protected void logInvocationIfDebug(String string, Object arg) {
         if (log.isDebugEnabled()) {
             log.debug(string, arg);
@@ -34,6 +46,65 @@ public class AbstractApiCommand {
     protected void logInvocationIfDebug(String string, Object arg1, Object arg2) {
         if (log.isDebugEnabled()) {
             log.debug(string, arg1, arg2);
+        }
+    }
+
+
+    protected void logInvocationIfDebug(String string, Object arg1, Object arg2, Object arg3) {
+        if (log.isDebugEnabled()) {
+            log.debug(string, arg1, arg2, arg3);
+        }
+    }
+
+    protected void logInvocationIfDebug(String string, Object arg1, Object arg2, Object arg3, Object arg4) {
+        if (log.isDebugEnabled()) {
+            log.debug(string, arg1, arg2, arg3, arg4);
+        }
+    }
+
+    protected void logInvocationIfDebug(String string, Object arg1, Object arg2, Object arg3, Object arg4, Object arg5) {
+        if (log.isDebugEnabled()) {
+            log.debug(string, arg1, arg2, arg3, arg4, arg5);
+        }
+    }
+
+    protected Optional<VerifiableCredentialSubject> readVerifiableCredentialSubjectArgs(Map<String, Object> subject) {
+        if (subject == null) {
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.of(new VerifiableCredentialSubject(subject));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    protected Optional<List<VerifiableCredential>> readVerifiableCredentialArgs(List<Map<String, Object>> payload) {
+        if (payload == null) {
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.of(
+                    payload.stream()
+                            .map(this::readVerifiableCredentialArg)
+                            .map(Optional::orElseThrow)
+                            .collect(Collectors.toList()));
+        } catch (Exception e) {
+            return Optional.empty();
+        }
+    }
+
+    protected Optional<VerifiableCredential> readVerifiableCredentialArg(Map<String, Object> payload) {
+        if (payload == null) {
+            return Optional.empty();
+        }
+
+        try {
+            return Optional.of(new VerifiableCredential(payload));
+        } catch (Exception e) {
+            return Optional.empty();
         }
     }
 }

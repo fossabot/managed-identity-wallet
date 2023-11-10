@@ -39,7 +39,7 @@ import java.util.Optional;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-class PostWalletApiProcessor extends AbstractApiCommand {
+class PostWalletApiAdminApiHandler extends AbstractApiCommand {
 
     private final ApiV2Mapper apiMapper;
     private final WalletService walletService;

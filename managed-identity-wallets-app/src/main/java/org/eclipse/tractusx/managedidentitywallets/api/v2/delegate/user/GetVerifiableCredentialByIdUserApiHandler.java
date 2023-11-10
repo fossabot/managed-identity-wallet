@@ -19,38 +19,36 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
+package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.user;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiCommand;
-import org.eclipse.tractusx.managedidentitywallets.api.v2.map.ApiV2Mapper;
-import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
-import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
-import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.WalletResponsePayloadV2;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
+import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
-class GetWalletByIdProcessor extends AbstractApiCommand {
+class GetVerifiableCredentialByIdUserApiHandler extends AbstractApiCommand {
 
-    private final ApiV2Mapper apiMapper;
-    private final WalletService walletService;
+    private final VerifiableCredentialService verifiableCredentialService;
 
-    public ResponseEntity<WalletResponsePayloadV2> execute(@NonNull String walletId) {
-        logInvocationIfDebug("getWalletById(walletId={})", walletId);
+    public ResponseEntity<Map<String, Object>> execute(String verifiableCredentialId) {
+        logInvocationIfDebug("userGetVerifiableCredentialById(walletId={}, verifiableCredentialId={})", TMP_WALLET_ID, verifiableCredentialId);
 
-        final Optional<Wallet> wallet = walletService.findById(new WalletId(walletId));
-        if (wallet.isPresent()) {
-            final WalletResponsePayloadV2 payloadV2 = apiMapper.mapWalletResponsePayloadV2(wallet.get());
-            return ResponseEntity.ok(payloadV2);
-        }
-        return ResponseEntity.notFound().build();
+        final VerifiableCredentialId id = new VerifiableCredentialId(verifiableCredentialId);
+        final Optional<VerifiableCredential> verifiableCredential = verifiableCredentialService.findById(id);
+
+        return verifiableCredential.<ResponseEntity<Map<String, Object>>>map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
+
+
 }

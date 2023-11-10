@@ -26,23 +26,27 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiCommand;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+
+import java.util.Map;
+import java.util.Optional;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
-class DeleteVerifiableCredentialByIdProcessor extends AbstractApiCommand {
+class GetVerifiableCredentialByIdAdminApiHandler extends AbstractApiCommand {
 
     private final VerifiableCredentialService verifiableCredentialService;
 
-    public ResponseEntity<Void> execute(String verifiableCredentialId) {
-        if (log.isDebugEnabled()) {
-            log.debug("deleteVerifiableCredentialById(verifiableCredentialId={})", verifiableCredentialId);
-        }
+    public ResponseEntity<Map<String, Object>> execute(String verifiableCredentialId) {
+        logInvocationIfDebug("deleteVerifiableCredentialById(verifiableCredentialId={})", verifiableCredentialId);
 
-        verifiableCredentialService.findById(new VerifiableCredentialId(verifiableCredentialId)).ifPresent(verifiableCredentialService::delete);
-        return ResponseEntity.noContent().build();
+        final Optional<VerifiableCredential> wallet = verifiableCredentialService.findById(new VerifiableCredentialId(verifiableCredentialId));
+        return wallet
+                .<ResponseEntity<Map<String, Object>>>map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
 }

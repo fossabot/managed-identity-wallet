@@ -44,22 +44,16 @@ public class ValidationService {
     private final JsonLdValidator jsonLdValidator;
 
     public VerifiablePresentationValidationResult validate(VerifiablePresentation verifiablePresentation) {
-        final List<VerifiablePresentationValidationResultViolation> violations = new ArrayList<>();
-
-        final List<VerifiablePresentationValidationResultViolation.Type> types = new ArrayList<>();
+        final List<VerifiablePresentationValidationResult.Type> violations = new ArrayList<>();
 
         if (isExpired(verifiablePresentation)) {
-            types.add(VerifiablePresentationValidationResultViolation.Type.EXPIRED);
+            violations.add(VerifiablePresentationValidationResult.Type.EXPIRED);
         }
         if (!isJsonLdValid(verifiablePresentation)) {
-            types.add(VerifiablePresentationValidationResultViolation.Type.INVALID_JSONLD_FORMAT);
+            violations.add(VerifiablePresentationValidationResult.Type.INVALID_JSONLD_FORMAT);
         }
         if (!isSignatureValid(verifiablePresentation)) {
-            types.add(VerifiablePresentationValidationResultViolation.Type.INVALID_SIGNATURE);
-        }
-        if (!types.isEmpty()) {
-            final VerifiablePresentationId id = new VerifiablePresentationId(verifiablePresentation.getId().toString());
-            violations.add(new VerifiablePresentationValidationResultViolation(id, types));
+            violations.add(VerifiablePresentationValidationResult.Type.INVALID_SIGNATURE);
         }
 
         final VerifiableCredentialValidationResult validationResult = validate(verifiablePresentation.getVerifiableCredentials());
