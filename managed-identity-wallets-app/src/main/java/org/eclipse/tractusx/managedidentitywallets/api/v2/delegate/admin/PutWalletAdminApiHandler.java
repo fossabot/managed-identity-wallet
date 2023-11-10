@@ -24,7 +24,7 @@ package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiCommand;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiHandler;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.map.ApiV2Mapper;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
@@ -41,7 +41,7 @@ import java.util.Optional;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-class PutWalletAdminApiHandler extends AbstractApiCommand {
+class PutWalletAdminApiHandler extends AbstractApiHandler {
 
     private final ApiV2Mapper apiMapper;
     private final WalletService walletService;

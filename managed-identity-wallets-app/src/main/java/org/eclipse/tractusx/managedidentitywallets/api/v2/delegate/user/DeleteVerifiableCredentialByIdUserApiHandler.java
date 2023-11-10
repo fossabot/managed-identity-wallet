@@ -23,7 +23,7 @@ package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiCommand;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiHandler;
 import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
@@ -36,7 +36,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-class DeleteVerifiableCredentialByIdUserApiHandler extends AbstractApiCommand {
+class DeleteVerifiableCredentialByIdUserApiHandler extends AbstractApiHandler {
 
     private final WalletService walletService;
     private final VerifiableCredentialService verifiableCredentialService;

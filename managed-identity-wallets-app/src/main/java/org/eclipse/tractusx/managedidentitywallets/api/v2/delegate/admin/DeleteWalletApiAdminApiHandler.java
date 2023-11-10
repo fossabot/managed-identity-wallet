@@ -23,7 +23,7 @@ package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiCommand;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiHandler;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.springframework.http.ResponseEntity;
@@ -31,7 +31,7 @@ import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-class DeleteWalletApiAdminApiHandler extends AbstractApiCommand {
+class DeleteWalletApiAdminApiHandler extends AbstractApiHandler {
 
     private final WalletService walletService;
 

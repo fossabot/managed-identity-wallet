@@ -24,7 +24,7 @@ package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.user;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiCommand;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiHandler;
 import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.VerifiablePresentationFactory;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
@@ -41,7 +41,7 @@ import java.util.Optional;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-class PostSignedVerifiablePresentationUserApiHandler extends AbstractApiCommand {
+class PostSignedVerifiablePresentationUserApiHandler extends AbstractApiHandler {
 
     private final WalletService walletService;
     private final VerifiablePresentationFactory verifiablePresentationFactory;

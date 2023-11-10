@@ -23,7 +23,7 @@ package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiCommand;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiHandler;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.map.VerifiableCredentialsMapper;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
@@ -39,7 +39,7 @@ import java.util.Optional;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-class PostVerifiableCredentialAdminApiHandler extends AbstractApiCommand {
+class PostVerifiableCredentialAdminApiHandler extends AbstractApiHandler {
 
     private final VerifiableCredentialsMapper verifiableCredentialsMapper;
     private final VerifiableCredentialService verifiableCredentialService;

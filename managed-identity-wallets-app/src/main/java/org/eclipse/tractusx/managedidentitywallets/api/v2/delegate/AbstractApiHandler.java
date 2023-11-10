@@ -32,7 +32,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Slf4j
-public class AbstractApiCommand {
+public class AbstractApiHandler {
 
     /* Used as long as there is no authentication */
     protected static final WalletId TMP_WALLET_ID = new WalletId("BPNL000000000000");

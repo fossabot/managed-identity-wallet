@@ -23,7 +23,7 @@ package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiCommand;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiHandler;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.springframework.http.ResponseEntity;
@@ -32,7 +32,7 @@ import org.springframework.stereotype.Component;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-class DeleteVerifiableCredentialByIdAdminApiHandler extends AbstractApiCommand {
+class DeleteVerifiableCredentialByIdAdminApiHandler extends AbstractApiHandler {
 
     private final VerifiableCredentialService verifiableCredentialService;
 
