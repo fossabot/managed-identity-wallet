@@ -23,7 +23,7 @@ package org.eclipse.tractusx.managedidentitywallets.repository;
 
 import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.ManagedIdentityWalletsApplication;
-import org.eclipse.tractusx.managedidentitywallets.factory.MiwIntegrationTest;
+import org.eclipse.tractusx.managedidentitywallets.factory.MiwTestCase;
 import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
@@ -44,14 +44,14 @@ import java.util.Optional;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {ManagedIdentityWalletsApplication.class})
 @ContextConfiguration(initializers = {TestContextInitializer.class})
-public class VerifiableCredentialRepositoryTest extends MiwIntegrationTest {
+public class VerifiableCredentialRepositoryTest extends MiwTestCase {
 
     @Autowired
     private VerifiableCredentialRepository verifiableCredentialRepository;
 
     @Test
     public void testCreate() {
-        final VerifiableCredential verifiableCredential = createRandomVerifiableCredential();
+        final VerifiableCredential verifiableCredential = newVerifiableCredentialPersisted();
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
                 .verifiableCredentialId(new VerifiableCredentialId(verifiableCredential.getId().toString()))
@@ -64,7 +64,7 @@ public class VerifiableCredentialRepositoryTest extends MiwIntegrationTest {
     @Test
     @SneakyThrows
     public void testDelete() {
-        final VerifiableCredential verifiableCredential = createRandomVerifiableCredential();
+        final VerifiableCredential verifiableCredential = newVerifiableCredentialPersisted();
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
                 .verifiableCredentialId(new VerifiableCredentialId(verifiableCredential.getId().toString()))
@@ -79,9 +79,9 @@ public class VerifiableCredentialRepositoryTest extends MiwIntegrationTest {
     @Test
     @SneakyThrows
     public void testFindByIssuer() {
-        final VerifiableCredential verifiableCredential = createRandomVerifiableCredential();
-        createRandomVerifiableCredential();
-        createRandomVerifiableCredential();
+        final VerifiableCredential verifiableCredential = newVerifiableCredentialPersisted();
+        newVerifiableCredentialPersisted();
+        newVerifiableCredentialPersisted();
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
                 .verifiableCredentialIssuer(new VerifiableCredentialIssuer(verifiableCredential.getIssuer().toString()))
@@ -95,8 +95,8 @@ public class VerifiableCredentialRepositoryTest extends MiwIntegrationTest {
     @Test
     @SneakyThrows
     public void testFindByHolder() {
-        final Wallet wallet = createRandomWallet();
-        final VerifiableCredential verifiableCredential = createRandomVerifiableCredential();
+        final Wallet wallet = newWalletPersisted();
+        final VerifiableCredential verifiableCredential = newVerifiableCredentialPersisted();
         final VerifiableCredentialId verifiableCredentialId = new VerifiableCredentialId(verifiableCredential.getId().toString());
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
@@ -112,9 +112,9 @@ public class VerifiableCredentialRepositoryTest extends MiwIntegrationTest {
     @SneakyThrows
     public void testFindByType() {
 
-        createRandomVerifiableCredential();
-        createRandomVerifiableCredential();
-        createRandomVerifiableCredential();
+        newVerifiableCredentialPersisted();
+        newVerifiableCredentialPersisted();
+        newVerifiableCredentialPersisted();
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
                 .verifiableCredentialTypes(List.of(new VerifiableCredentialType("VerifiableCredential")))

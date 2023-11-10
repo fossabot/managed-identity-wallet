@@ -24,7 +24,7 @@ package org.eclipse.tractusx.managedidentitywallets.did;
 import org.eclipse.tractusx.managedidentitywallets.ManagedIdentityWalletsApplication;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.RestURI;
 import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
-import org.eclipse.tractusx.managedidentitywallets.factory.MiwIntegrationTest;
+import org.eclipse.tractusx.managedidentitywallets.factory.MiwTestCase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,7 +38,7 @@ import java.util.UUID;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {ManagedIdentityWalletsApplication.class})
 @ContextConfiguration(initializers = {TestContextInitializer.class})
-class DidDocumentsTest extends MiwIntegrationTest {
+class DidDocumentsTest extends MiwTestCase {
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -53,7 +53,7 @@ class DidDocumentsTest extends MiwIntegrationTest {
     void getDidDocumentWithBpn200() {
 
         String bpn = UUID.randomUUID().toString();
-        createWallet(bpn);
+        newWalletPersisted(bpn);
 
         ResponseEntity<String> response = restTemplate.getForEntity(RestURI.DID_DOCUMENTS, String.class, bpn);
         Assertions.assertEquals(HttpStatus.OK.value(), response.getStatusCode().value());
@@ -71,7 +71,7 @@ class DidDocumentsTest extends MiwIntegrationTest {
 
         String bpn = UUID.randomUUID().toString();
 
-        createWallet(bpn);
+        newWalletPersisted(bpn);
         ResponseEntity<String> response = restTemplate.getForEntity(RestURI.DID_RESOLVE, String.class, bpn);
         Assertions.assertEquals(HttpStatus.OK.value(), response.getStatusCode().value());
         Assertions.assertNotNull(response.getBody());

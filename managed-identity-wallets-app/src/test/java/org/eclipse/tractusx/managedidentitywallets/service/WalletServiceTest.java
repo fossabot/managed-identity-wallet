@@ -32,7 +32,7 @@ import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
-import org.eclipse.tractusx.managedidentitywallets.factory.MiwIntegrationTest;
+import org.eclipse.tractusx.managedidentitywallets.factory.MiwTestCase;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -50,7 +50,7 @@ import java.util.Optional;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {ManagedIdentityWalletsApplication.class})
 @ContextConfiguration(initializers = {TestContextInitializer.class}, classes = WalletServiceTest.WalletEventTrackerConfiguration.class)
-public class WalletServiceTest extends MiwIntegrationTest {
+public class WalletServiceTest extends MiwTestCase {
 
 
     @Autowired
@@ -70,9 +70,9 @@ public class WalletServiceTest extends MiwIntegrationTest {
     @Test
     @SneakyThrows
     public void testWalletCreation() {
-        final Wallet w1 = newWalletObject("1", "1");
-        final Wallet w2 = newWalletObject("2", "2");
-        final Wallet w3 = newWalletObject("3", "3");
+        final Wallet w1 = newWallet("1", "1");
+        final Wallet w2 = newWallet("2", "2");
+        final Wallet w3 = newWallet("3", "3");
 
         walletService.create(w1);
         walletService.create(w2);
@@ -92,7 +92,7 @@ public class WalletServiceTest extends MiwIntegrationTest {
     @Test
     @SneakyThrows
     public void testWalletUpdate() {
-        final Wallet originalWallet = createRandomWallet();
+        final Wallet originalWallet = newWalletPersisted();
 
         final WalletId originalId = originalWallet.getWalletId();
         final WalletName newName = new WalletName("updatedName");
@@ -113,9 +113,9 @@ public class WalletServiceTest extends MiwIntegrationTest {
     @Test
     @SneakyThrows
     public void testWalletDeletion() {
-        final Wallet w1 = createRandomWallet();
-        final Wallet w2 = createRandomWallet();
-        final Wallet w3 = createRandomWallet();
+        final Wallet w1 = newWalletPersisted();
+        final Wallet w2 = newWalletPersisted();
+        final Wallet w3 = newWalletPersisted();
 
         walletService.delete(w1);
         walletService.delete(w2);
@@ -135,9 +135,9 @@ public class WalletServiceTest extends MiwIntegrationTest {
     @Test
     @SneakyThrows
     public void testWalletFindById() {
-        createWallet("1", "name");
-        createWallet("2", "name");
-        createWallet("3", "name");
+        newWalletPersisted("1", "name");
+        newWalletPersisted("2", "name");
+        newWalletPersisted("3", "name");
 
         final Optional<Wallet> wallet = walletService.findById(new WalletId("1"));
 
@@ -147,9 +147,9 @@ public class WalletServiceTest extends MiwIntegrationTest {
     @Test
     @SneakyThrows
     public void testWalletFindByName() {
-        createWallet("1", "name");
-        createWallet("2", "name");
-        createWallet("3", "name");
+        newWalletPersisted("1", "name");
+        newWalletPersisted("2", "name");
+        newWalletPersisted("3", "name");
 
         final WalletQuery walletQuery = WalletQuery.builder()
                 .name(new WalletName("name"))

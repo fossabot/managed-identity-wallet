@@ -24,7 +24,7 @@ package org.eclipse.tractusx.managedidentitywallets.repository;
 import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.ManagedIdentityWalletsApplication;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
-import org.eclipse.tractusx.managedidentitywallets.factory.MiwIntegrationTest;
+import org.eclipse.tractusx.managedidentitywallets.factory.MiwTestCase;
 import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
@@ -42,7 +42,7 @@ import java.util.Optional;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {ManagedIdentityWalletsApplication.class})
 @ContextConfiguration(initializers = {TestContextInitializer.class})
-public class WalletRepositoryTest extends MiwIntegrationTest {
+public class WalletRepositoryTest extends MiwTestCase {
 
     @Autowired
     private WalletRepository walletRepository;
@@ -50,7 +50,7 @@ public class WalletRepositoryTest extends MiwIntegrationTest {
     @Test
     @SneakyThrows
     public void testWalletCreation() {
-        final Wallet wallet = createRandomWallet();
+        final Wallet wallet = newWalletPersisted();
         final WalletId walletId = wallet.getWalletId();
 
         final WalletQuery query = WalletQuery.builder()
@@ -117,9 +117,9 @@ public class WalletRepositoryTest extends MiwIntegrationTest {
 
     @Test
     public void testFindById() {
-        final Wallet wallet = createRandomWallet();
-        createRandomWallet();
-        createRandomWallet();
+        final Wallet wallet = newWalletPersisted();
+        newWalletPersisted();
+        newWalletPersisted();
 
         final WalletQuery query = WalletQuery.builder()
                 .walletId(wallet.getWalletId())
@@ -131,10 +131,10 @@ public class WalletRepositoryTest extends MiwIntegrationTest {
     @Test
     public void testFindByName() {
         final String name = "foo";
-        createWallet(null, name);
-        createWallet(null, name);
-        createRandomWallet();
-        createRandomWallet();
+        newWalletPersisted(null, name);
+        newWalletPersisted(null, name);
+        newWalletPersisted();
+        newWalletPersisted();
 
         final WalletQuery query = WalletQuery.builder()
                 .name(new WalletName(name))

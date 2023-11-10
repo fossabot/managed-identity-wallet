@@ -21,6 +21,7 @@
 
 package org.eclipse.tractusx.managedidentitywallets.listener;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.event.WalletCreatedEvent;
@@ -33,15 +34,15 @@ import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.B
 import org.eclipse.tractusx.managedidentitywallets.factory.Ed25519KeyFactory;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.context.event.EventListener;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
 @RequiredArgsConstructor
 @Service
 @Slf4j
-public class WalletCreatedEventListener {
+public class WalletCreatingEventListener {
 
     private final Ed25519KeyFactory ed25519KeyFactory;
     private final BusinessPartnerVerifiableCredentialFactory businessPartnerVerifiableCredentialFactory;
@@ -50,7 +51,8 @@ public class WalletCreatedEventListener {
     private final VaultService vaultService;
 
     @EventListener
-    public void generateEd25519Key(WalletCreatingEvent event) {
+    @Order(10)
+    public void generateEd25519Key(@NonNull final WalletCreatingEvent event) {
 
         final Wallet wallet = event.getWallet();
         final WalletId walletId = event.getWallet().getWalletId();
@@ -80,7 +82,8 @@ public class WalletCreatedEventListener {
     }
 
     @EventListener
-    public void issueBusinessPartnerCredential(WalletCreatedEvent event) {
+    @Order(20) // credential is generation must be after key generation
+    public void issueBusinessPartnerCredential(@NonNull final WalletCreatingEvent event) {
         final Wallet wallet = event.getWallet();
         final VerifiableCredential bpnCredential = businessPartnerVerifiableCredentialFactory
                 .createBusinessPartnerNumberCredential(event.getWallet());

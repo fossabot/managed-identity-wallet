@@ -96,12 +96,12 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(409).body(createMessage(ex.getMessage()));
     }
 
-    @ExceptionHandler(value = {IllegalArgumentException.class})
+    @ExceptionHandler(value = {ConstraintViolationException.class})
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @ResponseBody
-    public ResponseEntity<Object> handleIllegalArgumentException(IllegalArgumentException ex) {
+    public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
         if (log.isDebugEnabled()) {
-            log.debug("IllegalArgumentException: {}", ex.getMessage(), ex);
+            log.debug("ConstraintViolationException: {}", ex.getMessage(), ex);
         }
         return ResponseEntity.badRequest().body(createMessage(ex.getMessage()));
     }

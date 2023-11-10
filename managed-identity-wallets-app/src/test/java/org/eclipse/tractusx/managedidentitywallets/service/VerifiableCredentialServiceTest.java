@@ -29,9 +29,10 @@ import org.eclipse.tractusx.managedidentitywallets.event.*;
 import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
+import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
-import org.eclipse.tractusx.managedidentitywallets.factory.MiwIntegrationTest;
+import org.eclipse.tractusx.managedidentitywallets.factory.MiwTestCase;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
@@ -50,7 +51,7 @@ import java.util.Optional;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {ManagedIdentityWalletsApplication.class})
 @ContextConfiguration(initializers = {TestContextInitializer.class}, classes = VerifiableCredentialServiceTest.VerifiableCredentialEventTrackerConfiguration.class)
-public class VerifiableCredentialServiceTest extends MiwIntegrationTest {
+public class VerifiableCredentialServiceTest extends MiwTestCase {
 
     @Autowired
     private VerifiableCredentialService verifiableCredentialService;
@@ -69,9 +70,10 @@ public class VerifiableCredentialServiceTest extends MiwIntegrationTest {
     @Test
     @SneakyThrows
     public void testVerifiableCredentialCreation() {
-        final VerifiableCredential vc1 = newVerifiableCredential("did:test:1#1", "did:test:1");
-        final VerifiableCredential vc2 = newVerifiableCredential("did:test:1#2", "did:test:2");
-        final VerifiableCredential vc3 = newVerifiableCredential("did:test:1#3", "did:test:3");
+        final Wallet wallet = newWalletPersisted();
+        final VerifiableCredential vc1 = newVerifiableCredential(wallet);
+        final VerifiableCredential vc2 = newVerifiableCredential(wallet);
+        final VerifiableCredential vc3 = newVerifiableCredential(wallet);
 
         verifiableCredentialService.create(vc1);
         verifiableCredentialService.create(vc2);
@@ -91,9 +93,9 @@ public class VerifiableCredentialServiceTest extends MiwIntegrationTest {
     @Test
     @SneakyThrows
     public void testVerifiableCredentialDeletion() {
-        final VerifiableCredential w1 = createRandomVerifiableCredential();
-        final VerifiableCredential w2 = createRandomVerifiableCredential();
-        final VerifiableCredential w3 = createRandomVerifiableCredential();
+        final VerifiableCredential w1 = newVerifiableCredentialPersisted();
+        final VerifiableCredential w2 = newVerifiableCredentialPersisted();
+        final VerifiableCredential w3 = newVerifiableCredentialPersisted();
 
         verifiableCredentialService.delete(w1);
         verifiableCredentialService.delete(w2);
@@ -113,12 +115,12 @@ public class VerifiableCredentialServiceTest extends MiwIntegrationTest {
     @Test
     @SneakyThrows
     public void testVerifiableCredentialFindById() {
-        createVerifiableCredential("did:test:1#1", "did:test:1");
-        createVerifiableCredential("did:test:2#2", "did:test:2");
-        createVerifiableCredential("did:test:3#3", "did:test:3");
+        var c1 = newVerifiableCredentialPersisted();
+        var c2 = newVerifiableCredentialPersisted();
+        var c3 = newVerifiableCredentialPersisted();
 
         final Optional<VerifiableCredential> verifiableCredential =
-                verifiableCredentialService.findById(new VerifiableCredentialId("did:test:1#1"));
+                verifiableCredentialService.findById(new VerifiableCredentialId(c1.getId().toString()));
 
         Assertions.assertTrue(verifiableCredential.isPresent(), "VerifiableCredential should be present");
     }
@@ -126,12 +128,12 @@ public class VerifiableCredentialServiceTest extends MiwIntegrationTest {
     @Test
     @SneakyThrows
     public void testVerifiableCredentialFindByIssuer() {
-        createVerifiableCredential("did:test:1#1", "did:test:1");
-        createVerifiableCredential("did:test:2#2", "did:test:2");
-        createVerifiableCredential("did:test:3#3", "did:test:2");
+        var c1 = newVerifiableCredentialPersisted();
+        var c2 = newVerifiableCredentialPersisted();
+        var c3 = newVerifiableCredentialPersisted();
 
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
-                .verifiableCredentialIssuer(new VerifiableCredentialIssuer("did:test:2"))
+                .verifiableCredentialIssuer(new VerifiableCredentialIssuer(c1.getIssuer().toString()))
                 .build();
         final Page<VerifiableCredential> verifiableCredentials = verifiableCredentialService.findAll(verifiableCredentialQuery, 0, 10);
 
