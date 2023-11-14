@@ -26,6 +26,7 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.exception.*;
 import org.eclipse.tractusx.managedidentitywallets.spring.controllers.v2.AdministratorApi;
+import org.eclipse.tractusx.managedidentitywallets.spring.controllers.v2.UserApi;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.transaction.UnexpectedRollbackException;
@@ -38,7 +39,7 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 import java.util.Map;
 
 @Slf4j
-@ControllerAdvice(basePackageClasses = {AdministratorApi.class})
+@ControllerAdvice(basePackageClasses = {UserApi.class, AdministratorApi.class})
 public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler(value = {WalletNotFoundException.class})
