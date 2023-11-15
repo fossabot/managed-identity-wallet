@@ -51,7 +51,6 @@ public @interface IsSignatureValid {
 
         private final ValidationService validationService;
 
-
         @Override
         public boolean isValid(VerifiableCredential verifiableCredential, ConstraintValidatorContext context) {
             return verifiableCredential != null &&
