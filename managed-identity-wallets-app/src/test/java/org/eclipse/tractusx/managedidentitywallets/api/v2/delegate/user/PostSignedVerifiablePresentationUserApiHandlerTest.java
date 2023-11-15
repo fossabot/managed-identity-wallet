@@ -40,7 +40,6 @@ public class PostSignedVerifiablePresentationUserApiHandlerTest extends RestAssu
                 "verifiableCredentials", List.of(verifiableCredential)
         );
 
-
         given()
                 .header("Content-Type", "application/json")
                 .body(payload)

@@ -41,7 +41,6 @@ public class PostSignedVerifiablePresentationJwtUserApiHandlerTest extends RestA
                 "verifiableCredentials", List.of(verifiableCredential)
         );
 
-
         given()
                 .header("Content-Type", "application/json")
                 .body(payload)

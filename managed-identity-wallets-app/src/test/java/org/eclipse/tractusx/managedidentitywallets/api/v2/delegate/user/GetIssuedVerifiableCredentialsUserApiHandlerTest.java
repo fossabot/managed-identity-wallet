@@ -36,10 +36,6 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class GetIssuedVerifiableCredentialsUserApiHandlerTest extends RestAssuredTestCase {
 
-
-    @Autowired
-    private DidFactory didFactory;
-
     @Autowired
     private WalletRepository walletRepository;
 
