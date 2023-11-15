@@ -22,39 +22,29 @@
 package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.user;
 
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.junit.jupiter.api.Test;
+
+import java.util.List;
+import java.util.Map;
 
 import static io.restassured.RestAssured.given;
 
-public class PostSignedVerifiableCredentialUserApiHandlerTest extends RestAssuredTestCase {
+public class PostVerifiableCredentialsValidationUserApiHandlerTest extends RestAssuredTestCase {
 
     @Test
     public void testPostSignedVerifiableCredentialUserApiHandler() {
+        final VerifiableCredential verifiableCredential = newVerifiableCredentialPersisted();
+        final Map<String,Object> payload= Map.of(
+                "verifiableCredentials", List.of(verifiableCredential)
+        );
 
-        final String payload = "{" +
-                "    \"verifiableCredentialSubject\": {" +
-                "        \"holderIdentifier\": \"FOO\"," +
-                "        \"id\": \"BAR\"," +
-                "        \"type\": \"SummaryCredential\"," +
-                "        \"contractTemplate\": \"https://public.catena-x.org/contracts/\"," +
-                "        \"items\": [" +
-                "            \"BpnCredential\"" +
-                "        ]" +
-                "    }," +
-                "    \"expirationDate\": \"\"," +
-                "    \"additionalVerifiableCredentialTypes\": [" +
-                "        \"SummaryCredential\"" +
-                "    ]," +
-                "    \"additionalVerifiableCredentialContexts\": [" +
-                "        \"https://catenax-ng.github.io/product-core-schemas/SummaryVC.json\"" +
-                "    ]" +
-                "}";
 
         given()
                 .header("Content-Type", "application/json")
                 .body(payload)
                 .when()
-                .post("/api/v2/signed-verifiable-credentials")
+                .post("/api/v2/verifiable-credentials-validation")
                 .then()
                 .statusCode(200);
     }
