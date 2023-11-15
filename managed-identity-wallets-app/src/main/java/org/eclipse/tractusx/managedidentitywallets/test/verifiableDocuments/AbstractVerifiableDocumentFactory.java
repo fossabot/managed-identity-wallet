@@ -19,7 +19,7 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments;
+package org.eclipse.tractusx.managedidentitywallets.test.verifiableDocuments;
 
 import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
@@ -29,7 +29,7 @@ import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
-import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
+import org.eclipse.tractusx.managedidentitywallets.test.DidFactory;
 import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559PrivateKey;
 import org.eclipse.tractusx.ssi.lib.exception.InvalidePrivateKeyFormat;
 import org.eclipse.tractusx.ssi.lib.exception.UnsupportedSignatureTypeException;

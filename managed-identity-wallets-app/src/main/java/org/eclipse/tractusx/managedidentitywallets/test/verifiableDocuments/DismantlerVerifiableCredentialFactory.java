@@ -19,7 +19,7 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments;
+package org.eclipse.tractusx.managedidentitywallets.test.verifiableDocuments;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
@@ -27,7 +27,7 @@ import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.MIWVerifiable
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
-import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
+import org.eclipse.tractusx.managedidentitywallets.test.DidFactory;
 import org.eclipse.tractusx.ssi.lib.model.did.Did;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialSubject;

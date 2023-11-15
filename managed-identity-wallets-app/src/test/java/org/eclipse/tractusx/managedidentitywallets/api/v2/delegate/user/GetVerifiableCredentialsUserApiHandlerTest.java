@@ -22,7 +22,6 @@
 package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.user;
 
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
-import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
@@ -55,7 +54,7 @@ public class GetVerifiableCredentialsUserApiHandlerTest extends RestAssuredTestC
         final int MAX_CREDENTIALS = 10;
         for (var i = 0; i < MAX_CREDENTIALS; i++) {
             final VerifiableCredential verifiableCredential =
-                    newVerifiableCredentialPersisted(holderWallet);
+                    newWalletPlusVerifiableCredentialPersisted(holderWallet);
 
             walletService.storeVerifiableCredential(holderWallet, verifiableCredential);
         }

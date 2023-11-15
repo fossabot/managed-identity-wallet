@@ -35,7 +35,7 @@ public class PostSignedVerifiablePresentationUserApiHandlerTest extends RestAssu
     @Test
     public void testPostSignedVerifiableCredentialUserApiHandler() {
 
-        final VerifiableCredential verifiableCredential = newVerifiableCredentialPersisted();
+        final VerifiableCredential verifiableCredential = newWalletPlusVerifiableCredentialPersisted();
         final Map<String,Object> payload= Map.of(
                 "verifiableCredentials", List.of(verifiableCredential)
         );

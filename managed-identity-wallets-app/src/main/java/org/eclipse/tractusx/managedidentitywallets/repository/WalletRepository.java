@@ -208,6 +208,10 @@ public class WalletRepository {
 
     }
 
+    public Page<Wallet> findAll() {
+        return findAll(WalletQuery.builder().build(), Pageable.unpaged());
+    }
+
     public Page<Wallet> findAll(@NonNull WalletQuery query, @NonNull Pageable pageable) {
         final Predicate predicate = WalletPredicate.fromQuery(query);
         if (log.isTraceEnabled()) {

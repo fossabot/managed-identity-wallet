@@ -21,36 +21,23 @@
 
 package org.eclipse.tractusx.managedidentitywallets.service;
 
-import lombok.NonNull;
 import lombok.SneakyThrows;
-import org.eclipse.tractusx.managedidentitywallets.ManagedIdentityWalletsApplication;
-import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
-import org.eclipse.tractusx.managedidentitywallets.event.*;
 import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
-import org.eclipse.tractusx.managedidentitywallets.factory.MiwTestCase;
+import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
+import org.eclipse.tractusx.managedidentitywallets.test.VerifiableCredentialEventTracker;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
-import org.springframework.test.context.ContextConfiguration;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Optional;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {ManagedIdentityWalletsApplication.class})
-@ContextConfiguration(initializers = {TestContextInitializer.class}, classes = VerifiableCredentialServiceTest.VerifiableCredentialEventTrackerConfiguration.class)
 public class VerifiableCredentialServiceTest extends MiwTestCase {
 
     @Autowired
@@ -62,11 +49,6 @@ public class VerifiableCredentialServiceTest extends MiwTestCase {
     @Autowired
     private VerifiableCredentialEventTracker verifiableCredentialEventTracker;
 
-    @BeforeEach
-    public void setup() {
-        verifiableCredentialEventTracker.clear();
-    }
-
     @Test
     @SneakyThrows
     public void testVerifiableCredentialCreation() {
@@ -75,6 +57,7 @@ public class VerifiableCredentialServiceTest extends MiwTestCase {
         final VerifiableCredential vc2 = newVerifiableCredential(wallet);
         final VerifiableCredential vc3 = newVerifiableCredential(wallet);
 
+        verifiableCredentialEventTracker.clear();
         verifiableCredentialService.create(vc1);
         verifiableCredentialService.create(vc2);
         verifiableCredentialService.create(vc3);
@@ -85,18 +68,19 @@ public class VerifiableCredentialServiceTest extends MiwTestCase {
             // ignore
         }
 
-        Assertions.assertEquals(4, verifiableCredentialEventTracker.verifiableCredentialCreatingEvents.size(), "4 VerifiableCredentialCreatingEvents should have been fired");
-        Assertions.assertEquals(3, verifiableCredentialEventTracker.verifiableCredentialCreatedEvents.size(), "3 VerifiableCredentialCreatedEvents should have been fired");
-        Assertions.assertEquals(3, verifiableCredentialRepository.count(), "3 VerifiableCredentials should be in the database");
+        Assertions.assertEquals(3, verifiableCredentialEventTracker.getVerifiableCredentialCreatingEvents().size(), "3 VerifiableCredentialCreatingEvents should have been fired");
+        Assertions.assertEquals(3, verifiableCredentialEventTracker.getVerifiableCredentialCreatedEvents().size(), "3 VerifiableCredentialCreatedEvents should have been fired");
+        Assertions.assertEquals(4, verifiableCredentialRepository.count(), "3 new plus BPN credential (=4) VerifiableCredentials should be in the database");
     }
 
     @Test
     @SneakyThrows
     public void testVerifiableCredentialDeletion() {
-        final VerifiableCredential w1 = newVerifiableCredentialPersisted();
-        final VerifiableCredential w2 = newVerifiableCredentialPersisted();
-        final VerifiableCredential w3 = newVerifiableCredentialPersisted();
+        final VerifiableCredential w1 = newWalletPlusVerifiableCredentialPersisted();
+        final VerifiableCredential w2 = newWalletPlusVerifiableCredentialPersisted();
+        final VerifiableCredential w3 = newWalletPlusVerifiableCredentialPersisted();
 
+        verifiableCredentialEventTracker.clear();
         verifiableCredentialService.delete(w1);
         verifiableCredentialService.delete(w2);
         verifiableCredentialService.delete(w3);
@@ -107,17 +91,17 @@ public class VerifiableCredentialServiceTest extends MiwTestCase {
          */
         verifiableCredentialService.delete(w1);
 
-        Assertions.assertEquals(4, verifiableCredentialEventTracker.verifiableCredentialDeletingEvents.size(), "4 VerifiableCredentialDeletingEvent should have been fired");
-        Assertions.assertEquals(4, verifiableCredentialEventTracker.verifiableCredentialDeletedEvents.size(), "4 VerifiableCredentialDeletedEvent should have been fired");
-        Assertions.assertEquals(0, verifiableCredentialRepository.count(), "0 VerifiableCredentials should be in the database");
+        Assertions.assertEquals(4, verifiableCredentialEventTracker.getVerifiableCredentialDeletingEvents().size(), "4 VerifiableCredentialDeletingEvent should have been fired");
+        Assertions.assertEquals(4, verifiableCredentialEventTracker.getVerifiableCredentialDeletedEvents().size(), "4 VerifiableCredentialDeletedEvent should have been fired");
+        Assertions.assertEquals(3, verifiableCredentialRepository.count(), "Only 3 BPN VerifiableCredentials should be in the database");
     }
 
     @Test
     @SneakyThrows
     public void testVerifiableCredentialFindById() {
-        var c1 = newVerifiableCredentialPersisted();
-        var c2 = newVerifiableCredentialPersisted();
-        var c3 = newVerifiableCredentialPersisted();
+        var c1 = newWalletPlusVerifiableCredentialPersisted();
+        newWalletPlusVerifiableCredentialPersisted();
+        newWalletPlusVerifiableCredentialPersisted();
 
         final Optional<VerifiableCredential> verifiableCredential =
                 verifiableCredentialService.findById(new VerifiableCredentialId(c1.getId().toString()));
@@ -128,57 +112,15 @@ public class VerifiableCredentialServiceTest extends MiwTestCase {
     @Test
     @SneakyThrows
     public void testVerifiableCredentialFindByIssuer() {
-        var c1 = newVerifiableCredentialPersisted();
-        var c2 = newVerifiableCredentialPersisted();
-        var c3 = newVerifiableCredentialPersisted();
+        var c1 = newWalletPlusVerifiableCredentialPersisted();
+        newWalletPlusVerifiableCredentialPersisted();
+        newWalletPlusVerifiableCredentialPersisted();
 
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
                 .verifiableCredentialIssuer(new VerifiableCredentialIssuer(c1.getIssuer().toString()))
                 .build();
         final Page<VerifiableCredential> verifiableCredentials = verifiableCredentialService.findAll(verifiableCredentialQuery, 0, 10);
 
-        Assertions.assertEquals(2, verifiableCredentials.getTotalElements(), "2 VerifiableCredentials should be found");
-    }
-
-    @Configuration
-    static class VerifiableCredentialEventTrackerConfiguration {
-        @Bean
-        public VerifiableCredentialServiceTest.VerifiableCredentialEventTracker getVerifiableCredentialEventTracker() {
-            return new VerifiableCredentialServiceTest.VerifiableCredentialEventTracker();
-        }
-    }
-
-    static class VerifiableCredentialEventTracker {
-        final List<VerifiableCredentialCreatingEvent> verifiableCredentialCreatingEvents = new ArrayList<>();
-        final List<VerifiableCredentialCreatedEvent> verifiableCredentialCreatedEvents = new ArrayList<>();
-        final List<VerifiableCredentialDeletedEvent> verifiableCredentialDeletedEvents = new ArrayList<>();
-        final List<VerifiableCredentialDeletingEvent> verifiableCredentialDeletingEvents = new ArrayList<>();
-
-        @EventListener
-        public void onVerifiableCredentialCreatingEvent(@NonNull VerifiableCredentialCreatingEvent event) {
-            verifiableCredentialCreatingEvents.add(event);
-        }
-
-        @EventListener
-        public void onVerifiableCredentialCreatedEvent(@NonNull VerifiableCredentialCreatedEvent event) {
-            verifiableCredentialCreatedEvents.add(event);
-        }
-
-        @EventListener
-        public void onVerifiableCredentialDeletedEvent(@NonNull VerifiableCredentialDeletedEvent event) {
-            verifiableCredentialDeletedEvents.add(event);
-        }
-
-        @EventListener
-        public void onVerifiableCredentialDeletingEvent(@NonNull VerifiableCredentialDeletingEvent event) {
-            verifiableCredentialDeletingEvents.add(event);
-        }
-
-        public void clear() {
-            verifiableCredentialCreatedEvents.clear();
-            verifiableCredentialCreatingEvents.clear();
-            verifiableCredentialDeletedEvents.clear();
-            verifiableCredentialDeletingEvents.clear();
-        }
+        Assertions.assertEquals(1, verifiableCredentials.getTotalElements(), "1 VerifiableCredentials should be found");
     }
 }

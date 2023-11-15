@@ -19,11 +19,10 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.factory;
+package org.eclipse.tractusx.managedidentitywallets.test;
 
 import lombok.NonNull;
 import lombok.SneakyThrows;
-import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.GenericVerifiableCredentialFactory;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
@@ -33,16 +32,27 @@ import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
+import org.eclipse.tractusx.managedidentitywallets.test.verifiableDocuments.GenericVerifiableCredentialFactory;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialSubject;
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.data.domain.Pageable;
+import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.junit4.SpringRunner;
 
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
+
+@RunWith(SpringRunner.class)
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
+@ActiveProfiles("dev")
 public abstract class MiwTestCase {
 
     @Autowired
@@ -60,9 +70,17 @@ public abstract class MiwTestCase {
     @Autowired
     private VerifiableCredentialService verifiableCredentialService;
 
+    @Autowired
+    private VerifiableCredentialEventTracker verifiableCredentialEventTracker;
+
+    @Autowired
+    private WalletEventTracker walletEventTracker;
+
     @BeforeEach
     public void cleanUp() {
 
+        walletEventTracker.clear();
+        verifiableCredentialEventTracker.clear();
         verifiableCredentialRepository.deleteAll();
 
         // delete all except authority wallet
@@ -76,13 +94,13 @@ public abstract class MiwTestCase {
     }
 
     @SneakyThrows
-    protected VerifiableCredential newVerifiableCredentialPersisted() {
+    protected VerifiableCredential newWalletPlusVerifiableCredentialPersisted() {
         final Wallet wallet = newWalletPersisted();
-        return newVerifiableCredentialPersisted(wallet);
+        return newWalletPlusVerifiableCredentialPersisted(wallet);
     }
 
     @SneakyThrows
-    protected VerifiableCredential newVerifiableCredentialPersisted(@NonNull Wallet issuer) {
+    protected VerifiableCredential newWalletPlusVerifiableCredentialPersisted(@NonNull Wallet issuer) {
         final VerifiableCredential verifiableCredential = newVerifiableCredential(issuer);
 
         verifiableCredentialService.create(verifiableCredential);
@@ -129,5 +147,18 @@ public abstract class MiwTestCase {
                 .build();
 
         return genericVerifiableCredentialFactory.createVerifiableCredential(args);
+    }
+
+    @Configuration
+    static class MiwTestCaseConfiguration {
+        @Bean
+        public VerifiableCredentialEventTracker getVerifiableCredentialEventTracker() {
+            return new VerifiableCredentialEventTracker();
+        }
+
+        @Bean
+        public WalletEventTracker getWalletEventTracker() {
+            return new WalletEventTracker();
+        }
     }
 }

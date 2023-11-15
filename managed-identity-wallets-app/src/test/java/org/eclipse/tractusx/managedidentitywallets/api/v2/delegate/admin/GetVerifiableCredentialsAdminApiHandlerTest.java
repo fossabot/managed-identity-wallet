@@ -22,7 +22,7 @@
 package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
 
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
-import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
+import org.eclipse.tractusx.managedidentitywallets.test.DidFactory;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.ssi.lib.model.did.Did;
 import org.junit.jupiter.api.Test;
@@ -42,11 +42,11 @@ public class GetVerifiableCredentialsAdminApiHandlerTest extends RestAssuredTest
 
         final int MAX_CREDENTIALS = 10;
         for (var i = 0; i < MAX_CREDENTIALS; i++) {
-            newVerifiableCredentialPersisted();
+            newWalletPlusVerifiableCredentialPersisted();
         }
 
         final Wallet issuerWallet = newWalletPersisted();
-        newVerifiableCredentialPersisted(issuerWallet);
+        newWalletPlusVerifiableCredentialPersisted(issuerWallet);
 
         final Did issuerDid = didFactory.generateDid(issuerWallet);
         when()

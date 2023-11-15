@@ -22,9 +22,7 @@
 package org.eclipse.tractusx.managedidentitywallets.repository;
 
 import lombok.SneakyThrows;
-import org.eclipse.tractusx.managedidentitywallets.ManagedIdentityWalletsApplication;
-import org.eclipse.tractusx.managedidentitywallets.factory.MiwTestCase;
-import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
+import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
@@ -34,16 +32,12 @@ import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCreden
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.test.context.ContextConfiguration;
 
 import java.util.List;
 import java.util.Optional;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {ManagedIdentityWalletsApplication.class})
-@ContextConfiguration(initializers = {TestContextInitializer.class})
 public class VerifiableCredentialRepositoryTest extends MiwTestCase {
 
     @Autowired
@@ -51,7 +45,7 @@ public class VerifiableCredentialRepositoryTest extends MiwTestCase {
 
     @Test
     public void testCreate() {
-        final VerifiableCredential verifiableCredential = newVerifiableCredentialPersisted();
+        final VerifiableCredential verifiableCredential = newWalletPlusVerifiableCredentialPersisted();
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
                 .verifiableCredentialId(new VerifiableCredentialId(verifiableCredential.getId().toString()))
@@ -64,24 +58,24 @@ public class VerifiableCredentialRepositoryTest extends MiwTestCase {
     @Test
     @SneakyThrows
     public void testDelete() {
-        final VerifiableCredential verifiableCredential = newVerifiableCredentialPersisted();
+        final VerifiableCredential verifiableCredential = newWalletPlusVerifiableCredentialPersisted();
+
+        verifiableCredentialRepository.delete(verifiableCredential);
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
                 .verifiableCredentialId(new VerifiableCredentialId(verifiableCredential.getId().toString()))
                 .build();
-
-        verifiableCredentialRepository.delete(verifiableCredential);
         final Optional<VerifiableCredential> result = verifiableCredentialRepository.findOne(query);
 
-        Assertions.assertTrue(result.isPresent(), "VerifiableCredential not found");
+        Assertions.assertTrue(result.isEmpty(), "VerifiableCredential not deleted");
     }
 
     @Test
     @SneakyThrows
     public void testFindByIssuer() {
-        final VerifiableCredential verifiableCredential = newVerifiableCredentialPersisted();
-        newVerifiableCredentialPersisted();
-        newVerifiableCredentialPersisted();
+        final VerifiableCredential verifiableCredential = newWalletPlusVerifiableCredentialPersisted();
+        newWalletPlusVerifiableCredentialPersisted();
+        newWalletPlusVerifiableCredentialPersisted();
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
                 .verifiableCredentialIssuer(new VerifiableCredentialIssuer(verifiableCredential.getIssuer().toString()))
@@ -96,7 +90,7 @@ public class VerifiableCredentialRepositoryTest extends MiwTestCase {
     @SneakyThrows
     public void testFindByHolder() {
         final Wallet wallet = newWalletPersisted();
-        final VerifiableCredential verifiableCredential = newVerifiableCredentialPersisted();
+        final VerifiableCredential verifiableCredential = newWalletPlusVerifiableCredentialPersisted();
         final VerifiableCredentialId verifiableCredentialId = new VerifiableCredentialId(verifiableCredential.getId().toString());
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
@@ -105,22 +99,22 @@ public class VerifiableCredentialRepositoryTest extends MiwTestCase {
         verifiableCredentialRepository.createWalletIntersection(verifiableCredentialId, wallet.getWalletId());
         final Page<VerifiableCredential> result = verifiableCredentialRepository.findAll(query, Pageable.unpaged());
 
-        Assertions.assertEquals(3, result.getTotalElements());
+        Assertions.assertEquals(2, result.getTotalElements()); // newly created + bpn credential
     }
 
     @Test
     @SneakyThrows
     public void testFindByType() {
-
-        newVerifiableCredentialPersisted();
-        newVerifiableCredentialPersisted();
-        newVerifiableCredentialPersisted();
+        newWalletPlusVerifiableCredentialPersisted();
+        newWalletPlusVerifiableCredentialPersisted();
+        newWalletPlusVerifiableCredentialPersisted();
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
                 .verifiableCredentialTypes(List.of(new VerifiableCredentialType("VerifiableCredential")))
                 .build();
+
         final Page<VerifiableCredential> result = verifiableCredentialRepository.findAll(query, Pageable.unpaged());
 
-        Assertions.assertEquals(3, result.getTotalElements());
+        Assertions.assertEquals(6, result.getTotalElements()); // 3x2 (newly created & bpn credential)
     }
 }

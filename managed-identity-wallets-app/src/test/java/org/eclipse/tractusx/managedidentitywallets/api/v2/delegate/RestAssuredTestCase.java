@@ -23,17 +23,10 @@ package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate;
 
 
 import io.restassured.RestAssured;
-import org.eclipse.tractusx.managedidentitywallets.factory.MiwTestCase;
+import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.runner.RunWith;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.junit4.SpringRunner;
 
-@RunWith(SpringRunner.class)
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
-@ActiveProfiles("dev")
 public class RestAssuredTestCase extends MiwTestCase {
 
     @LocalServerPort
