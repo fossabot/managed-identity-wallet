@@ -83,7 +83,6 @@ paths:
                 $ref: '#/components/schemas/VerifiableCredentialResponsePayload'
         '404':
           description: Verifiable credential not found.
-
     delete:
       operationId: userDeleteVerifiableCredentialById
       tags:
@@ -261,7 +260,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ListWalletsResponsePayload'
-
     post:
       operationId: adminCreateWallet
       tags:
@@ -285,7 +283,6 @@ paths:
           description: Wallet already exists.
         '400':
           description: Bad request.
-
     put:
       operationId: adminUpdateWallet
       tags:
@@ -326,7 +323,6 @@ paths:
                 $ref: '#/components/schemas/WalletResponsePayload'
         '404':
           description: Wallet not found.
-
     delete:
       operationId: adminDeleteWalletById
       tags:
@@ -360,7 +356,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/VerifiableCredentialListResponsePayload'
-
     post:
       operationId: adminCreateVerifiableCredential
       tags:
@@ -401,8 +396,6 @@ paths:
                 $ref: '#/components/schemas/VerifiableCredentialResponsePayload'
         '404':
           description: Verifiable credential not found.
-
-
     delete:
       operationId: adminDeleteVerifiableCredentialById
       tags:
@@ -734,6 +727,7 @@ components:
                   enum:
                     - incorrect_json_ld_format
                     - incorrect_signature
+                    - no_embedded_signature
                     - expired
     VerifiablePresentationValidationResult:
       type: object

@@ -36,7 +36,7 @@ import java.util.List;
 @Documented
 @Target({ElementType.PARAMETER})
 @Retention(RetentionPolicy.RUNTIME)
-@Constraint(validatedBy = {IsSignatureValid.VerifiableCredentialValidator.class,IsSignatureValid.VerifiableCredentialsValidator.class})
+@Constraint(validatedBy = {IsSignatureValid.VerifiableCredentialValidator.class, IsSignatureValid.VerifiableCredentialsValidator.class})
 public @interface IsSignatureValid {
     String message() default "Verifiable Credential signature not valid";
 
@@ -54,7 +54,9 @@ public @interface IsSignatureValid {
 
         @Override
         public boolean isValid(VerifiableCredential verifiableCredential, ConstraintValidatorContext context) {
-            return verifiableCredential != null && validationService.isSignatureValid(verifiableCredential);
+            return verifiableCredential != null &&
+                    validationService.hasSignature(verifiableCredential) &&
+                    validationService.isSignatureValid(verifiableCredential);
         }
     }
 
@@ -67,7 +69,9 @@ public @interface IsSignatureValid {
 
         @Override
         public boolean isValid(List<VerifiableCredential> verifiableCredentials, ConstraintValidatorContext context) {
-            return verifiableCredentials != null && validationService.isSignatureValid(verifiableCredentials);
+            return verifiableCredentials != null &&
+                    validationService.hasSignature(verifiableCredentials) &&
+                    validationService.isSignatureValid(verifiableCredentials);
 
         }
     }

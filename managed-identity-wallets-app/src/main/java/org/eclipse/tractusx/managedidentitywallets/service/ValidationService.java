@@ -79,7 +79,9 @@ public class ValidationService {
             if (!isJsonLdValid(verifiableCredential)) {
                 types.add(VerifiableCredentialValidationResultViolation.Type.INVALID_JSONLD_FORMAT);
             }
-            if (!isSignatureValid(verifiableCredential)) {
+            if (!hasSignature(verifiableCredential)) {
+                types.add(VerifiableCredentialValidationResultViolation.Type.NO_EMBEDDED_SIGNATURE);
+            } else if (!isSignatureValid(verifiableCredential)) {
                 types.add(VerifiableCredentialValidationResultViolation.Type.INVALID_SIGNATURE);
             }
 
@@ -157,6 +159,7 @@ public class ValidationService {
             result = false;
         }
 
+
         if (log.isTraceEnabled()) {
             log.trace(result ? "VerifiablePresentation is JSON-LD valid. (id={})" : "VerifiablePresentation is not JSON-LD valid. (id={})", presentation.getId());
         }
@@ -164,9 +167,18 @@ public class ValidationService {
         return result;
     }
 
-
     public <T extends Verifiable> boolean isSignatureValid(List<T> verifiableCredentials) {
         return verifiableCredentials.stream().allMatch(this::isSignatureValid);
+    }
+
+    public boolean hasSignature(List<VerifiableCredential> verifiableCredentials) {
+        return verifiableCredentials.stream().allMatch(this::hasSignature);
+    }
+
+    public boolean hasSignature(VerifiableCredential verifiableCredential) {
+        return verifiableCredential.getProof() != null &&
+                verifiableCredential.getProof().getType() != null &&
+                !verifiableCredential.getProof().getType().isBlank();
     }
 
     public boolean isSignatureValid(Verifiable verifiableCredential) {

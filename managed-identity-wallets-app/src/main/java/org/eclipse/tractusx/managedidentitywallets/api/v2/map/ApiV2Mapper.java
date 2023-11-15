@@ -37,6 +37,7 @@ public interface ApiV2Mapper {
 
     @ValueMapping(target = "INCORRECT_JSON_LD_FORMAT", source = "INVALID_JSONLD_FORMAT")
     @ValueMapping(target = "INCORRECT_SIGNATURE", source = "INVALID_SIGNATURE")
+    @ValueMapping(target = "NO_EMBEDDED_SIGNATURE", source = "NO_EMBEDDED_SIGNATURE")
     @ValueMapping(target = "EXPIRED", source = "EXPIRED")
     VerifiableCredentialValidationResultViolationsInnerV2.TypeEnum getVerifiableCredentialValidationResultViolationsInnerV2(VerifiableCredentialValidationResultViolation.Type type);
 

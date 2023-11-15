@@ -39,6 +39,7 @@ public class VerifiableCredentialValidationResultViolation {
     public enum Type {
         INVALID_JSONLD_FORMAT,
         INVALID_SIGNATURE,
+        NO_EMBEDDED_SIGNATURE,
         EXPIRED
     }
 }
