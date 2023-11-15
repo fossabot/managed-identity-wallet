@@ -19,7 +19,7 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.did;
+package org.eclipse.tractusx.managedidentitywallets.api.v1.did;
 
 import org.eclipse.tractusx.managedidentitywallets.ManagedIdentityWalletsApplication;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.RestURI;
@@ -36,8 +36,6 @@ import org.springframework.test.context.ContextConfiguration;
 
 import java.util.UUID;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {ManagedIdentityWalletsApplication.class})
-@ContextConfiguration(initializers = {TestContextInitializer.class})
 class DidDocumentsTest extends MiwTestCase {
 
     @Autowired
