@@ -19,7 +19,7 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.test.verifiableDocuments;
+package org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments;
 
 import com.nimbusds.jwt.SignedJWT;
 import lombok.NonNull;
@@ -29,7 +29,7 @@ import org.eclipse.tractusx.managedidentitywallets.annotations.IsJsonLdValid;
 import org.eclipse.tractusx.managedidentitywallets.annotations.IsSignatureValid;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
-import org.eclipse.tractusx.managedidentitywallets.test.DidFactory;
+import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
 import org.eclipse.tractusx.ssi.lib.crypt.octet.OctetKeyPairFactory;
 import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559PrivateKey;
 import org.eclipse.tractusx.ssi.lib.exception.InvalidePrivateKeyFormat;

@@ -1,0 +1,29 @@
+{
+  "issuanceDate": "2023-10-01T17:56:48Z",
+  "credentialSubject": [
+    {
+      "bpn": "BPNL000000000000",
+      "id": "did:web:managed-identity-wallets-alpha.dev.demo.catena-x.net:BPNL000000000000",
+      "type": "BpnCredential"
+    }
+  ],
+  "id": "did:web:managed-identity-wallets-alpha.dev.demo.catena-x.net:BPNL000000000000#b9e05964-7a55-4b70-b731-a2071882d337",
+  "proof": {
+    "proofPurpose": "assertionMethod",
+    "type": "JsonWebSignature2020",
+    "verificationMethod": "did:web:managed-identity-wallets-alpha.dev.demo.catena-x.net:BPNL000000000000#b143b76d-0d42-44d0-9d1a-65ab0ca1dda6",
+    "created": "2023-10-01T17:56:51Z",
+    "jws": "eyJhbGciOiJFZERTQSJ9..gnlVbdkHjbTDGW3jWCe4CuUAu2yE9LP6FNWINRsBxvH1TX7r2fI45mqj6OAGSqrho8mIJgPoLltb0g1W1ipkAg"
+  },
+  "type": [
+    "VerifiableCredential",
+    "BpnCredential"
+  ],
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://catenax-ng.github.io/product-core-schemas/businessPartnerData.json",
+    "https://w3id.org/security/suites/jws-2020/v1"
+  ],
+  "issuer": "did:web:managed-identity-wallets-alpha.dev.demo.catena-x.net:BPNL000000000000",
+  "expirationDate": "2023-12-31T00:00:00Z"
+}

@@ -115,4 +115,9 @@ public class ApplicationConfig implements WebMvcConfigurer {
         beanValidatorFactory.setValidationMessageSource(messageSource());
         return beanValidatorFactory;
     }
+
+    @Bean
+    public VerifiableCredentialContexts verifiableCredentialContexts() {
+        return new VerifiableCredentialContexts();
+    }
 }

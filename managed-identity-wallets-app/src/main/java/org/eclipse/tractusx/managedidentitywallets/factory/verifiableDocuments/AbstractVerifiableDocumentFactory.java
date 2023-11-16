@@ -19,8 +19,9 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.test.verifiableDocuments;
+package org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments;
 
+import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
@@ -29,7 +30,7 @@ import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
-import org.eclipse.tractusx.managedidentitywallets.test.DidFactory;
+import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
 import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559PrivateKey;
 import org.eclipse.tractusx.ssi.lib.exception.InvalidePrivateKeyFormat;
 import org.eclipse.tractusx.ssi.lib.exception.UnsupportedSignatureTypeException;
@@ -46,10 +47,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 import java.net.URI;
 import java.time.Instant;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 public abstract class AbstractVerifiableDocumentFactory {
 
@@ -62,22 +60,32 @@ public abstract class AbstractVerifiableDocumentFactory {
     @Autowired
     private VaultService vaultService;
 
-    protected VerifiableCredential createdIssuedCredential(VerifiableCredentialSubject subject, String type) {
-        return createdIssuedCredential(subject, type, miwSettings.getVcExpiryDate().toInstant());
+    protected VerifiableCredential createdIssuedCredential(@NonNull VerifiableCredentialSubject subject, @NonNull String type) {
+        return createdIssuedCredential(subject, type, Collections.emptyList(), miwSettings.getVcExpiryDate().toInstant());
+    }
+
+    protected VerifiableCredential createdIssuedCredential(@NonNull VerifiableCredentialSubject subject, @NonNull String type, @NonNull List<URI> additionalContexts) {
+        return createdIssuedCredential(subject, type, additionalContexts, miwSettings.getVcExpiryDate().toInstant());
+    }
+
+    protected VerifiableCredential createdIssuedCredential(@NonNull VerifiableCredentialSubject subject, @NonNull String type, @NonNull Instant expiryDate) {
+        return createdIssuedCredential(subject, type, Collections.emptyList(), expiryDate);
     }
 
     @SneakyThrows({UnsupportedSignatureTypeException.class, InvalidePrivateKeyFormat.class})
-    protected VerifiableCredential createdIssuedCredential(VerifiableCredentialSubject subject, String type, Instant expiryDate) {
+    protected VerifiableCredential createdIssuedCredential(@NonNull VerifiableCredentialSubject subject, @NonNull String type, @NonNull List<URI> additionalContexts, @NonNull Instant expiryDate) {
 
-        final List<URI> contexts = miwSettings.getVcContexts();
-        final Wallet issuerWallet = getIssuerWallet();
-        final Did issuerDid = didFactory.generateDid(issuerWallet);
+        final List<URI> contexts = new ArrayList<>();
+        contexts.addAll(miwSettings.getVcContexts());
+        contexts.addAll(additionalContexts);
 
         // if the credential does not contain the JWS proof-context add it
         final URI jwsUri = URI.create("https://w3id.org/security/suites/jws-2020/v1");
         if (!contexts.contains(jwsUri))
             contexts.add(jwsUri);
 
+        final Wallet issuerWallet = getIssuerWallet();
+        final Did issuerDid = didFactory.generateDid(issuerWallet);
         final VerifiableCredentialBuilder builder =
                 new VerifiableCredentialBuilder()
                         .context(contexts)
@@ -92,7 +100,7 @@ public abstract class AbstractVerifiableDocumentFactory {
         return builder.proof(proof).build();
     }
 
-    protected Proof generateProof(Wallet issuerWallet, Verifiable verifiable) throws UnsupportedSignatureTypeException, InvalidePrivateKeyFormat {
+    protected Proof generateProof(@NonNull Wallet issuerWallet, @NonNull Verifiable verifiable) throws UnsupportedSignatureTypeException, InvalidePrivateKeyFormat {
         if (issuerWallet.getStoredEd25519Keys().isEmpty()) {
             throw new RuntimeException("No key found for wallet " + issuerWallet.getWalletId());
         }

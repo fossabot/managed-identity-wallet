@@ -19,46 +19,42 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.test.verifiableDocuments;
+package org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.MIWVerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
-import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
-import org.eclipse.tractusx.managedidentitywallets.test.DidFactory;
+import org.eclipse.tractusx.managedidentitywallets.config.VerifiableCredentialContexts;
+import org.eclipse.tractusx.managedidentitywallets.models.*;
+import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
 import org.eclipse.tractusx.ssi.lib.model.did.Did;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialSubject;
 import org.springframework.stereotype.Component;
 
-import java.util.Collections;
+import java.net.URI;
 import java.util.List;
 import java.util.Map;
 
 @Component
 @RequiredArgsConstructor
-public class DismantlerVerifiableCredentialFactory extends AbstractVerifiableDocumentFactory {
+public class BusinessPartnerNumberVerifiableCredentialFactory extends AbstractVerifiableDocumentFactory {
 
     private final DidFactory didFactory;
+    private final VerifiableCredentialContexts verifiableCredentialContexts;
 
-    public VerifiableCredential createDismantlerVerifiableCredential(@NonNull Wallet wallet, @NonNull String activityType) {
-        return createDismantlerVerifiableCredential(wallet, activityType, Collections.emptyList());
-    }
-
-    public VerifiableCredential createDismantlerVerifiableCredential(@NonNull Wallet wallet, @NonNull String activityType, @NonNull List<String> allowedVehicleBrands) {
-
+    public VerifiableCredential createBusinessPartnerNumberCredential(@NonNull Wallet wallet) {
         final WalletId walletId = wallet.getWalletId();
         final Did did = didFactory.generateDid(wallet);
 
-        VerifiableCredentialSubject verifiableCredentialSubject = new VerifiableCredentialSubject(Map.of(
-                StringPool.TYPE, MIWVerifiableCredentialType.DISMANTLER_CREDENTIAL,
-                StringPool.ID, did.toString(),
-                StringPool.HOLDER_IDENTIFIER, walletId.getText(),
-                StringPool.ACTIVITY_TYPE, activityType,
-                StringPool.ALLOWED_VEHICLE_BRANDS, allowedVehicleBrands));
+        final VerifiableCredentialSubject verifiableCredentialSubject =
+                new VerifiableCredentialSubject(Map.of(
+                        StringPool.TYPE, MIWVerifiableCredentialType.BPN_CREDENTIAL,
+                        StringPool.ID, did.toString(),
+                        StringPool.BPN, walletId.getText()));
 
-        return createdIssuedCredential(verifiableCredentialSubject, MIWVerifiableCredentialType.DISMANTLER_CREDENTIAL);
+        final URI context = verifiableCredentialContexts.getBusinessPartnerNumberVerifiableCredentialContext();
+        return createdIssuedCredential(verifiableCredentialSubject, MIWVerifiableCredentialType.BPN_CREDENTIAL, List.of(context));
     }
 }

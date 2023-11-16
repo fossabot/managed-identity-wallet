@@ -29,8 +29,8 @@ import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
-import org.eclipse.tractusx.managedidentitywallets.test.verifiableDocuments.BusinessPartnerVerifiableCredentialFactory;
-import org.eclipse.tractusx.managedidentitywallets.test.Ed25519KeyFactory;
+import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.BusinessPartnerNumberVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.factory.Ed25519KeyFactory;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.annotation.Order;
@@ -44,7 +44,7 @@ import java.util.List;
 public class WalletCreatingEventListener {
 
     private final Ed25519KeyFactory ed25519KeyFactory;
-    private final BusinessPartnerVerifiableCredentialFactory businessPartnerVerifiableCredentialFactory;
+    private final BusinessPartnerNumberVerifiableCredentialFactory businessPartnerNumberVerifiableCredentialFactory;
     private final WalletService walletService;
     private final VerifiableCredentialService verifiableCredentialService;
     private final VaultService vaultService;
@@ -84,7 +84,7 @@ public class WalletCreatingEventListener {
     @Order(20) // credential is generation must be after key generation
     public void issueBusinessPartnerCredential(@NonNull final WalletCreatingEvent event) {
         final Wallet wallet = event.getWallet();
-        final VerifiableCredential bpnCredential = businessPartnerVerifiableCredentialFactory
+        final VerifiableCredential bpnCredential = businessPartnerNumberVerifiableCredentialFactory
                 .createBusinessPartnerNumberCredential(event.getWallet());
 
         verifiableCredentialService.create(bpnCredential);

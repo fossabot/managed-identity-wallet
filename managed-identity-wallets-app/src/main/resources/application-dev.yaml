@@ -25,12 +25,7 @@ miw:
   host: localhost:8080
   encryptionKey: d6aab34fb68e090c2789a9b1a67648d3
   authorityWalletBpn: BPNL000000000000
-  authorityWalletName: Test
   authorityWalletDid: did:web:localhost%3A8080:BPNL000000000000
-  vcContexts: https://www.w3.org/2018/credentials/v1, https://catenax-ng.github.io/product-core-schemas/businessPartnerData.json
-  summaryVcContexts: https://www.w3.org/2018/credentials/v1, https://catenax-ng.github.io/product-core-schemas/SummaryVC.json
-  vcExpiryDate: 01-10-2025
-  supportedFrameworkVCTypes: PcfCredential, SustainabilityCredential, QualityCredential, TraceabilityCredential, BehaviorTwinCredential, ResiliencyCredential
   enforceHttps: false
   contractTemplatesUrl: https://public.catena-x.org/contracts/
   didDocumentContextUrls: https://www.w3.org/ns/did/v1,https://w3c.github.io/vc-jws-2020/contexts/v1

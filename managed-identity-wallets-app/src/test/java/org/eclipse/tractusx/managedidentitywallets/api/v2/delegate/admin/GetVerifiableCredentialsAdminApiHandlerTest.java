@@ -22,7 +22,7 @@
 package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
 
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
-import org.eclipse.tractusx.managedidentitywallets.test.DidFactory;
+import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.ssi.lib.model.did.Did;
 import org.junit.jupiter.api.Test;
