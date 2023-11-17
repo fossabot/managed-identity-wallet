@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class SummaryVerifiableCredentialJsonLdTest extends MiwTestCase {
+public class SummaryVerifiableCredentialFactroryTest extends MiwTestCase {
 
     @Autowired
     public SummaryVerifiableCredentialFactory factory;
