@@ -28,7 +28,11 @@ import org.springframework.beans.factory.annotation.Value;
 import java.net.URI;
 
 @Getter
-public class VerifiableCredentialContexts {
+public class VerifiableCredentialContextConfiguration {
+
+    @Value("${miw.verifiable.credential.contexts.useEmbeddedContexts}")
+    private boolean useEmbeddedContexts;
+
     @NonNull
     @Value("${miw.verifiable.credential.contexts.businessPartnerNumberCredential}")
     private URI businessPartnerNumberVerifiableCredentialContext;

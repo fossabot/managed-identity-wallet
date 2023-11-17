@@ -22,7 +22,7 @@
 package org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments;
 
 import lombok.SneakyThrows;
-import org.eclipse.tractusx.managedidentitywallets.config.VerifiableCredentialContexts;
+import org.eclipse.tractusx.managedidentitywallets.config.VerifiableCredentialContextConfiguration;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
@@ -42,7 +42,7 @@ public class DismantlerCredentialJsonLdTest extends MiwTestCase {
     public JsonLdValidator jsonLdValidator;
 
     @Autowired
-    public VerifiableCredentialContexts verifiableCredentialContexts;
+    public VerifiableCredentialContextConfiguration verifiableCredentialContextConfiguration;
 
     @Test
     public void testContextSet() {
@@ -54,7 +54,7 @@ public class DismantlerCredentialJsonLdTest extends MiwTestCase {
 
         final boolean containsBpnContext =
                 verifiableCredential.getContext()
-                        .contains(verifiableCredentialContexts.getDismantlerVerifiableCredentialContext());
+                        .contains(verifiableCredentialContextConfiguration.getDismantlerVerifiableCredentialContext());
 
         Assertions.assertTrue(containsBpnContext);
     }

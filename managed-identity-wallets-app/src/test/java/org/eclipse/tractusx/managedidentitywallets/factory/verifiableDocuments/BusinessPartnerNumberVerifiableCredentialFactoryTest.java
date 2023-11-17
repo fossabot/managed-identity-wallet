@@ -22,7 +22,7 @@
 package org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments;
 
 import lombok.SneakyThrows;
-import org.eclipse.tractusx.managedidentitywallets.config.VerifiableCredentialContexts;
+import org.eclipse.tractusx.managedidentitywallets.config.VerifiableCredentialContextConfiguration;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
@@ -40,7 +40,7 @@ public class BusinessPartnerNumberVerifiableCredentialFactoryTest extends MiwTes
     public JsonLdValidator jsonLdValidator;
 
     @Autowired
-    public VerifiableCredentialContexts verifiableCredentialContexts;
+    public VerifiableCredentialContextConfiguration verifiableCredentialContextConfiguration;
 
 
     @Test
@@ -51,7 +51,7 @@ public class BusinessPartnerNumberVerifiableCredentialFactoryTest extends MiwTes
 
         final boolean containsBpnContext =
                 verifiableCredential.getContext()
-                        .contains(verifiableCredentialContexts.getBusinessPartnerNumberVerifiableCredentialContext());
+                        .contains(verifiableCredentialContextConfiguration.getBusinessPartnerNumberVerifiableCredentialContext());
 
         Assertions.assertTrue(containsBpnContext);
     }

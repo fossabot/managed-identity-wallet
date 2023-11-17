@@ -25,7 +25,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.MIWVerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
-import org.eclipse.tractusx.managedidentitywallets.config.VerifiableCredentialContexts;
+import org.eclipse.tractusx.managedidentitywallets.config.VerifiableCredentialContextConfiguration;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
 import org.eclipse.tractusx.ssi.lib.model.did.Did;
@@ -42,7 +42,7 @@ import java.util.Map;
 public class BusinessPartnerNumberVerifiableCredentialFactory extends AbstractVerifiableDocumentFactory {
 
     private final DidFactory didFactory;
-    private final VerifiableCredentialContexts verifiableCredentialContexts;
+    private final VerifiableCredentialContextConfiguration verifiableCredentialContextConfiguration;
 
     public VerifiableCredential createBusinessPartnerNumberCredential(@NonNull Wallet wallet) {
         final WalletId walletId = wallet.getWalletId();
@@ -54,7 +54,7 @@ public class BusinessPartnerNumberVerifiableCredentialFactory extends AbstractVe
                         StringPool.ID, did.toString(),
                         StringPool.BPN, walletId.getText()));
 
-        final URI context = verifiableCredentialContexts.getBusinessPartnerNumberVerifiableCredentialContext();
+        final URI context = verifiableCredentialContextConfiguration.getBusinessPartnerNumberVerifiableCredentialContext();
         return createdIssuedCredential(verifiableCredentialSubject, MIWVerifiableCredentialType.BPN_CREDENTIAL, List.of(context));
     }
 }

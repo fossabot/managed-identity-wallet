@@ -117,7 +117,7 @@ public class ApplicationConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public VerifiableCredentialContexts verifiableCredentialContexts() {
-        return new VerifiableCredentialContexts();
+    public VerifiableCredentialContextConfiguration verifiableCredentialContexts() {
+        return new VerifiableCredentialContextConfiguration();
     }
 }

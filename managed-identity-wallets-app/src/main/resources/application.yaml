@@ -93,6 +93,7 @@ miw:
   verifiable:
     credential:
       contexts:
+        useEmbeddedContexts: ${USE_EMBEDDED_CONTEXTS:true}
         businessPartnerNumberCredential: ${SUPPORTED_FRAMEWORK_VC_TYPES:https://raw.githubusercontent.com/catenax-ng/product-core-schemas/main/bpn-credential-v2.json}
         dismantlerCredential: ${SUPPORTED_FRAMEWORK_VC_TYPES:https://raw.githubusercontent.com/catenax-ng/product-core-schemas/main/dismantler-credential-v2.json}
   security:

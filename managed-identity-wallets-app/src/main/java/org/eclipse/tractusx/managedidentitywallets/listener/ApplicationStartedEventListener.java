@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
+import org.eclipse.tractusx.managedidentitywallets.config.VerifiableCredentialContextConfiguration;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
@@ -40,7 +41,6 @@ import org.springframework.stereotype.Service;
 import java.net.URI;
 import java.time.OffsetDateTime;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -48,12 +48,16 @@ import java.util.Map;
 @Slf4j
 public class ApplicationStartedEventListener {
 
+    private static final int ORDER_REGISTER_EMBEDDED_RESOURCES = 10;
+    private static final int ORDER_CREATE_AUTHORITY_WALLET = 20;
+
     private final MIWSettings miwSettings;
     private final WalletService walletService;
     private final ApplicationResourceLoader applicationResourceLoader;
+    private final VerifiableCredentialContextConfiguration verifiableCredentialContextConfiguration;
 
     @EventListener
-    @Order(20)
+    @Order(ORDER_CREATE_AUTHORITY_WALLET)
     public void createAuthorityWallet(ApplicationStartedEvent event) {
         final WalletId walletId = new WalletId(miwSettings.getAuthorityWalletBpn());
         final WalletName walletName = new WalletName(miwSettings.getAuthorityWalletName());
@@ -75,13 +79,14 @@ public class ApplicationStartedEventListener {
 
     @EventListener
     @SneakyThrows
-    @Order(10) // resources should be loaded before the authority wallet is created
-    public void registerOfflineResources(ApplicationStartedEvent event) {
-
-        // TODO Make configurable
+    @Order(ORDER_REGISTER_EMBEDDED_RESOURCES)
+    public void registerEmbeddedResources(ApplicationStartedEvent event) {
+        if (!verifiableCredentialContextConfiguration.isUseEmbeddedContexts()) {
+            return;
+        }
 
         if (log.isTraceEnabled()) {
-            log.trace("Registering offline resources");
+            log.trace("Registering embedded resources");
         }
 
         final RemoteDocumentLoader documentLoader = RemoteDocumentLoader.getInstance();

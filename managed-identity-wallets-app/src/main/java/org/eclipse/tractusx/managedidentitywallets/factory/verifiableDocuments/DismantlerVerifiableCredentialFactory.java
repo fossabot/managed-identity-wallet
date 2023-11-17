@@ -25,7 +25,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.MIWVerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
-import org.eclipse.tractusx.managedidentitywallets.config.VerifiableCredentialContexts;
+import org.eclipse.tractusx.managedidentitywallets.config.VerifiableCredentialContextConfiguration;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
@@ -44,7 +44,7 @@ import java.util.Map;
 public class DismantlerVerifiableCredentialFactory extends AbstractVerifiableDocumentFactory {
 
     private final DidFactory didFactory;
-    private final VerifiableCredentialContexts verifiableCredentialContexts;
+    private final VerifiableCredentialContextConfiguration verifiableCredentialContextConfiguration;
 
     public VerifiableCredential createDismantlerVerifiableCredential(@NonNull Wallet wallet, @NonNull String activityType) {
         return createDismantlerVerifiableCredential(wallet, activityType, Collections.emptyList());
@@ -62,7 +62,7 @@ public class DismantlerVerifiableCredentialFactory extends AbstractVerifiableDoc
                 StringPool.ACTIVITY_TYPE, activityType,
                 StringPool.ALLOWED_VEHICLE_BRANDS, allowedVehicleBrands));
 
-        final URI context = verifiableCredentialContexts.getDismantlerVerifiableCredentialContext();
+        final URI context = verifiableCredentialContextConfiguration.getDismantlerVerifiableCredentialContext();
         return createdIssuedCredential(verifiableCredentialSubject, MIWVerifiableCredentialType.DISMANTLER_CREDENTIAL, List.of(context));
     }
 }
