@@ -49,8 +49,6 @@ public class MIWSettings {
 
     private List<URI> vcContexts;
 
-    private List<URI> summaryVcContexts;
-
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     private Date vcExpiryDate;
 

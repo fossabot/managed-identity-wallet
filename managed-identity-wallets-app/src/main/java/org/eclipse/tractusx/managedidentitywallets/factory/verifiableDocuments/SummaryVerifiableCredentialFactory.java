@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.MIWVerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
+import org.eclipse.tractusx.managedidentitywallets.config.VerifiableCredentialContextConfiguration;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
@@ -36,6 +37,7 @@ import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCreden
 import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Component;
 
+import java.net.URI;
 import java.time.Instant;
 import java.util.*;
 
@@ -45,6 +47,7 @@ public class SummaryVerifiableCredentialFactory extends AbstractVerifiableDocume
 
     private final DidFactory didFactory;
     private final MIWSettings miwSettings;
+    private final VerifiableCredentialContextConfiguration verifiableCredentialContextConfiguration;
     private final VerifiableCredentialService verifiableCredentialService;
 
     public VerifiableCredential createSummaryVerifiableCredential(@NonNull Wallet wallet) {
@@ -54,13 +57,14 @@ public class SummaryVerifiableCredentialFactory extends AbstractVerifiableDocume
         final Instant expirationDate = getExpirationDate(wallet);
 
         final VerifiableCredentialSubject subject = new VerifiableCredentialSubject(Map.of(
-                StringPool.ID, holderDid,
-                StringPool.HOLDER_IDENTIFIER, wallet.getWalletId(),
+                StringPool.ID, holderDid.toString(),
+                StringPool.HOLDER_IDENTIFIER, wallet.getWalletId().toString(),
                 StringPool.ITEMS, items,
                 StringPool.TYPE, MIWVerifiableCredentialType.SUMMARY_CREDENTIAL,
                 StringPool.CONTRACT_TEMPLATE, miwSettings.getContractTemplatesUrl()));
 
-        return createdIssuedCredential(subject, MIWVerifiableCredentialType.SUMMARY_CREDENTIAL, expirationDate);
+        final URI summaryContext = verifiableCredentialContextConfiguration.getSummaryVerifiableCredentialContext();
+        return createdIssuedCredential(subject, MIWVerifiableCredentialType.SUMMARY_CREDENTIAL, List.of(summaryContext), expirationDate);
     }
 
     private List<String> getFrameworkVcItems(@NonNull Wallet wallet) {

@@ -61,8 +61,9 @@ public class VerifiableCredentialContextConfigurationHealthIndicator extends Abs
 
         final VerifiableCredential dismantlerCredential = dismantlerVerifiableCredentialFactory.createDismantlerVerifiableCredential(wallet, "activityType");
         final VerifiableCredential bpnCredential = businessPartnerNumberVerifiableCredentialFactory.createBusinessPartnerNumberCredential(wallet);
+        final VerifiableCredential summaryCredential = summaryVerifiableCredentialFactory.createSummaryVerifiableCredential(wallet);
 
-        final List<VerifiableCredential> verifiableCredentials = List.of(dismantlerCredential, bpnCredential);
+        final List<VerifiableCredential> verifiableCredentials = List.of(dismantlerCredential, bpnCredential, summaryCredential);
         final VerifiableCredentialValidationResult validationResult = validationService.validate(verifiableCredentials);
 
         if (validationResult.isValid()) {

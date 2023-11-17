@@ -40,4 +40,7 @@ public class VerifiableCredentialContextConfiguration {
     @NonNull
     @Value("${miw.verifiable.credential.contexts.dismantlerCredential}")
     private URI dismantlerVerifiableCredentialContext;
+    @NonNull
+    @Value("${miw.verifiable.credential.contexts.summaryCredential}")
+    private URI summaryVerifiableCredentialContext;
 }

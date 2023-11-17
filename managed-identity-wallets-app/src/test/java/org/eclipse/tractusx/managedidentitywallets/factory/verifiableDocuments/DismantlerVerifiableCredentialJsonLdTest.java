@@ -31,7 +31,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-public class DismantlerCredentialJsonLdTest extends MiwTestCase {
+public class DismantlerVerifiableCredentialJsonLdTest extends MiwTestCase {
 
     private static final String ACTIVITY_TYPE = "recycle";
 
@@ -49,8 +49,6 @@ public class DismantlerCredentialJsonLdTest extends MiwTestCase {
         final Wallet wallet = newWalletPersisted();
 
         final VerifiableCredential verifiableCredential = factory.createDismantlerVerifiableCredential(wallet, ACTIVITY_TYPE);
-
-        System.out.println(verifiableCredential.toPrettyJson());
 
         final boolean containsBpnContext =
                 verifiableCredential.getContext()
