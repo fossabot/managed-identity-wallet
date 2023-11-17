@@ -24,6 +24,8 @@ package org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
+import org.eclipse.tractusx.managedidentitywallets.config.VerifiableCredentialContextConfiguration;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialContext;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
@@ -33,6 +35,8 @@ import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCreden
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialSubject;
 import org.springframework.stereotype.Component;
 
+import java.net.URI;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -40,11 +44,12 @@ import java.util.Map;
 public class FrameworkVerifiableCredentialFactory extends AbstractVerifiableDocumentFactory {
 
     private final DidFactory didFactory;
+    private final VerifiableCredentialContextConfiguration verifiableCredentialContextConfiguration;
 
-    public VerifiableCredential createDismantlerVerifiableCredential(@NonNull Wallet wallet,
-                                                                     @NonNull VerifiableCredentialType verifiableCredentialType,
-                                                                     @NonNull String contractTemplate,
-                                                                     @NonNull String contractVersion) {
+    public VerifiableCredential createFrameworkVerifiableCredential(@NonNull Wallet wallet,
+                                                                    @NonNull VerifiableCredentialType verifiableCredentialType,
+                                                                    @NonNull String contractTemplate,
+                                                                    @NonNull String contractVersion) {
         final WalletId walletId = wallet.getWalletId();
         final Did did = didFactory.generateDid(wallet);
 
@@ -55,6 +60,7 @@ public class FrameworkVerifiableCredentialFactory extends AbstractVerifiableDocu
                 StringPool.CONTRACT_TEMPLATE, contractTemplate,
                 StringPool.CONTRACT_VERSION, contractVersion));
 
-        return createdIssuedCredential(verifiableCredentialSubject, verifiableCredentialType.getText());
+        final URI context = verifiableCredentialContextConfiguration.getFrameworkVerifiableCredentialContext();
+        return createdIssuedCredential(verifiableCredentialSubject, verifiableCredentialType.getText(), List.of(context));
     }
 }

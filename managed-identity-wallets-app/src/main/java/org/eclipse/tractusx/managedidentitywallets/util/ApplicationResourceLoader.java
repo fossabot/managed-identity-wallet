@@ -43,7 +43,8 @@ public class ApplicationResourceLoader {
         BUSINESS_PARTNER_DATA_VC_V1("https://catenax-ng.github.io/product-core-schemas/businessPartnerData.json", "/contexts/business-partner-data-v1.json"),
         CREDENTIALS_V1("https://www.w3.org/2018/credentials/v1", "/contexts/credentials-v1.json"),
         BPN_VC_V2("https://raw.githubusercontent.com/catenax-ng/product-core-schemas/main/bpn-credential-v2.json", "/contexts/bpn-credential-v2.json"),
-        DISMANTLER_VC_V2("https://raw.githubusercontent.com/catenax-ng/product-core-schemas/main/dismantler-credential-v2.json", "/contexts/dismantler-credential-v2.json")
+        DISMANTLER_VC_V2("https://raw.githubusercontent.com/catenax-ng/product-core-schemas/main/dismantler-credential-v2.json", "/contexts/dismantler-credential-v2.json"),
+        FRAMEWORK_VC_V2("https://raw.githubusercontent.com/catenax-ng/product-core-schemas/main/framework-credential-v2.json", "/contexts/framework-credential-v2.json")
         ;
 
         @Getter

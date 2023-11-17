@@ -23,21 +23,22 @@ package org.eclipse.tractusx.managedidentitywallets.health;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.logging.log4j.util.Strings;
+import org.eclipse.tractusx.managedidentitywallets.config.HealthConfiguration;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.*;
-import org.eclipse.tractusx.managedidentitywallets.models.*;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialValidationResult;
+import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.ValidationService;
-import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.boot.actuate.health.AbstractHealthIndicator;
 import org.springframework.boot.actuate.health.Health;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
 
 @Slf4j
 @Component
@@ -46,6 +47,7 @@ public class VerifiableCredentialContextConfigurationHealthIndicator extends Abs
     private final MIWSettings miwSettings;
     private final WalletService walletService;
     private final ValidationService validationService;
+    private final HealthConfiguration healthConfiguration;
 
     private final BusinessPartnerNumberVerifiableCredentialFactory businessPartnerNumberVerifiableCredentialFactory;
     private final DismantlerVerifiableCredentialFactory dismantlerVerifiableCredentialFactory;
@@ -55,15 +57,14 @@ public class VerifiableCredentialContextConfigurationHealthIndicator extends Abs
 
     @Override
     protected void doHealthCheck(Health.Builder builder) {
+        if (!healthConfiguration.isSpecialCredentialIssuable()) {
+            return;
+        }
 
         final WalletId walletId = new WalletId(miwSettings.getAuthorityWalletBpn());
         final Wallet wallet = walletService.findById(walletId).orElseThrow();
 
-        final VerifiableCredential dismantlerCredential = dismantlerVerifiableCredentialFactory.createDismantlerVerifiableCredential(wallet, "activityType");
-        final VerifiableCredential bpnCredential = businessPartnerNumberVerifiableCredentialFactory.createBusinessPartnerNumberCredential(wallet);
-        final VerifiableCredential summaryCredential = summaryVerifiableCredentialFactory.createSummaryVerifiableCredential(wallet);
-
-        final List<VerifiableCredential> verifiableCredentials = List.of(dismantlerCredential, bpnCredential, summaryCredential);
+        final List<VerifiableCredential> verifiableCredentials = createAllSpecialVerifiableCredentials(wallet);
         final VerifiableCredentialValidationResult validationResult = validationService.validate(verifiableCredentials);
 
         if (validationResult.isValid()) {
@@ -81,6 +82,26 @@ public class VerifiableCredentialContextConfigurationHealthIndicator extends Abs
             }
             builder.down();
         }
+    }
 
+    private List<VerifiableCredential> createAllSpecialVerifiableCredentials(Wallet wallet) {
+        final String contractTemplateUrl = miwSettings.getContractTemplatesUrl();
+        final List<VerifiableCredential> frameworkCredentials =
+                miwSettings.getSupportedFrameworkVCTypes().stream()
+                        .map(VerifiableCredentialType::new)
+                        .map(type -> frameworkVerifiableCredentialFactory.createFrameworkVerifiableCredential(wallet, type, contractTemplateUrl, "1.0.0"))
+                        .toList();
+
+        final VerifiableCredential dismantlerCredential = dismantlerVerifiableCredentialFactory.createDismantlerVerifiableCredential(wallet, "activityType");
+        final VerifiableCredential bpnCredential = businessPartnerNumberVerifiableCredentialFactory.createBusinessPartnerNumberCredential(wallet);
+        final VerifiableCredential summaryCredential = summaryVerifiableCredentialFactory.createSummaryVerifiableCredential(wallet);
+        final VerifiableCredential membershipCredential = membershipVerifiableCredentialFactory.createMembershipVerifiableCredential(wallet);
+
+        final List<VerifiableCredential> verifiableCredentials = new ArrayList<>(frameworkCredentials);
+        verifiableCredentials.add(dismantlerCredential);
+        verifiableCredentials.add(bpnCredential);
+        verifiableCredentials.add(summaryCredential);
+        verifiableCredentials.add(membershipCredential);
+        return verifiableCredentials;
     }
 }

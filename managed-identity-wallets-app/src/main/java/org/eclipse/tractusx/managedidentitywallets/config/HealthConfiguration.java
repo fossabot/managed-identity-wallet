@@ -28,28 +28,12 @@ import org.springframework.beans.factory.annotation.Value;
 import java.net.URI;
 
 @Getter
-public class VerifiableCredentialContextConfiguration {
+public class HealthConfiguration {
 
-    @Value("${miw.verifiable.credential.contexts.useEmbeddedContexts}")
-    private boolean useEmbeddedContexts;
+    @Value("${miw.health.checkAuthorityKeyReachable}")
+    private boolean authorityKeyReachable;
 
-    @NonNull
-    @Value("${miw.verifiable.credential.contexts.businessPartnerNumberCredential}")
-    private URI businessPartnerNumberVerifiableCredentialContext;
+    @Value("${miw.health.checkSpecialCredentialIssuable}")
+    private boolean specialCredentialIssuable;
 
-    @NonNull
-    @Value("${miw.verifiable.credential.contexts.dismantlerCredential}")
-    private URI dismantlerVerifiableCredentialContext;
-
-    @NonNull
-    @Value("${miw.verifiable.credential.contexts.summaryCredential}")
-    private URI summaryVerifiableCredentialContext;
-
-    @NonNull
-    @Value("${miw.verifiable.credential.contexts.frameworkCredential}")
-    private URI frameworkVerifiableCredentialContext;
-
-    @NonNull
-    @Value("${miw.verifiable.credential.contexts.membershipCredential}")
-    private URI membershipVerifiableCredentialContext;
 }

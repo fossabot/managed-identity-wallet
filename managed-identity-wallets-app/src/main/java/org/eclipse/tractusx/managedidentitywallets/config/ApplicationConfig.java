@@ -117,7 +117,12 @@ public class ApplicationConfig implements WebMvcConfigurer {
     }
 
     @Bean
-    public VerifiableCredentialContextConfiguration verifiableCredentialContexts() {
+    public VerifiableCredentialContextConfiguration verifiableCredentialContextConfiguration() {
         return new VerifiableCredentialContextConfiguration();
+    }
+
+    @Bean
+    public HealthConfiguration healthConfiguration() {
+        return new HealthConfiguration();
     }
 }

@@ -106,6 +106,7 @@ public class SummaryVerifiableCredentialFactory extends AbstractVerifiableDocume
 
             if (latestVcCredential.isPresent()) {
                 // new expiration date should be the lowest date of summarized vcs
+
                 expirationDate = latestVcCredential.get().getExpirationDate().isBefore(expirationDate) ?
                         latestVcCredential.get().getExpirationDate() : expirationDate;
             }

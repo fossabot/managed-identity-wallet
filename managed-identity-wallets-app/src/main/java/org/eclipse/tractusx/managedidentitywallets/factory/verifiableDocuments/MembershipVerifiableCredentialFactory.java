@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.MIWVerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
+import org.eclipse.tractusx.managedidentitywallets.config.VerifiableCredentialContextConfiguration;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
@@ -36,7 +37,9 @@ import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCreden
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialType;
 import org.springframework.stereotype.Component;
 
+import java.net.URI;
 import java.time.Instant;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -46,6 +49,7 @@ public class MembershipVerifiableCredentialFactory extends AbstractVerifiableDoc
     private final DidFactory didFactory;
     private final MIWSettings miwSettings;
     private final WalletService walletService;
+    private final VerifiableCredentialContextConfiguration verifiableCredentialContextConfiguration;
 
     public VerifiableCredential createMembershipVerifiableCredential(@NonNull Wallet wallet) {
 
@@ -53,7 +57,6 @@ public class MembershipVerifiableCredentialFactory extends AbstractVerifiableDoc
         final WalletId issuerWalletId = new WalletId(miwSettings.getAuthorityWalletBpn());
         final Wallet issuerWallet = walletService.findById(issuerWalletId).orElseThrow(() -> new RuntimeException("Issuer wallet not found"));
         final Did did = didFactory.generateDid(wallet);
-
 
         final VerifiableCredentialSubject verifiableCredentialSubject = new VerifiableCredentialSubject(Map.of(
                 StringPool.TYPE, VerifiableCredentialType.MEMBERSHIP_CREDENTIAL,
@@ -63,6 +66,7 @@ public class MembershipVerifiableCredentialFactory extends AbstractVerifiableDoc
                 StringPool.STATUS, "Active",
                 StringPool.START_TIME, Instant.now().toString()));
 
-        return createdIssuedCredential(verifiableCredentialSubject, MIWVerifiableCredentialType.MEMBERSHIP_CREDENTIAL);
+        final URI context = verifiableCredentialContextConfiguration.getMembershipVerifiableCredentialContext();
+        return createdIssuedCredential(verifiableCredentialSubject, MIWVerifiableCredentialType.MEMBERSHIP_CREDENTIAL, List.of(context));
     }
 }

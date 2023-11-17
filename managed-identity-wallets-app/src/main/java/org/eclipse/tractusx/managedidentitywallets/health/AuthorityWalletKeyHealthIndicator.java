@@ -23,6 +23,7 @@ package org.eclipse.tractusx.managedidentitywallets.health;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.config.HealthConfiguration;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
 import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
@@ -45,9 +46,14 @@ public class AuthorityWalletKeyHealthIndicator extends AbstractHealthIndicator {
     private final MIWSettings miwSettings;
     private final WalletService walletService;
     private final VaultService vaultService;
+    private final HealthConfiguration healthConfiguration;
 
     @Override
     protected void doHealthCheck(Health.Builder builder) {
+        if(!healthConfiguration.isAuthorityKeyReachable()){
+            return;
+        }
+
         final String bpn = Objects.requireNonNull(miwSettings.getAuthorityWalletBpn());
 
         final WalletId walletId = new WalletId(bpn);

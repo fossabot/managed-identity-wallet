@@ -89,12 +89,17 @@ miw:
   contractTemplatesUrl: ${CONTRACT_TEMPLATES_URL:https://public.catena-x.org/contracts/}
   didDocumentContextUrls: ${DID_DOCUMENT_CONTEXT_URL:https://www.w3.org/ns/did/v1,https://w3c.github.io/vc-jws-2020/contexts/v1}
   apiDefaultPageSize: 10
+  health:
+    checkAuthorityKeyReachable: true
+    checkSpecialCredentialIssuable: true
   verifiable:
     credential:
       contexts:
         useEmbeddedContexts: ${USE_EMBEDDED_CONTEXTS:true}
         summaryCredential: ${SUMMARY_VC_SCHEMA_LINK:https://catenax-ng.github.io/product-core-schemas/SummaryVC.json}
+        membershipCredential: ${SUPPORTED_FRAMEWORK_VC_TYPES:https://catenax-ng.github.io/product-core-schemas/businessPartnerData.json}
         businessPartnerNumberCredential: ${SUPPORTED_FRAMEWORK_VC_TYPES:https://raw.githubusercontent.com/catenax-ng/product-core-schemas/main/bpn-credential-v2.json}
+        frameworkCredential: ${SUPPORTED_FRAMEWORK_VC_TYPES:https://raw.githubusercontent.com/catenax-ng/product-core-schemas/main/framework-credential-v2.json}
         dismantlerCredential: ${SUPPORTED_FRAMEWORK_VC_TYPES:https://raw.githubusercontent.com/catenax-ng/product-core-schemas/main/dismantler-credential-v2.json}
   security:
     enabled: true

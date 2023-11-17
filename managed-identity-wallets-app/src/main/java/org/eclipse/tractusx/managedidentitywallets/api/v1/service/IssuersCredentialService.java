@@ -169,7 +169,7 @@ public class IssuersCredentialService {
         final String contractVersion = request.getContractVersion();
         final org.eclipse.tractusx.managedidentitywallets.models.Wallet wallet = walletService.findById(new WalletId(request.getHolderIdentifier()))
                 .orElseThrow(() -> new WalletNotFoundProblem("Wallet not found"));
-        final VerifiableCredential verifiableCredential = frameworkVerifiableCredentialFactory.createDismantlerVerifiableCredential(
+        final VerifiableCredential verifiableCredential = frameworkVerifiableCredentialFactory.createFrameworkVerifiableCredential(
                 wallet, verifiableCredentialType, contractTemplate, contractVersion);
 
         //save in holder wallet
