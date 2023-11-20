@@ -13,7 +13,7 @@
 
   <p align="center">
     <br />
-        <a href="javascript:history.back()"><strong>Back »</strong></a>
+        <a href="../"><strong>Back »</strong></a>
         <br />
     <br />
   </p>
