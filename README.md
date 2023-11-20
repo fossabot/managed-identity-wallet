@@ -39,14 +39,14 @@ The Managed Identity Wallets (MIW) service implements the Self-Sovereign-Identit
 
 ## Documentation
 
-| Topic                     | Description                                                                                                                                             | Link                                                       |
-|---------------------------|---------------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|
-| API Documentation         | Explore details about the REST API of the MIW service.                                                                                                  | [API Documentation](/documentation/api)                    |
-| Application Documentation | Find details specific to the documentation of the Managed Identity Wallets Application.                                                                 | [Application Documentation](/managed-identity-wallets-app) |
-| Developer Documentation   | Gain insights into the MIW service architecture, design, and implementation.                                                                            | [Development Documentation](/documentation/development)    |
-| Integration Documentation | Learn how to seamlessly integrate the MIW service into other applications.                                                                              | [Integration Documentation](/documentation/integration)    |
-| Operations Documentation  | Access information on the deployment and operation of the MIW service.                                                                                  | [Operations Documentation](/documentation/operations)      |
-| SSI Documentation         | Delve into a comprehensive overview of the Self-Sovereign Identity (SSI) concept, along with specific details on its implementation in the MIW service. | [SSI Documentation](/documentation/ssi)                    |
+| Topic                     | Description                                                                                                                      | Link                                                       |
+|---------------------------|----------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|
+| API Documentation         | Dive into the intricacies of the MIW service's REST API with detailed documentation.                                             | [API Documentation](/documentation/api)                    |
+| Application Documentation | Access specific details related to the documentation of the Managed Identity Wallets Application.                                | [Application Documentation](/managed-identity-wallets-app) |
+| Developer Documentation   | Learn how to navigate and contribute to this repository from a developer's perspective.                                          | [Development Documentation](/documentation/development)    |
+| Integration Documentation | Understand the seamless integration process of the MIW service into various applications.                                        | [Integration Documentation](/documentation/integration)    |
+| Operations Documentation  | Find comprehensive information on the deployment and operational aspects of the MIW service.                                     | [Operations Documentation](/documentation/operations)      |
+| SSI Documentation         | Explore a detailed overview of the Self-Sovereign Identity (SSI) concept and its specific implementation within the MIW service. | [SSI Documentation](/documentation/ssi)                    |
 
 ## Project Structure
 
