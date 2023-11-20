@@ -48,14 +48,15 @@ The Managed Identity Wallets (MIW) service implements the Self-Sovereign-Identit
 
 ## Project Structure
 
-| Directory                          | Description                                                                               | Further Documentation                             |
-|------------------------------------|-------------------------------------------------------------------------------------------|---------------------------------------------------|
-| `/dev-assets`                      | The dev-assets directory contains all development assets.                                 |                                                   |
-| `/charts`                          | The charts directory contains all Helm charts.                                            |                                                   |
-| `/documentation`                   | The documentation directory contains all documentation files.                             |                                                   |
-| `/images`                          | The images directory contains all images used in the documentation.                       |                                                   |
-| `/managed-identity-wallets-api-v1` | OpenAPI generated projects. Contains the API v1 controller definition of the MIW service. | [API Documentation](/documentation/api/README.md) |
-| `/managed-identity-wallets-api-v2` | OpenAPI generated projects. Contains the API v2 controller definition of the MIW service. | [API Documentation](/documentation/api/README.md) |
+| Directory                           | Description                                                                               | Further Documentation                                        |
+|-------------------------------------|-------------------------------------------------------------------------------------------|--------------------------------------------------------------|
+| `/dev-assets`                       | The dev-assets directory contains all development assets.                                 |                                                              |
+| `/charts`                           | The charts directory contains all Helm charts.                                            |                                                              |
+| `/documentation`                    | The documentation directory contains all documentation files.                             |                                                              |
+| `/images`                           | The images directory contains all images used in the documentation.                       |                                                              |
+| `/managed-identity-wallets-api-v1`  | OpenAPI generated projects. Contains the API v1 controller definition of the MIW service. | [API Documentation](/documentation/api/README.md)            |
+| `/managed-identity-wallets-api-v2`  | OpenAPI generated projects. Contains the API v2 controller definition of the MIW service. | [API Documentation](/documentation/api/README.md)            |
+| `/managed-identity-wallets-api-app` | Managed Identity Wallets application.                                                     | [App Documentation](/managed-identity-wallets-app/README.md) |
 
 ## Reference of external lib
 
@@ -107,8 +108,10 @@ You can freely use, modify, and distribute this project under the terms of the A
 If you have any questions, suggestions, or feedback regarding this project, please feel free to
 reach out to us. You can contact our team at:
 
-- Responsible Persons: https://github.com/eclipse-tractusx
-- Issue Tracker: https://github.com/eclipse-tractusx/managed-identity-wallet/issues
+| Name          | Link                                                               |
+|---------------|--------------------------------------------------------------------|
+| Organization  | https://eclipse-tractusx.github.io                                 |
+| Issue Tracker | https://github.com/eclipse-tractusx/managed-identity-wallet/issues |
 
 We value your input and appreciate your interest in contributing to the project. Don't hesitate to
 contact us if you need any assistance or want to get involved.
