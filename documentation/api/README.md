@@ -14,7 +14,7 @@
   <p align="center">
 
     <br />
-    <div markdown="1">[» Back to project root](/documentation/api)</div>
+    <div class="a" markdown="1">[» Back to project root](/documentation/api)</div>
     <br />
     <br />
   </p>
