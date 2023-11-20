@@ -45,9 +45,11 @@ public class GetWalletUserApiHandlerTest extends RestAssuredTestCase {
     @Test
     public void testGetWalletUserApiSuccess() {
 
+        final String bpn = "BPNL000000000000";
+
         // TODO currently the logged-in user always is BPNL000000000000
         final WalletQuery walletQuery = WalletQuery.builder()
-                .walletId(new WalletId("BPNL000000000000"))
+                .walletId(new WalletId(bpn))
                 .build();
         final Wallet holderWallet = walletRepository.findOne(walletQuery).orElseThrow();
 
@@ -63,9 +65,6 @@ public class GetWalletUserApiHandlerTest extends RestAssuredTestCase {
                 .get("/api/v2/wallet")
                 .then()
                 .statusCode(200)
-                .body("id", equalTo(0))
-                .body("size", equalTo(MAX_CREDENTIALS))
-                .body("items.size()", equalTo(MAX_CREDENTIALS))
-                .body("totalElements", equalTo(MAX_CREDENTIALS));
+                .body("id", equalTo(bpn));
     }
 }

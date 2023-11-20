@@ -26,6 +26,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.entity.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.WalletNotFoundProblem;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
@@ -80,7 +81,7 @@ public class CommonService {
                 .walletId(walletId)
                 .build();
         final org.eclipse.tractusx.managedidentitywallets.models.Wallet wallet = walletRepository.findOne(walletQuery)
-                .orElseThrow(() -> new RuntimeException("Wallet not found: " + bpn));
+                .orElseThrow(() -> new WalletNotFoundProblem("Wallet not found: " + bpn));
 
         final VerifiableCredentialQuery vcQuery = VerifiableCredentialQuery.builder()
                 .holderWalletId(walletId)

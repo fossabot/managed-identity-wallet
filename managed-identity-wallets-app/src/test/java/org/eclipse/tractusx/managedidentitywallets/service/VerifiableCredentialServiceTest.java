@@ -70,7 +70,7 @@ public class VerifiableCredentialServiceTest extends MiwTestCase {
 
         Assertions.assertEquals(3, verifiableCredentialEventTracker.getVerifiableCredentialCreatingEvents().size(), "3 VerifiableCredentialCreatingEvents should have been fired");
         Assertions.assertEquals(3, verifiableCredentialEventTracker.getVerifiableCredentialCreatedEvents().size(), "3 VerifiableCredentialCreatedEvents should have been fired");
-        Assertions.assertEquals(4, verifiableCredentialRepository.count(), "3 new plus BPN credential (=4) VerifiableCredentials should be in the database");
+        Assertions.assertEquals(5, verifiableCredentialRepository.count(), "3+BPN&Summary (=5) VerifiableCredentials should be in the database");
     }
 
     @Test
@@ -93,7 +93,7 @@ public class VerifiableCredentialServiceTest extends MiwTestCase {
 
         Assertions.assertEquals(4, verifiableCredentialEventTracker.getVerifiableCredentialDeletingEvents().size(), "4 VerifiableCredentialDeletingEvent should have been fired");
         Assertions.assertEquals(4, verifiableCredentialEventTracker.getVerifiableCredentialDeletedEvents().size(), "4 VerifiableCredentialDeletedEvent should have been fired");
-        Assertions.assertEquals(3, verifiableCredentialRepository.count(), "Only 3 BPN VerifiableCredentials should be in the database");
+        Assertions.assertEquals(6, verifiableCredentialRepository.count(), "Only 6 VerifiableCredentials should be in the database (1 Bpn+Summary per Wallet)");
     }
 
     @Test

@@ -99,7 +99,7 @@ public class VerifiableCredentialRepositoryTest extends MiwTestCase {
         verifiableCredentialRepository.createWalletIntersection(verifiableCredentialId, wallet.getWalletId());
         final Page<VerifiableCredential> result = verifiableCredentialRepository.findAll(query, Pageable.unpaged());
 
-        Assertions.assertEquals(2, result.getTotalElements()); // newly created + bpn credential
+        Assertions.assertEquals(3, result.getTotalElements()); // newly created + bpn credential
     }
 
     @Test
@@ -115,6 +115,6 @@ public class VerifiableCredentialRepositoryTest extends MiwTestCase {
 
         final Page<VerifiableCredential> result = verifiableCredentialRepository.findAll(query, Pageable.unpaged());
 
-        Assertions.assertEquals(6, result.getTotalElements()); // 3x2 (newly created & bpn credential)
+        Assertions.assertEquals(9, result.getTotalElements()); // 3+3+3 (newly created & bpn & summary credential)
     }
 }
