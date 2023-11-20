@@ -20,7 +20,7 @@
 The Managed Identity Wallets Application is a Spring Boot project encompassing services, controllers, events, health
 checks, and additional functionalities. It also incorporates features related to Self-Sovereign Identity (SSI).
 
-### Invoker Components
+<strong>Invoker Components</strong>
 
 The system comprises four distinct component types, each activated under specific conditions to potentially alter the
 application's state:
@@ -30,15 +30,14 @@ application's state:
 - Cron Jobs
 - Health Indicator
 
-### Business Components
+<strong>Business Components</strong>
 
 These components have the ability to invoke factories, generating essential objects to execute their designated tasks.
 Utilizing these objects, they can access required services to fulfill their functions.
 
-### Persistence Components
+<strong>Persistence Components</strong>
 
 Services initiate interactions with repositories to persist newly created or updated application states.
-
 
 <img src="../images/appDesign.png" alt="design.png" style="max-width: 800px">
 

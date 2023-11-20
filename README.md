@@ -20,7 +20,6 @@
 <h3 align="center">Tractus-X Managed Identity Wallets</h3>
 
   <p align="center">
-    This open source project has emerged with a goal to foster collaborative development and innovation in the area of Self-Sovereign Identity.
     <br />
         <a href="https://github.com/eclipse-tractusx/managed-identity-wallet/tree/main/cx-ssi-lib/docs"><strong>Explore the docs »</strong></a>
         <br />
@@ -50,19 +49,19 @@ The Managed Identity Wallets (MIW) service implements the Self-Sovereign-Identit
 
 ## Project Structure
 
-| Directory                                   | Description                                                                               | 
-|---------------------------------------------|-------------------------------------------------------------------------------------------|
-| `/dev-assets`                               | The dev-assets directory contains all development assets.                                 |
-| `/charts`                                   | The charts directory contains all Helm charts.                                            |
-| `/documentation`                            | The documentation directory contains all documentation files.                             |
-| `/images`                                   | The images directory contains all images used in the documentation.                       |
-| `/managed-identity-wallets-api-v1`          | OpenAPI generated projects. Contains the API v1 controller definition of the MIW service. |
-| `/managed-identity-wallets-api-v2`          | OpenAPI generated projects. Contains the API v2 controller definition of the MIW service. |
-| `/managed-identity-wallets-api-app`         | Managed Identity Wallets application.                                                     |
-| `/managed-identity-wallets-okhttp3-v1`      | OpenAPI generated projects. Contains the API v1 Okhttp3 client for the MIW service.       |
-| `/managed-identity-wallets-okhttp3-v2`      | OpenAPI generated projects. Contains the API v2 Okhttp3 client for the MIW service.       |
-| `/managed-identity-wallets-resttemplate-v1` | OpenAPI generated projects. Contains the API v1 RestTemplate client for the MIW service.  |
-| `/managed-identity-wallets-resttemplate-v2` | OpenAPI generated projects. Contains the API v2 RestTemplate client for the MIW service.  |
+| Directory                                   | Description                                                                                 | 
+|---------------------------------------------|---------------------------------------------------------------------------------------------|
+| `/dev-assets`                               | Housing all development assets.                                                             |
+| `/charts`                                   | Storage for Helm charts related to the project.                                             |
+| `/documentation`                            | Repository for all documentation files.                                                     |
+| `/images`                                   | Collection of images utilized in the documentation.                                         |
+| `/managed-identity-wallets-api-v1`          | OpenAPI-generated projects containing the API v1 controller definition for the MIW service. |
+| `/managed-identity-wallets-api-v2`          | OpenAPI-generated projects containing the API v2 controller definition for the MIW service. |
+| `/managed-identity-wallets-api-app`         | Application directory for the Managed Identity Wallets.                                     |
+| `/managed-identity-wallets-okhttp3-v1`      | OpenAPI-generated projects with the API v1 Okhttp3 client for the MIW service.              |
+| `/managed-identity-wallets-okhttp3-v2`      | OpenAPI-generated projects with the API v2 Okhttp3 client for the MIW service.              |
+| `/managed-identity-wallets-resttemplate-v1` | OpenAPI-generated projects with the API v1 RestTemplate client for the MIW service.         |
+| `/managed-identity-wallets-resttemplate-v2` | OpenAPI-generated projects with the API v2 RestTemplate client for the MIW service.         |
 
 ## Reference of external lib
 
