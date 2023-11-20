@@ -11,4 +11,14 @@
 <h3 align="center">API Documentation</h3>
 <h4 align="center">Tractus-X Managed Identity Wallets</h4>
 
+  <p align="center">
+
+    <br />
+    <div markdown="1">[» Back to project root](/documentation/api)</div>
+    <br />
+    <br />
+  </p>
 </div>
+
+
+
