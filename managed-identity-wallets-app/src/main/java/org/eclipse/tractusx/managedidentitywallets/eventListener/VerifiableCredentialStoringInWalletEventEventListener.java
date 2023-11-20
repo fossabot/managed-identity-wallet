@@ -19,7 +19,7 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.listener;
+package org.eclipse.tractusx.managedidentitywallets.eventListener;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

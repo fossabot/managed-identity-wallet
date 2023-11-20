@@ -19,7 +19,7 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.listener;
+package org.eclipse.tractusx.managedidentitywallets.eventListener;
 
 import com.apicatalog.jsonld.document.JsonDocument;
 import lombok.RequiredArgsConstructor;

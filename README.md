@@ -1,314 +1,137 @@
-# Managed Identity Wallets `<a id="introduction"></a>`
+<a name="readme-top"></a>
+
+<!-- Shields -->
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![MIT License][license-shield]][license-url]
+
+
+
+<!-- Caption -->
+
+<br />
+<div align="center">
+  <a href="https://eclipse-tractusx.github.io/img/logo_tractus-x.svg">
+    <img src="https://eclipse-tractusx.github.io/img/logo_tractus-x.svg" alt="Logo" width="80" height="80">
+  </a>
+
+<h3 align="center">Tractus-X Managed Identity Wallets</h3>
+
+  <p align="center">
+    This open source project has emerged with a goal to foster collaborative development and innovation in the area of Self-Sovereign Identity.
+    <br />
+        <a href="https://github.com/eclipse-tractusx/SSI-agent-lib/tree/main/cx-ssi-lib/docs"><strong>Explore the docs »</strong></a>
+        <br />
+    <br />
+    <a href="https://github.com/eclipse-tractusx/SSI-agent-lib/issues">Report Bug</a>
+    ·
+    <a href="https://github.com/eclipse-tractusx/SSI-agent-lib/issues">Request Feature</a>
+  </p>
+</div>
+
+## About the Project
 
 The Managed Identity Wallets (MIW) service implements the Self-Sovereign-Identity (SSI) using did:web
 
-# Developer Documentation
-
-To run MIW locally, this section describes the tooling as well as the local development setup.
-
-There are two possible flows, which can be used for development:
-
-1. **local**: Run the postgresql and keycloak server inside docker. Start MIW from within your IDE (recommended for actual development)
-2. **docker**: Run everything inside docker (use to test or check behavior inside a docker environment)
-
-## Tooling
-
-Following tools the MIW development team used successfully:
-
-| Area     | Tool     | Download Link                                   | Comment                                                                                             |
-| -------- | -------- | ----------------------------------------------- | --------------------------------------------------------------------------------------------------- |
-| IDE      | IntelliJ | https://www.jetbrains.com/idea/download/        | Use[envfile plugin](https://plugins.jetbrains.com/plugin/7861-envfile) to use the **local** flow |
-| Build    | Gradle   | https://gradle.org/install/                     |                                                                                                     |
-| Runtime  | Docker   | https://www.docker.com/products/docker-desktop/ |                                                                                                     |
-| Database | DBeaver  | https://dbeaver.io/                             |                                                                                                     |
-| IAM      | Keycloak | https://www.keycloak.org/                       |                                                                                                     |
-
-# Administrator Documentation
-
-## Manual Keycloak Configuration
-
-Within the development setup the Keycloak instance is initially prepared with the
-values in `./dev-assets/docker-environment/keycloak`. The realm could also be
-manually added and configured at http://localhost:8080 via the "Add realm"
-button. It can be for example named `localkeycloak`. Also add an additional client,
-e.g. named `miw_private_client` with *valid redirect url* set to
-`http://localhost:8080/*`. The roles
-
-* add_wallets
-* view_wallets
-* update_wallets
-* delete_wallets
-* view_wallet
-* update_wallet
-* manage_app
-
-Roles can be added under *Clients > miw_private_client > Roles* and then
-assigned to the client using *Clients > miw_private_client > Client Scopes*
-*> Service Account Roles > Client Roles > miw_private_client*.
-
-The available scopes/roles are:
-
-1. Role `add_wallets` to create a new wallet
-2. Role `view_wallets`:
-
-   * to get a list of all wallets
-   * to retrieve one wallet by its identifier
-   * to validate a Verifiable Credential
-   * to validate a Verifiable Presentation
-   * to get all stored Verifiable Credentials
-3. Role `update_wallets` for the following actions:
-
-   * to store Verifiable Credential
-   * to issue a Verifiable Credential
-   * to issue a Verifiable Presentation
-4. Role `update_wallet`:
-
-   * to remove a Verifiable Credential
-   * to store a Verifiable Credential
-   * to issue a Verifiable Credential
-   * to issue a Verifiable Presentation
-5. Role `view_wallet` requires the BPN of Caller and it can be used:
-
-   * to get the Wallet of the related BPN
-   * to get stored Verifiable Credentials of the related BPN
-   * to validate any Verifiable Credential
-   * to validate any Verifiable Presentation
-6. Role `manage_app` used to change the log level of the application at runtime. Check Logging in the application section for more
-   details
-
-Overview by Endpoint
-
-| Artefact                                  | CRUD   | HTTP Verb/ Request | Endpoint                              | Roles                                        | Constraints                                                |
-|-------------------------------------------|--------|--------------------|---------------------------------------|----------------------------------------------|------------------------------------------------------------|
-| **Wallets**                               | Read   | GET                | /api/wallets                          | **view_wallets**                             |                                                            |
-| **Wallets**                               | Create | POST               | /api/wallets                          | **add_wallets**                              | **1 BPN : 1 WALLET**(PER ONE [1] BPN ONLY ONE [1] WALLET!) |
-| **Wallets**                               | Create | POST               | /api/wallets/{identifier}/credentials | **update_wallets** <br />OR**update_wallet** |                                                            |
-| **Wallets**                               | Read   | GET                | /api/wallets/{identifier}             | **view_wallets** OR<br />**view_wallet**     |                                                            |
-| **Verifiable Presentations - Generation** | Create | POST               | /api/presentation                     | **update_wallets** OR<br />**update_wallet** |                                                            |
-| **Verifiable Presentations - Validation** | Create | POST               | /api/presentations/validation         | **view_wallets** OR<br />**view_wallet**     |                                                            |
-| **Verifiable Credential - Holder**        | Read   | GET                | /api/credentials                      | **view_wallets** OR<br />**view_wallet**     |                                                            |
-| **Verifiable Credential - Holder**        | Create | POST               | /api/credentials                      | **update_wallet** OR<br />**update_wallet**  |                                                            |
-| **Verifiable Credential - Holder**        | Delete | DELETE             | /api/credentials                      | **update_wallet**                            |                                                            |
-| **Verfiable Credential - Validation**     | Create | POST               | /api/credentials/validation           | **view_wallets** OR<br />**view_wallet**     |                                                            |
-| **Verfiable Credential - Issuer**         | Read   | GET                | /api/credentials/issuer               | **view_wallets**                             |                                                            |
-| **Verfiable Credential - Issuer**         | Create | POST               | /api/credentials/issuer               | **update_wallets**                           |                                                            |
-| **Verfiable Credential - Issuer**         | Create | POST               | /api/credentials/issuer/membership    | **update_wallets**                           |                                                            |
-| **Verfiable Credential - Issuer**         | Create | POST               | /api/credentials/issuer/framework     | **update_wallets**                           |                                                            |
-| **Verfiable Credential - Issuer**         | Create | POST               | /api/credentials/issuer/distmantler   | **update_wallets**                           |                                                            |
-| **DIDDocument**                           | Read   | GET                | /{bpn}/did.json                       | N/A                                          |                                                            |
-| **DIDDocument**                           | Read   | GET                | /api/didDocuments/{identifier}        | N/A                                          |                                                            |
-
-
-
-Additionally, a Token mapper can be created under *Clients* &gt;
-*ManagedIdentityWallets* &gt; *Mappers* &gt; *create* with the following
-configuration (using as an example `BPNL000000001`):
-
-| Key                                | Value           |
-|------------------------------------|-----------------|
-| Name                               | StaticBPN       |
-| Mapper Type                        | Hardcoded claim |
-| Token Claim Name                   | BPN             |
-| Claim value                        | BPNL000000001   |
-| Claim JSON Type                    | String          |
-| Add to ID token                    | OFF             |
-| Add to access token                | ON              |
-| Add to userinfo                    | OFF             |
-| includeInAccessTokenResponse.label | ON              |
-
-If you receive an error message that the client secret is not valid, please go into
-keycloak admin and within *Clients > Credentials* recreate the secret.
-
-## Development Setup
-
-### Prerequisites
-
-To simplify the dev environment, [Taskfile](https://taskfile.dev) is used as a task executor. You have to install it first.
-
-> **IMPORTANT**: Before executing any of th tasks, you have to choose your flow (_local_ or _docker_). _local_ is
-> default.
-> To change that, you need to edit the variable **ENV** in the _Taskfile.yaml_. (see below)
-
-After that, run `task check-prereqs` to see, if any other required tool is installed or missing. If something is
-missing, a link to the install docs is provided.
-
-Now, you have to adjust the _env_ files (located in _dev-assets/env-files_). To do that, copy every file to the same
-directory, but without ".dist" at the end.
-
-Description of the env files:
-
-- **env.local**: Setup everything to get ready for flow "local". You need to fill in the passwords. Everything else can
-  remain as it is.
-- **env.docker**: Setup everything to get ready for flow "docker". You need to fill in the passwords. Everything else
-  can remain as it is.
-
-> **IMPORTANT**: When you are using MacOS and the MIW docker container won't start up (stuck somewhere or doesn't start
-> at all), you can enable the docker-desktop feature "Use Rosetta for x86/amd64 emulation on Apple Silicon" in your Docker
-> settings (under "features in development"). This should fix the issue.
-
-In both env files (env.local and env.docker) you need to set _GITHUB_USERNAME_ and _GITHUB_TOKEN_ in order to be able to
-build the app, because the SSI lib is stored in a private repo (you also need the proper rights to access the repo).
-The access token need to have `read:packages` access. (ref: https://github.com/settings/tokens/new)
-
-Note: _SKIP_GRADLE_TASKS_PARAM_ is used to pass parameters to the build process of the MIW jar. Currently, it skips the
-tests and code coverage, but speeds up the build time.
-If you want to activate it, just comment it out like `SKIP_GRADLE_TASKS_PARAM="" #"-x jacocoTestCoverageVerification -x test"`
-
-After every execution (either _local_ or _docker_ flow), run the matching "stop" task (e.g.: `task docker:start-app` -> `task docker:stop-app`)
-
-When you just run `task` without parameters, you will see all tasks available.
-
-### local
-
-1. Run `task docker:start-middleware` and wait until it shows "(main) Running the server in development mode. DO NOT use this configuration in production." in the terminal
-2. Run `task app:build` to build the MIW application
-3. Run [ManagedIdentityWalletsApplication.java](src/main/java/org/eclipse/tractusx/managedidentitywallets/ManagedIdentityWalletsApplication.java) via IDE and use the local.env file to populate environment vars (e.g. EnvFile plugin for IntelliJ)
-4. Run `task app:get-token` and copy the token (including "BEARER" prefix) (Mac users have the token already in their clipboard :) )
-5. Open API doc on http://localhost:8000 (or what port you configured in the _env.local_ file)
-6. Click on Authorize on swagger UI and on the dialog paste the token into the "value" input
-7. Click on "Authorize" and "close"
-8. MIW is up and running
-
-### docker
-
-1. Run `task docker:start-app` and wait until it shows "Started ManagedIdentityWalletsApplication in ... seconds"
-2. Run `task app:get-token` and copy the token (including "BEARER" prefix) (Mac users have the token already in their clipboard :) )
-3. Open API doc on http://localhost:8000 (or what port you configured in the _env.local_ file)
-4. Click on Authorize on swagger UI and on the dialog paste the token into the "value" input
-5. Click on "Authorize" and "close"
-6. MIW is up and running
-
-# End Users
-
-See OpenAPI documentation, which is automatically created from
-the source and available on each deployment at the `/docs/api-docs/docs` endpoint
-(e.g. locally at http://localhost:8087/docs/api-docs/docs). An export of the JSON
-document can be also found in [docs/openapi_v001.json](docs/openapi_v001.json).
-
-# Test Coverage
-
-Jacoco is used to generate the coverage report. The report generation
-and the coverage verification are automatically executed after tests.
-
-The generated HTML report can be found under `jacoco-report/html/`
-
-To generate the report run the command
-
-```
-task app:test-report
-```
-
-To check the coverage run the command
-
-```
-task app:coverage
-```
-
-Currently, the minimum is 80% coverage.
-
-# Common issues and solutions during local setup
-
-#### 1. Can not build with test cases
-
-Test cases are written using the Spring Boot integration test frameworks. These test frameworks start the Spring Boot
-test context, which allows us to perform integration testing. In our tests, we utilize the Testcontainers
-library (https://java.testcontainers.org/) for managing Docker containers. Specifically, we use Testcontainers to start
-PostgreSQL and Keycloak Docker containers locally.
-
-Before running the tests, please ensure that you have Docker runtime installed and that you have the necessary
-permissions to run containers.
-
-Alternative, you can skip test during the build with `` ./gradlew clean build -x test``
-
-#### 2. Database migration related issue
-
-We have implemented database migration using Liquibase (https://www.liquibase.org/). Liquibase allows us to manage
-database schema changes effectively.
-
-In case you encounter any database-related issues, you can resolve them by following these steps:
-
-1. Delete all tables from the database.
-2. Restart the application.
-3. Upon restart, the application will recreate the database schema from scratch.
-
-This process ensures that any issues with the database schema are resolved by recreating it in a fresh state.
-
-# Environment Variables `<a id= "environmentVariables"></a>`
-
-| name                            | description                                                                                  | default value                                                                                                                                       |
-|---------------------------------|----------------------------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
-| APPLICATION_PORT                | port number of application                                                                   | 8080                                                                                                                                                |
-| APPLICATION_ENVIRONMENT         | Environment of the application ie. local, dev, int and prod                                  | local                                                                                                                                               |
-| DB_HOST                         | Database host                                                                                | localhost                                                                                                                                           |
-| DB_PORT                         | Port of database                                                                             | 5432                                                                                                                                                |
-| DB_NAME                         | Database name                                                                                | miw                                                                                                                                                 |
-| USE_SSL                         | Whether SSL is enabled in database server                                                    | false                                                                                                                                               |
-| DB_USER_NAME                    | Database username                                                                            |                                                                                                                                                     |
-| DB_PASSWORD                     | Database password                                                                            |                                                                                                                                                     |
-| DB_POOL_SIZE                    | Max number of database connection acquired by application                                    | 10                                                                                                                                                  |
-| KEYCLOAK_MIW_PUBLIC_CLIENT      | Only needed if we want enable login with keyalock in swagger                                 | miw_public                                                                                                                                          |
-| MANAGEMENT_PORT                 | Spring actuator port                                                                         | 8090                                                                                                                                                |
-| MIW_HOST_NAME                   | Application host name, this will be used in creation of did ie. did:web:MIW_HOST_NAME:BPN    | localhost                                                                                                                                           |
-| ENCRYPTION_KEY                  | encryption key used to encrypt and decrypt private and public key of wallet                  |                                                                                                                                                     |
-| AUTHORITY_WALLET_BPN            | base wallet BPN number                                                                       | BPNL000000000000                                                                                                                                    |
-| AUTHORITY_WALLET_NAME           | Base wallet name                                                                             | Catena-X                                                                                                                                            |
-| AUTHORITY_WALLET_DID            | Base wallet web did                                                                          | web:did:host:BPNL000000000000                                                                                                                       |
-| VC_SCHEMA_LINK                  | Comma separated list of VC schema URL                                                        | https://www.w3.org/2018/credentials/v1, https://catenax-ng.github.io/product-core-schemas/businessPartnerData.json                                  |
-| VC_EXPIRY_DATE                  | Expiry date of VC (dd-MM-yyyy ie. 01-01-2025 expiry date will be 2024-12-31T18:30:00Z in VC) | 01-01-2025                                                                                                                                          |
-| KEYCLOAK_REALM                  | Realm name of keycloak                                                                       | miw_test                                                                                                                                            |
-| KEYCLOAK_CLIENT_ID              | Keycloak private client id                                                                   |                                                                                                                                                     |
-| AUTH_SERVER_URL                 | Keycloak server url                                                                          |                                                                                                                                                     |
-| SUPPORTED_FRAMEWORK_VC_TYPES    | Supported framework VC, provide values ie type1=value1,type2=value2                          | cx-behavior-twin=Behavior Twin,cx-pcf=PCF,cx-quality=Quality,cx-resiliency=Resiliency,cx-sustainability=Sustainability,cx-traceability=ID_3.0_Trace |
-| ENFORCE_HTTPS_IN_DID_RESOLUTION | Enforce https during web did resolution                                                      | true                                                                                                                                                |
-| CONTRACT_TEMPLATES_URL          | Contract templates URL used in summary VC                                                    | https://public.catena-x.org/contracts/                                                                                                              |
-| APP_LOG_LEVEL                   | Log level of application                                                                     | INFO                                                                                                                                                |
-|                                 |                                                                                              |                                                                                                                                                     |
-
-# Technical Debts and Known issue
-
-1. Keys are stored in database in encrypted format, need to store keys in more secure place ie. Vault
-2. Policies can be validated dynamically as per
-   request while validating VP and
-   VC. [Check this for more details](https://docs.walt.id/v/ssikit/concepts/verification-policies)
-
-# Logging in application
-
-Log level in application can be set using environment variable ``APP_LOG_LEVEL``. Possible values
-are ``OFF, ERROR, WARN, INFO, DEBUG, TRACE`` and default value set to ``INFO``
-
-### Change log level at runtime using Spring actuator
-
-We can use ``/actuator/loggers`` API endpoint of actuator for log related things. This end point can be accessible with
-role ``manage_app``. We can add this role to authority wallet client using keycloak as below:
-
-![manage_app.png](docs%2Fmanage_app.png)
-
-1. API to get current log settings
-
-```bash
-curl --location 'http://localhost:8090/actuator/loggers' \
---header 'Authorization: Bearer access_token'
-```
-
-2. Change log level at runtime
-
-```bash
-curl --location 'http://localhost:8090/actuator/loggers/{java package name}' \
---header 'Content-Type: application/json' \
---header 'Authorization: Bearer access_token' \
---data '{"configuredLevel":"INFO"}'
-```
-i.e.
-```bash
-curl --location 'http://localhost:8090/actuator/loggers/org.eclipse.tractusx.managedidentitywallets' \
---header 'Content-Type: application/json' \
---header 'Authorization: Bearer access_token' \
---data '{"configuredLevel":"INFO"}'
-```
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+## Documentation
+
+| Topic                    | Description                                                                                                                                     | Link                                                            |
+|--------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------------|
+| API Documentation        | The API documentation provides information about the REST API of the MIW service.                                                               | [API Documentation](/documentation/api/README.md)               |
+| Developer Documentation  | The developer documentation provides information about the architecture, the design and the implementation of the MIW service.                  | [Developer Documentation](/documentation/development/README.md) |
+| Operations Documentation | The operations documentation provides information about the deployment and the operation of the MIW service.                                    | [Operations Documentation](/documentation/operations/README.md) |
+| SSI Documentation        | The SSI documentation offers a broad overview of the SSI concept and provides specific details about its implementation within the MIW service. | [SSI Documentation](/documentation/ssi/README.md)               |
+
+## Project Structure
+
+| Directory                          | Description                                                                               | Further Documentation                             |
+|------------------------------------|-------------------------------------------------------------------------------------------|---------------------------------------------------|
+| `/dev-assets`                      | The dev-assets directory contains all development assets.                                 |                                                   |
+| `/charts`                          | The charts directory contains all Helm charts.                                            |                                                   |
+| `/documentation`                   | The documentation directory contains all documentation files.                             |                                                   |
+| `/images`                          | The images directory contains all images used in the documentation.                       |                                                   |
+| `/managed-identity-wallets-api-v1` | OpenAPI generated projects. Contains the API v1 controller definition of the MIW service. | [API Documentation](/documentation/api/README.md) |
+| `/managed-identity-wallets-api-v2` | OpenAPI generated projects. Contains the API v2 controller definition of the MIW service. | [API Documentation](/documentation/api/README.md) |
 
 ## Reference of external lib
 
-1. https://www.testcontainers.org/modules/databases/postgres/
-2. https://github.com/dasniko/testcontainers-keycloak
-3. https://github.com/smartSenseSolutions/smartsense-java-commons
-4. https://github.com/catenax-ng/product-lab-ssi
+1. https://github.com/eclipse-tractusx/managed-identity-wallet
+2. https://www.testcontainers.org/modules/databases/postgres/
+3. https://github.com/dasniko/testcontainers-keycloak
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+<!-- CONTRIBUTING -->
+
+## Contributing
+
+We are thrilled to have you here and excited about your interest in contributing to our project.
+Your contributions play a vital role in making our project successful and we truly appreciate your
+support.
+
+To ensure a smooth and enjoyable experience for everyone involved, we have put together this guide
+to help you understand how you can contribute effectively. Please take a moment to read through
+the [CONTRIBUTING.md](CONTRIBUTING.md) before you start contributing.
+
+Please ensure that you adhere to the project's coding style, write unit tests for your changes if
+applicable, and provide clear documentation for any new features or changes.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+<!-- LICENSE -->
+
+# License
+
+This project is licensed under the Apache License 2.0. See the [LICENSE](LICENSE) file for more
+information.
+
+```
+Apache License
+Version 2.0, January 2004
+http://www.apache.org/licenses/
+```
+
+You can freely use, modify, and distribute this project under the terms of the Apache License 2.0.
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+<!-- CONTACT -->
+
+# Contact
+
+If you have any questions, suggestions, or feedback regarding this project, please feel free to
+reach out to us. You can contact our team at:
+
+- Responsible Persons: https://github.com/eclipse-tractusx
+- Issue Tracker: https://github.com/eclipse-tractusx/managed-identity-wallet/issues
+
+We value your input and appreciate your interest in contributing to the project. Don't hesitate to
+contact us if you need any assistance or want to get involved.
+
+<p align="right">(<a href="#readme-top">back to top</a>)</p>
+
+
+[contributors-shield]: https://img.shields.io/github/contributors/eclipse-tractusx/managed-identity-wallet.svg?style=for-the-badge
+
+[contributors-url]: https://github.com/eclipse-tractusx/managed-identity-wallet/graphs/contributors
+
+[forks-shield]: https://img.shields.io/github/forks/eclipse-tractusx/managed-identity-wallet.svg?style=for-the-badge
+
+[forks-url]: https://github.com/eclipse-tractusx/managed-identity-wallet/network/members
+
+[stars-shield]: https://img.shields.io/github/stars/eclipse-tractusx/managed-identity-wallet.svg?style=for-the-badge
+
+[stars-url]: https://github.com/eclipse-tractusx/managed-identity-wallet/stargazers
+
+[issues-shield]: https://img.shields.io/github/issues/eclipse-tractusx/managed-identity-wallet.svg?style=for-the-badge
+
+[issues-url]: https://github.com/eclipse-tractusx/managed-identity-wallet/issues
+
+[license-shield]: https://img.shields.io/github/license/eclipse-tractusx/managed-identity-wallet.svg?style=for-the-badge
+
+[license-url]: https://github.com/eclipse-tractusx/managed-identity-wallet/blob/master/LICENSE.txt
