@@ -15,3 +15,12 @@
 </div>
 
 [« Up](../../README.md)
+
+# Overview
+
+TBD
+
+# Open API Specification
+
+- [Open API v1 YAML](../../src/main/resources/static/openapi_v1.yaml)
+- [Open API v2 YAML](../../src/main/resources/static/openapi_v2.yaml)
