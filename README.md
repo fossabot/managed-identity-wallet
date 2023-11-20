@@ -39,13 +39,13 @@ The Managed Identity Wallets (MIW) service implements the Self-Sovereign-Identit
 
 ## Documentation
 
-| Topic                     | Description                                                                                                                                     | Link                                                              |
-|---------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|-------------------------------------------------------------------|
-| API Documentation         | The API documentation provides information about the REST API of the MIW service.                                                               | [API Documentation](/documentation/api/README.md)                 |
-| Developer Documentation   | The developer documentation provides information about the architecture, the design and the implementation of the MIW service.                  | [Development Documentation](/documentation/development/README.md) |
-| Integration Documentation | The integration documentation provides information about the integration of the MIW service into other applications.                            | [Integration Documentation](/documentation/integration/README.md) |
-| Operations Documentation  | The operations documentation provides information about the deployment and the operation of the MIW service.                                    | [Operations Documentation](/documentation/operations/README.md)   |
-| SSI Documentation         | The SSI documentation offers a broad overview of the SSI concept and provides specific details about its implementation within the MIW service. | [SSI Documentation](/documentation/ssi/README.md)                 |
+| Topic                     | Description                                                                                                                                     | Link                                                     |
+|---------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------|
+| API Documentation         | The API documentation provides information about the REST API of the MIW service.                                                               | [API Documentation](/documentation/api/)                 |
+| Developer Documentation   | The developer documentation provides information about the architecture, the design and the implementation of the MIW service.                  | [Development Documentation](/documentation/development/) |
+| Integration Documentation | The integration documentation provides information about the integration of the MIW service into other applications.                            | [Integration Documentation](/documentation/integration/) |
+| Operations Documentation  | The operations documentation provides information about the deployment and the operation of the MIW service.                                    | [Operations Documentation](/documentation/operations/)   |
+| SSI Documentation         | The SSI documentation offers a broad overview of the SSI concept and provides specific details about its implementation within the MIW service. | [SSI Documentation](/documentation/ssi/)                 |
 
 ## Project Structure
 
