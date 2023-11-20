@@ -42,6 +42,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.OffsetDateTime;
 import java.util.Optional;
 
 @Component
@@ -97,6 +98,11 @@ public class VerifiableCredentialRepository {
         final VerifiableCredentialEntity verifiableCredentialEntity = new VerifiableCredentialEntity();
         verifiableCredentialEntity.setId(vc.getId().toString());
         verifiableCredentialEntity.setJson(vc.toJson());
+
+        if (vc.getExpirationDate() != null) {
+            verifiableCredentialEntity.setExpirationDate(vc.getExpirationDate().atOffset(OffsetDateTime.now().getOffset()));
+        }
+
         if (!verifiableCredentialJpaRepository.existsById(verifiableCredentialEntity.getId())) {
             verifiableCredentialJpaRepository.save(verifiableCredentialEntity);
         } else {

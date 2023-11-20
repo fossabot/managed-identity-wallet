@@ -35,12 +35,12 @@ CREATE INDEX wallet_name ON wallet (name);
 /* Key */
 CREATE TABLE IF NOT EXISTS key_ed25519
 (
-    id             varchar(255) NOT NULL,
-    version        varchar(8)               DEFAULT 'v1',
+    id           varchar(255) NOT NULL,
+    version      varchar(8)               DEFAULT 'v1',
     did_fragment varchar(255) NOT NULL,
-    wallet_id      varchar(255) NOT NULL,
-    created_at     timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
-    modified_at    timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    wallet_id    varchar(255) NOT NULL,
+    created_at   timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
+    modified_at  timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
     FOREIGN KEY (wallet_id) REFERENCES wallet (id) ON DELETE CASCADE
 );
@@ -48,11 +48,12 @@ CREATE TABLE IF NOT EXISTS key_ed25519
 /* Verifiable Credential */
 CREATE TABLE IF NOT EXISTS verifiable_credential
 (
-    id          varchar(255) NOT NULL,
-    version     varchar(8)   DEFAULT 'v1',
-    raw         text         NOT NULL,
-    created_at  timestamp(6) DEFAULT CURRENT_TIMESTAMP,
-    modified_at timestamp(6) NULL,
+    id              varchar(255) NOT NULL,
+    version         varchar(8)   DEFAULT 'v1',
+    expiration_date timestamp(6),
+    raw             text         NOT NULL,
+    created_at      timestamp(6) DEFAULT CURRENT_TIMESTAMP,
+    modified_at     timestamp(6) NULL,
     PRIMARY KEY (id)
 );
 

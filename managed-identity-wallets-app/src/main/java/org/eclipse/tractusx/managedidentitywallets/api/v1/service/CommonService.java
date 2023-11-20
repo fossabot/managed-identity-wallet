@@ -162,7 +162,7 @@ public class CommonService {
         try {
             Did did = DidParser.parse(identifier);
             return did.getMethodIdentifier().getValue();
-        } catch (DidParseException e) {
+        } catch (Exception e) {
             // not a did ->  ignore
             return identifier;
         }

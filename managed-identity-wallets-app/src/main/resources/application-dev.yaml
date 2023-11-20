@@ -31,4 +31,10 @@ miw:
   didDocumentContextUrls: https://www.w3.org/ns/did/v1,https://w3c.github.io/vc-jws-2020/contexts/v1
   apiDefaultPageSize: 10
   security:
-    enabled: false
+    enabled: true
+    realm: ${KEYCLOAK_REALM:miw_test}
+    clientId: ${KEYCLOAK_CLIENT_ID:miw_private_client}
+    auth-server-url: ${AUTH_SERVER_URL:https://managed-identity-wallets-alpha.dev.demo.catena-x.net}
+    auth-url: ${miw.security.auth-server-url}/realms/${miw.security.realm}/protocol/openid-connect/auth
+    token-url: ${miw.security.auth-server-url}/realms/${miw.security.realm}/protocol/openid-connect/token
+    refresh-token-url: ${miw.security.token-url}

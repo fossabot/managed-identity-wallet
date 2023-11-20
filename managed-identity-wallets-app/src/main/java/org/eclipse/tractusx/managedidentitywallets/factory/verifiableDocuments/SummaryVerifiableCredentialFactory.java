@@ -40,6 +40,7 @@ import org.springframework.stereotype.Component;
 import java.net.URI;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Component
 @RequiredArgsConstructor
@@ -53,8 +54,9 @@ public class SummaryVerifiableCredentialFactory extends AbstractVerifiableDocume
     public VerifiableCredential createSummaryVerifiableCredential(@NonNull Wallet wallet) {
 
         final Did holderDid = didFactory.generateDid(wallet);
-        final List<String> items = getFrameworkVcItems(wallet);
-        final Instant expirationDate = getExpirationDate(wallet);
+        final List<VerifiableCredential> specialCredentials = getAllSpecialVerifiableCredentials(wallet);
+        final List<String> items = getFrameworkVcItems(specialCredentials);
+        final Instant expirationDate = getExpirationDate(specialCredentials);
 
         final VerifiableCredentialSubject subject = new VerifiableCredentialSubject(Map.of(
                 StringPool.ID, holderDid.toString(),
@@ -67,52 +69,55 @@ public class SummaryVerifiableCredentialFactory extends AbstractVerifiableDocume
         return createdIssuedCredential(subject, MIWVerifiableCredentialType.SUMMARY_CREDENTIAL, List.of(summaryContext), expirationDate);
     }
 
-    private List<String> getFrameworkVcItems(@NonNull Wallet wallet) {
-        final WalletId walletId = wallet.getWalletId();
-        final Set<String> frameworkVcTypes = miwSettings.getSupportedFrameworkVCTypes();
+    private List<VerifiableCredential> getAllSpecialVerifiableCredentials(Wallet wallet) {
+
+        final List<VerifiableCredentialType> types = miwSettings.getSupportedFrameworkVCTypes()
+                .stream()
+                .map(VerifiableCredentialType::new)
+                .collect(Collectors.toList());
+        types.add(new VerifiableCredentialType(MIWVerifiableCredentialType.BPN_CREDENTIAL));
+        types.add(new VerifiableCredentialType(MIWVerifiableCredentialType.DISMANTLER_CREDENTIAL));
+        types.add(new VerifiableCredentialType(MIWVerifiableCredentialType.MEMBERSHIP_CREDENTIAL));
+
+        return getVerifiableCredentialsByType(wallet, types);
+    }
+
+
+    private List<String> getFrameworkVcItems(@NonNull List<VerifiableCredential> verifiableCredentials) {
         final List<String> vcItems = new ArrayList<>();
-
-        for (var vcType : frameworkVcTypes) {
-            final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
-                    .verifiableCredentialTypes(List.of(new VerifiableCredentialType(vcType)))
-                    .holderWalletId(walletId)
-                    .build();
-            final Page<VerifiableCredential> vcCredentials =
-                    verifiableCredentialService.findAll(verifiableCredentialQuery);
-
-            vcCredentials.stream()
-                    .max(Comparator.comparing(VerifiableCredential::getIssuanceDate))
-                    .ifPresent(vc -> vcItems.add(vcType));
+        for (var specialCredential : verifiableCredentials) {
+            specialCredential.getTypes()
+                    .stream()
+                    .filter(t -> !t.equals(VerifiableCredentialType.VERIFIABLE_CREDENTIAL.toString()))
+                    .findFirst()
+                    .ifPresent(vcItems::add);
         }
 
         return vcItems;
     }
 
-    private Instant getExpirationDate(@NonNull Wallet wallet) {
-        final WalletId walletId = wallet.getWalletId();
-        Instant expirationDate = Instant.now();
-        final Set<String> frameworkVcTypes = miwSettings.getSupportedFrameworkVCTypes();
-
-        for (var vcType : frameworkVcTypes) {
-            final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
-                    .verifiableCredentialTypes(List.of(new VerifiableCredentialType(vcType)))
-                    .holderWalletId(walletId)
-                    .build();
-            final Page<VerifiableCredential> vcCredentials =
-                    verifiableCredentialService.findAll(verifiableCredentialQuery);
-
-            final Optional<VerifiableCredential> latestVcCredential = vcCredentials.stream()
-                    .max(Comparator.comparing(VerifiableCredential::getIssuanceDate));
-
-            if (latestVcCredential.isPresent()) {
-                // new expiration date should be the lowest date of summarized vcs
-
-                expirationDate = latestVcCredential.get().getExpirationDate().isBefore(expirationDate) ?
-                        latestVcCredential.get().getExpirationDate() : expirationDate;
-            }
-        }
-
-        return expirationDate;
+    private Instant getExpirationDate(@NonNull List<VerifiableCredential> verifiableCredentials) {
+        return verifiableCredentials
+                .stream().min(Comparator.comparing(VerifiableCredential::getExpirationDate))
+                .map(VerifiableCredential::getExpirationDate)
+                .orElse(Instant.now());
     }
 
+    private List<VerifiableCredential> getVerifiableCredentialsByType(Wallet wallet, List<VerifiableCredentialType> types) {
+        final WalletId walletId = wallet.getWalletId();
+        final WalletId isserWalletId = new WalletId(miwSettings.getAuthorityWalletBpn());
+        final Did issuerDid = didFactory.generateDid(isserWalletId);
+        final VerifiableCredentialIssuer issuer = new VerifiableCredentialIssuer(issuerDid.toString());
+
+        return types.stream()
+                .map(t -> VerifiableCredentialQuery.builder()
+                        .verifiableCredentialTypes(List.of(t))
+                        .verifiableCredentialIssuer(issuer)
+                        .holderWalletId(walletId)
+                        .isExpired(false)
+                        .build())
+                .map(verifiableCredentialService::findAll)
+                .flatMap(Page::stream)
+                .toList();
+    }
 }

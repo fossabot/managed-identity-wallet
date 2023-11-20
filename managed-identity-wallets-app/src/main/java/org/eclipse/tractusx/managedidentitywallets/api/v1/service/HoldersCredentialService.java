@@ -89,10 +89,7 @@ public class HoldersCredentialService {
 
             switch (sortColumn) {
                 case "createdAt":
-                    sort = Sort.by(direction, VerifiableCredentialEntity.COLUMN_CREATED_AT);
-                    break;
-                case "credentialId":
-                    sort = Sort.by(direction, VerifiableCredentialEntity.COLUMN_ID);
+                    sort = Sort.by(direction, "createdAt");
                     break;
                 case "issuerDid":
                     log.warn("Sorting by issuer is not supported.");
@@ -106,12 +103,16 @@ public class HoldersCredentialService {
             }
         }
 
-        final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
-                .holderWalletId(new WalletId(callerBPN))
-                .verifiableCredentialTypes(type.stream().map(VerifiableCredentialType::new).toList())
-                .verifiableCredentialIssuer(new VerifiableCredentialIssuer(issuerIdentifier))
-                .build();
+        final VerifiableCredentialQuery.VerifiableCredentialQueryBuilder builder = VerifiableCredentialQuery.builder()
+                .holderWalletId(new WalletId(callerBPN));
+        if (type != null) {
+            builder.verifiableCredentialTypes(type.stream().map(VerifiableCredentialType::new).toList());
+        }
+        if (issuerIdentifier != null) {
+            builder.verifiableCredentialIssuer(new VerifiableCredentialIssuer(issuerIdentifier));
+        }
 
+        final VerifiableCredentialQuery verifiableCredentialQuery = builder.build();
         return verifiableCredentialService
                 .findAll(verifiableCredentialQuery, pageNumber, size, sort);
     }

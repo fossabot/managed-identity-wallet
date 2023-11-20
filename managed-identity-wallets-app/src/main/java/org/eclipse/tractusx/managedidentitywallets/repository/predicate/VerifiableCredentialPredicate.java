@@ -33,6 +33,7 @@ import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.QVerifiableCredentialEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
 
+import java.time.OffsetDateTime;
 import java.util.Optional;
 
 
@@ -67,6 +68,11 @@ public class VerifiableCredentialPredicate {
                 .map(VerifiableCredentialPredicate::hasIssuer)
                 .ifPresent(predicate::and);
 
+        /* By Is Expired */
+        Optional.ofNullable(query.getIsExpired())
+                .map(isExpired -> isExpired ? isExpired() : isNotExpired())
+                .ifPresent(predicate::and);
+
         return predicate;
     }
 
@@ -99,5 +105,19 @@ public class VerifiableCredentialPredicate {
                 .credentialIssuerIntersections.any()
                 .id.verifiableCredentialIssuer
                 .issuer.eq(walletId);
+    }
+
+    private static BooleanExpression isNotExpired() {
+        return QVerifiableCredentialEntity.verifiableCredentialEntity
+                .expirationDate.isNull().or(
+                        QVerifiableCredentialEntity.verifiableCredentialEntity
+                                .expirationDate.after(OffsetDateTime.now()));
+    }
+
+    private static BooleanExpression isExpired() {
+        return QVerifiableCredentialEntity.verifiableCredentialEntity
+                .expirationDate.isNotNull().and(
+                        QVerifiableCredentialEntity.verifiableCredentialEntity
+                                .expirationDate.before(OffsetDateTime.now()));
     }
 }

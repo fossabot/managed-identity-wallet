@@ -25,13 +25,14 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.MIWVerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
+import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialStoredInWalletEvent;
 import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialStoringInWalletEvent;
+import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.SummaryVerifiableCredentialFactory;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
-import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.SummaryVerifiableCredentialFactory;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.context.event.EventListener;
 import org.springframework.data.domain.Page;
@@ -74,7 +75,7 @@ public class VerifiableCredentialStoringInWalletEventEventListener {
                 .anyMatch(type -> type.equalsIgnoreCase(MIWVerifiableCredentialType.BPN_CREDENTIAL)
                         || type.equalsIgnoreCase(MIWVerifiableCredentialType.DISMANTLER_CREDENTIAL)
                         || type.equalsIgnoreCase(MIWVerifiableCredentialType.MEMBERSHIP_CREDENTIAL))
-                &&
+                ||
                 miwSettings.getSupportedFrameworkVCTypes().stream().anyMatch(
                         type -> verifiableCredential.getTypes().stream().anyMatch(type::equalsIgnoreCase));
     }
