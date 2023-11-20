@@ -13,6 +13,8 @@
 
 </div>
 
+[« Up](..)
+
 ## Overview
 
 The Managed Identity Wallets Application is a Spring Boot project encompassing services, controllers, events, health
