@@ -14,6 +14,7 @@
 
 </div>
 
+[« Up](../README.md)
 
 
 ## Manual Keycloak Configuration
