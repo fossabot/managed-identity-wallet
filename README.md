@@ -22,12 +22,12 @@
   <p align="center">
     This open source project has emerged with a goal to foster collaborative development and innovation in the area of Self-Sovereign Identity.
     <br />
-        <a href="https://github.com/eclipse-tractusx/SSI-agent-lib/tree/main/cx-ssi-lib/docs"><strong>Explore the docs »</strong></a>
+        <a href="https://github.com/eclipse-tractusx/managed-identity-wallet/tree/main/cx-ssi-lib/docs"><strong>Explore the docs »</strong></a>
         <br />
     <br />
-    <a href="https://github.com/eclipse-tractusx/SSI-agent-lib/issues">Report Bug</a>
+    <a href="https://github.com/eclipse-tractusx/managed-identity-wallet/issues">Report Bug</a>
     ·
-    <a href="https://github.com/eclipse-tractusx/SSI-agent-lib/issues">Request Feature</a>
+    <a href="https://github.com/eclipse-tractusx/managed-identity-wallet/issues">Request Feature</a>
   </p>
 </div>
 
