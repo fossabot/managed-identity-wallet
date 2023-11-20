@@ -30,6 +30,22 @@
   </p>
 </div>
 
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+    </li>
+    <li><a href="#documentation">Documentation</a></li>
+    <li><a href="#project-structure">Project Structure</a></li>
+    <li><a href="#reference-of-external-lib">Reference of external lib</a></li>
+    <li><a href="#contributing">Contributing</a></li>
+    <li><a href="#license">License</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ol>
+</details>
+
 ## About the Project
 
 The Managed Identity Wallets (MIW) service implements the Self-Sovereign-Identity (SSI) using did:web
