@@ -1,5 +1,3 @@
-
-
 <a name="readme-top"></a>
 
 <!-- Caption -->
@@ -16,6 +14,9 @@
 </div>
 
 ## Overview
+
+The Managed Identity Wallets Application is a Spring Boot project encompassing services, controllers, events, health
+checks, and additional functionalities. It also incorporates features related to Self-Sovereign Identity (SSI).
 
 ### Invoker Components
 
