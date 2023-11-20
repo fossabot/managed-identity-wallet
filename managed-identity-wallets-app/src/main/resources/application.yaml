@@ -92,6 +92,8 @@ miw:
   health:
     checkAuthorityKeyReachable: true
     checkSpecialCredentialIssuable: true
+  cron:
+    updateSummaryVerifiableCredentials: ${CRON_UPDATE_SUMMARY_VC:0 0 * * * *}
   verifiable:
     credential:
       contexts:
