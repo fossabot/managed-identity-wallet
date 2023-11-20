@@ -39,29 +39,30 @@ The Managed Identity Wallets (MIW) service implements the Self-Sovereign-Identit
 
 ## Documentation
 
-| Topic                     | Description                                                                                                                                     | Link                                                   |
-|---------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|--------------------------------------------------------|
-| API Documentation         | The API documentation provides information about the REST API of the MIW service.                                                               | [API Documentation](/documentation/api)                |
-| Developer Documentation   | The developer documentation provides information about the architecture, the design and the implementation of the MIW service.                  | [Development Documentation](/documentation/development) |
-| Integration Documentation | The integration documentation provides information about the integration of the MIW service into other applications.                            | [Integration Documentation](/documentation/integration) |
-| Operations Documentation  | The operations documentation provides information about the deployment and the operation of the MIW service.                                    | [Operations Documentation](/documentation/operations)  |
-| SSI Documentation         | The SSI documentation offers a broad overview of the SSI concept and provides specific details about its implementation within the MIW service. | [SSI Documentation](/documentation/ssi)               |
+| Topic                     | Description                                                                                                                                     | Link                                                       |
+|---------------------------|-------------------------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|
+| API Documentation         | The API documentation provides information about the REST API of the MIW service.                                                               | [API Documentation](/documentation/api)                    |
+| Developer Documentation   | The developer documentation provides information about the architecture, the design and the implementation of the MIW service.                  | [Development Documentation](/documentation/development)    |
+| Integration Documentation | The integration documentation provides information about the integration of the MIW service into other applications.                            | [Integration Documentation](/documentation/integration)    |
+| Operations Documentation  | The operations documentation provides information about the deployment and the operation of the MIW service.                                    | [Operations Documentation](/documentation/operations)      |
+| SSI Documentation         | The SSI documentation offers a broad overview of the SSI concept and provides specific details about its implementation within the MIW service. | [SSI Documentation](/documentation/ssi)                    |
+| Application Documentation | The SSI documentation offers a broad overview of the SSI concept and provides specific details about its implementation within the MIW service. | [Application Documentation](/managed-identity-wallets-app) |
 
 ## Project Structure
 
-| Directory                                   | Description                                                                               | Further Documentation                                   |
-|---------------------------------------------|-------------------------------------------------------------------------------------------|---------------------------------------------------------|
-| `/dev-assets`                               | The dev-assets directory contains all development assets.                                 |                                                         |
-| `/charts`                                   | The charts directory contains all Helm charts.                                            |                                                         |
-| `/documentation`                            | The documentation directory contains all documentation files.                             |                                                         |
-| `/images`                                   | The images directory contains all images used in the documentation.                       |                                                         |
-| `/managed-identity-wallets-api-v1`          | OpenAPI generated projects. Contains the API v1 controller definition of the MIW service. | [API Documentation](/documentation/api)                 |
-| `/managed-identity-wallets-api-v2`          | OpenAPI generated projects. Contains the API v2 controller definition of the MIW service. | [API Documentation](/documentation/api)                 |
-| `/managed-identity-wallets-api-app`         | Managed Identity Wallets application.                                                     | [App Documentation](/managed-identity-wallets-app)      |
-| `/managed-identity-wallets-okhttp3-v1`      | OpenAPI generated projects. Contains the API v1 Okhttp3 client for the MIW service.       | [Integration Documentation](/documentation/integration) |
-| `/managed-identity-wallets-okhttp3-v2`      | OpenAPI generated projects. Contains the API v2 Okhttp3 client for the MIW service.       | [Integration Documentation](/documentation/integration) |
-| `/managed-identity-wallets-resttemplate-v1` | OpenAPI generated projects. Contains the API v1 RestTemplate client for the MIW service.  | [Integration Documentation](/documentation/integration) |
-| `/managed-identity-wallets-resttemplate-v2` | OpenAPI generated projects. Contains the API v2 RestTemplate client for the MIW service.  | [Integration Documentation](/documentation/integration) |
+| Directory                                   | Description                                                                               | 
+|---------------------------------------------|-------------------------------------------------------------------------------------------|
+| `/dev-assets`                               | The dev-assets directory contains all development assets.                                 |
+| `/charts`                                   | The charts directory contains all Helm charts.                                            |
+| `/documentation`                            | The documentation directory contains all documentation files.                             |
+| `/images`                                   | The images directory contains all images used in the documentation.                       |
+| `/managed-identity-wallets-api-v1`          | OpenAPI generated projects. Contains the API v1 controller definition of the MIW service. |
+| `/managed-identity-wallets-api-v2`          | OpenAPI generated projects. Contains the API v2 controller definition of the MIW service. |
+| `/managed-identity-wallets-api-app`         | Managed Identity Wallets application.                                                     |
+| `/managed-identity-wallets-okhttp3-v1`      | OpenAPI generated projects. Contains the API v1 Okhttp3 client for the MIW service.       |
+| `/managed-identity-wallets-okhttp3-v2`      | OpenAPI generated projects. Contains the API v2 Okhttp3 client for the MIW service.       |
+| `/managed-identity-wallets-resttemplate-v1` | OpenAPI generated projects. Contains the API v1 RestTemplate client for the MIW service.  |
+| `/managed-identity-wallets-resttemplate-v2` | OpenAPI generated projects. Contains the API v2 RestTemplate client for the MIW service.  |
 
 ## Reference of external lib
 
