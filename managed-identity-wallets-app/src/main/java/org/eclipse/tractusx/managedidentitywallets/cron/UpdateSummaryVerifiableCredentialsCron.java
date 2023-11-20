@@ -35,16 +35,14 @@ import org.springframework.stereotype.Component;
 @Slf4j
 public class UpdateSummaryVerifiableCredentialsCron {
 
-    public static final int PAGE_SIZE = 200;
+    private static final int PAGE_SIZE = 200;
 
     private final WalletService walletService;
     private final UpdateSummaryVerifiableCredentialCommand updateSummaryVerifiableCredentialCommand;
 
     @Scheduled(cron = "${miw.cron.updateSummaryVerifiableCredentials}", zone = "Europe/Istanbul")
     public void updateSummaryVerifiableCredentials() {
-        if (log.isDebugEnabled()) {
-            log.debug("Running Crone Job: [Update Summary Verifiable Credentials]");
-        }
+        log.info("Starting Crone Job: [Update Summary Verifiable Credentials]");
 
         doUpdateSummaryVerifiableCredentials(0);
     }
