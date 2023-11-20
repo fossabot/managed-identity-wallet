@@ -66,9 +66,13 @@ The Managed Identity Wallets (MIW) service implements the Self-Sovereign-Identit
 
 ## Reference of external lib
 
-1. https://github.com/eclipse-tractusx/managed-identity-wallet
-2. https://www.testcontainers.org/modules/databases/postgres/
-3. https://github.com/dasniko/testcontainers-keycloak
+1. https://spring.io/projects/spring-boot
+2. https://github.com/querydsl/querydsl
+3. https://github.com/OpenAPITools/openapi-generator
+4. https://github.com/eclipse-tractusx/managed-identity-wallet
+5. https://www.testcontainers.org/modules/databases/postgres/
+6. https://github.com/dasniko/testcontainers-keycloak
+7. https://github.com/mapstruct/mapstruct
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
