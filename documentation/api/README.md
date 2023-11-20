@@ -11,10 +11,4 @@
 <h3 align="center">API Documentation</h3>
 <h4 align="center">Tractus-X Managed Identity Wallets</h4>
 
-  <p align="center">
-    <br />
-        <a href="../"><strong>Back »</strong></a>
-        <br />
-    <br />
-  </p>
 </div>
