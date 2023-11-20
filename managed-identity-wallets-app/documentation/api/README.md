@@ -1,4 +1,3 @@
-
 <a name="readme-top"></a>
 
 <!-- Caption -->
@@ -20,7 +19,6 @@
 
 TBD
 
-# Open API Specification
+For a more general documentation regarding the API please refer to
+the [API Documentation](../../documentation/api) page.
 
-- [Open API v1 YAML](../../src/main/resources/static/openapi_v1.yaml)
-- [Open API v2 YAML](../../src/main/resources/static/openapi_v2.yaml)

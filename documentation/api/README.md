@@ -15,3 +15,16 @@
 
 [« Up](../../README.md)
 
+
+# Overview
+
+TBD
+
+
+For a more detailed documentation regarding the API please refer to
+the [Application API Documentation](../../managed-identity-wallets-app/documentation/api) page.
+
+# Open API Specification
+
+- [Open API v1 YAML](../../managed-identity-wallets-app/src/main/resources/static/openapi_v1.yaml)
+- [Open API v2 YAML](../../managed-identity-wallets-app/src/main/resources/static/openapi_v2.yaml)
