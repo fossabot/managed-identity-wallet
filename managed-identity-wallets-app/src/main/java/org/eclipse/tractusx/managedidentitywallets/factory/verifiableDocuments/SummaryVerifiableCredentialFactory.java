@@ -55,13 +55,13 @@ public class SummaryVerifiableCredentialFactory extends AbstractVerifiableDocume
 
         final Did holderDid = didFactory.generateDid(wallet);
         final List<VerifiableCredential> specialCredentials = getAllSpecialVerifiableCredentials(wallet);
-        final List<String> items = getFrameworkVcItems(specialCredentials);
+        final List<String> specialVcTypes = getSpecialVerifiableCredentialTypes(specialCredentials);
         final Instant expirationDate = getExpirationDate(specialCredentials);
 
         final VerifiableCredentialSubject subject = new VerifiableCredentialSubject(Map.of(
                 StringPool.ID, holderDid.toString(),
                 StringPool.HOLDER_IDENTIFIER, wallet.getWalletId().toString(),
-                StringPool.ITEMS, items,
+                StringPool.ITEMS, specialVcTypes,
                 StringPool.TYPE, MIWVerifiableCredentialType.SUMMARY_CREDENTIAL,
                 StringPool.CONTRACT_TEMPLATE, miwSettings.getContractTemplatesUrl()));
 
@@ -79,11 +79,11 @@ public class SummaryVerifiableCredentialFactory extends AbstractVerifiableDocume
         types.add(new VerifiableCredentialType(MIWVerifiableCredentialType.DISMANTLER_CREDENTIAL));
         types.add(new VerifiableCredentialType(MIWVerifiableCredentialType.MEMBERSHIP_CREDENTIAL));
 
-        return getVerifiableCredentialsByType(wallet, types);
+        return getSpecialVerifiableCredentialsByType(wallet, types);
     }
 
 
-    private List<String> getFrameworkVcItems(@NonNull List<VerifiableCredential> verifiableCredentials) {
+    private List<String> getSpecialVerifiableCredentialTypes(@NonNull List<VerifiableCredential> verifiableCredentials) {
         final List<String> vcItems = new ArrayList<>();
         for (var specialCredential : verifiableCredentials) {
             specialCredential.getTypes()
@@ -103,7 +103,7 @@ public class SummaryVerifiableCredentialFactory extends AbstractVerifiableDocume
                 .orElse(Instant.now());
     }
 
-    private List<VerifiableCredential> getVerifiableCredentialsByType(Wallet wallet, List<VerifiableCredentialType> types) {
+    private List<VerifiableCredential> getSpecialVerifiableCredentialsByType(Wallet wallet, List<VerifiableCredentialType> types) {
         final WalletId walletId = wallet.getWalletId();
         final WalletId isserWalletId = new WalletId(miwSettings.getAuthorityWalletBpn());
         final Did issuerDid = didFactory.generateDid(isserWalletId);
