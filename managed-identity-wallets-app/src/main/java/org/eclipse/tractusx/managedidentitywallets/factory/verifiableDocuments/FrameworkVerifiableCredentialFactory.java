@@ -23,6 +23,7 @@ package org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.MIWVerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.config.VerifiableCredentialContextConfiguration;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialContext;
@@ -59,8 +60,8 @@ public class FrameworkVerifiableCredentialFactory extends AbstractVerifiableDocu
                 StringPool.HOLDER_IDENTIFIER, walletId.getText(),
                 StringPool.CONTRACT_TEMPLATE, contractTemplate,
                 StringPool.CONTRACT_VERSION, contractVersion));
-
         final URI context = verifiableCredentialContextConfiguration.getFrameworkVerifiableCredentialContext();
-        return createdIssuedCredential(verifiableCredentialSubject, verifiableCredentialType.getText(), List.of(context));
+        final List<String> types = List.of(verifiableCredentialType.getText(), MIWVerifiableCredentialType.USE_CASE_FRAMEWORK_CONDITION);
+        return createdIssuedCredential(verifiableCredentialSubject, types, List.of(context));
     }
 }

@@ -23,6 +23,9 @@ package org.eclipse.tractusx.managedidentitywallets.api.v1.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.MIWVerifiableCredentialType;
+import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
+import org.eclipse.tractusx.managedidentitywallets.api.v1.dto.IssueFrameworkCredentialRequest;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
 import org.eclipse.tractusx.ssi.lib.model.did.DidDocument;
@@ -57,16 +60,16 @@ public class TestUtils {
 //
 //        return restTemplate.exchange(RestURI.CREDENTIALS_ISSUER_MEMBERSHIP, HttpMethod.POST, entity, String.class);
 //    }
-//
-//    public static IssueFrameworkCredentialRequest getIssueFrameworkCredentialRequest(String bpn, String type) {
-//        IssueFrameworkCredentialRequest twinRequest = IssueFrameworkCredentialRequest.builder()
-//                .contractTemplate("http://localhost")
-//                .contractVersion("v1")
-//                .type(type)
-//                .holderIdentifier(bpn)
-//                .build();
-//        return twinRequest;
-//    }
+
+    public static IssueFrameworkCredentialRequest getIssueFrameworkCredentialRequest(String bpn, String type) {
+        IssueFrameworkCredentialRequest twinRequest = IssueFrameworkCredentialRequest.builder()
+                .contractTemplate("http://localhost")
+                .contractVersion("v1")
+                .type(type)
+                .holderIdentifier(bpn)
+                .build();
+        return twinRequest;
+    }
 
 //    public static Wallet getWalletFromString(String body) throws JsonProcessingException {
 //        JSONObject jsonObject = new JSONObject(body);
@@ -103,31 +106,15 @@ public class TestUtils {
 //        return holderVCs.get(0).getData().getId().toString();
 //    }
 
-//    public static void checkSummaryCredential(String issuerDID, String holderDID, VerifiableCredentialRepository holdersCredentialRepository,
-//                                              IssuersCredentialRepository issuersCredentialRepository, String type, String previousSummaryCredentialId) {
-//
-//        //get VC from holder of Summary type
-//        List<HoldersCredential> holderVCs = holdersCredentialRepository.getByHolderDidAndType(holderDID, MIWVerifiableCredentialType.SUMMARY_CREDENTIAL);
-//        Assertions.assertEquals(1, holderVCs.size());
-//        VerifiableCredential vc = holderVCs.get(0).getData();
-//        VerifiableCredentialSubject subject = vc.getCredentialSubject().get(0);
-//
-//        //check if type is in items
-//        List<String> list = (List<String>) subject.get(StringPool.ITEMS);
-//        Assertions.assertTrue(list.contains(type));
-//
-//        //check in issuer table
-//        List<IssuersCredential> issuerVCs = issuersCredentialRepository.getByIssuerDidAndHolderDidAndType(issuerDID, holderDID,
-//                MIWVerifiableCredentialType.SUMMARY_CREDENTIAL);
-//        IssuersCredential issuersCredential = issuerVCs.stream()
-//                .filter(issuerVC -> issuerVC.getCredentialId().equalsIgnoreCase(vc.getId().toString())).findFirst()
-//                .orElse(null);
-//        Assertions.assertNotNull(issuersCredential);
-//        IssuersCredential previousIssuersCredential = issuerVCs.stream()
-//                .filter(issuerVC -> issuerVC.getCredentialId().equalsIgnoreCase(previousSummaryCredentialId)).findFirst()
-//                .orElse(null);
-//        Assertions.assertNotNull(previousIssuersCredential);
-//    }
+    public static void checkSummaryCredential(VerifiableCredential vc, String type) {
+
+        //get VC from holder of Summary type
+        VerifiableCredentialSubject subject = vc.getCredentialSubject().get(0);
+
+        //check if type is in items
+        List<String> list = (List<String>) subject.get(StringPool.ITEMS);
+        Assertions.assertTrue(list.contains(type));
+    }
 
     @NotNull
     public static List<VerifiableCredential> getVerifiableCredentials(ResponseEntity<String> response, ObjectMapper objectMapper) throws JsonProcessingException {

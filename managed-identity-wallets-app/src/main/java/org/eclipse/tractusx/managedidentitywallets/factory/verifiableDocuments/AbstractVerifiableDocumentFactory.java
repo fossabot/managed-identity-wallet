@@ -48,6 +48,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import java.net.URI;
 import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public abstract class AbstractVerifiableDocumentFactory {
 
@@ -60,20 +61,29 @@ public abstract class AbstractVerifiableDocumentFactory {
     @Autowired
     private VaultService vaultService;
 
-    protected VerifiableCredential createdIssuedCredential(@NonNull VerifiableCredentialSubject subject, @NonNull String type) {
-        return createdIssuedCredential(subject, type, Collections.emptyList(), miwSettings.getVcExpiryDate().toInstant());
+    protected VerifiableCredential createdIssuedCredential(@NonNull VerifiableCredentialSubject subject, @NonNull String verifiableCredentialType) {
+        return createdIssuedCredential(subject, verifiableCredentialType, Collections.emptyList(), miwSettings.getVcExpiryDate().toInstant());
     }
 
-    protected VerifiableCredential createdIssuedCredential(@NonNull VerifiableCredentialSubject subject, @NonNull String type, @NonNull List<URI> additionalContexts) {
-        return createdIssuedCredential(subject, type, additionalContexts, miwSettings.getVcExpiryDate().toInstant());
+
+    protected VerifiableCredential createdIssuedCredential(@NonNull VerifiableCredentialSubject subject, @NonNull List<String> verifiableCredentialTypes, @NonNull List<URI> additionalContexts) {
+        return createdIssuedCredential(subject, verifiableCredentialTypes, additionalContexts, miwSettings.getVcExpiryDate().toInstant());
     }
 
-    protected VerifiableCredential createdIssuedCredential(@NonNull VerifiableCredentialSubject subject, @NonNull String type, @NonNull Instant expiryDate) {
-        return createdIssuedCredential(subject, type, Collections.emptyList(), expiryDate);
+    protected VerifiableCredential createdIssuedCredential(@NonNull VerifiableCredentialSubject subject, @NonNull String verifiableCredentialType, @NonNull List<URI> additionalContexts) {
+        return createdIssuedCredential(subject, verifiableCredentialType, additionalContexts, miwSettings.getVcExpiryDate().toInstant());
+    }
+
+    protected VerifiableCredential createdIssuedCredential(@NonNull VerifiableCredentialSubject subject, @NonNull String verifiableCredentialType, @NonNull Instant expiryDate) {
+        return createdIssuedCredential(subject, verifiableCredentialType, Collections.emptyList(), expiryDate);
+    }
+
+    protected VerifiableCredential createdIssuedCredential(@NonNull VerifiableCredentialSubject subject, @NonNull String verifiableCredentialType, @NonNull List<URI> additionalContexts, @NonNull Instant expiryDate) {
+        return createdIssuedCredential(subject, List.of(verifiableCredentialType), additionalContexts, expiryDate);
     }
 
     @SneakyThrows({UnsupportedSignatureTypeException.class, InvalidePrivateKeyFormat.class})
-    protected VerifiableCredential createdIssuedCredential(@NonNull VerifiableCredentialSubject subject, @NonNull String type, @NonNull List<URI> additionalContexts, @NonNull Instant expiryDate) {
+    protected VerifiableCredential createdIssuedCredential(@NonNull VerifiableCredentialSubject subject, @NonNull List<String> verifiableCredentialTypes, @NonNull List<URI> additionalContexts, @NonNull Instant expiryDate) {
 
         final List<URI> contexts = new ArrayList<>();
         contexts.addAll(miwSettings.getVcContexts());
@@ -84,13 +94,18 @@ public abstract class AbstractVerifiableDocumentFactory {
         if (!contexts.contains(jwsUri))
             contexts.add(jwsUri);
 
+        // distinct list of all verifiable credential types
+        List<String> types = new ArrayList<>(verifiableCredentialTypes);
+        types.add(VerifiableCredentialType.VERIFIABLE_CREDENTIAL);
+        types = types.stream().distinct().collect(Collectors.toList());
+
         final Wallet issuerWallet = getIssuerWallet();
         final Did issuerDid = didFactory.generateDid(issuerWallet);
         final VerifiableCredentialBuilder builder =
                 new VerifiableCredentialBuilder()
                         .context(contexts)
                         .id(URI.create(issuerDid + "#" + UUID.randomUUID()))
-                        .type(List.of(VerifiableCredentialType.VERIFIABLE_CREDENTIAL, type))
+                        .type(types)
                         .issuer(issuerDid.toUri())
                         .expirationDate(expiryDate)
                         .issuanceDate(Instant.now())
