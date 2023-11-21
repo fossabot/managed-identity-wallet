@@ -92,6 +92,7 @@ public class CommonService {
         final DidDocument didDocument = getDidDocument(wallet);
 
         return Wallet.builder()
+                .id(wallet.getWalletId().getText())
                 .bpn(bpn)
                 .did(did.toString())
                 .name(wallet.getWalletName().getText())

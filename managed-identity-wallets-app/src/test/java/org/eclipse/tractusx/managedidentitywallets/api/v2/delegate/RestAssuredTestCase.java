@@ -26,6 +26,7 @@ import io.restassured.RestAssured;
 import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.web.client.RestTemplate;
 
 public class RestAssuredTestCase extends MiwTestCase {
 

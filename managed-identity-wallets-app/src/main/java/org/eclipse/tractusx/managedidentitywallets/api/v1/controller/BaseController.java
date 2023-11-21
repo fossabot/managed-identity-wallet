@@ -43,15 +43,14 @@ public class BaseController {
      * @return the bpn from token
      */
     public String getBPNFromToken(Principal principal) {
-        return "BPNL000000000000";
-//        Object principal1 = ((JwtAuthenticationToken) principal).getPrincipal();
-//        Jwt jwt = (Jwt) principal1;
-//
-//        //this will misbehave if we have more then one claims with different case
-//        // ie. BPN=123456 and bpn=789456
-//        Map<String, Object> claims = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-//        claims.putAll(jwt.getClaims());
-//        Validate.isFalse(claims.containsKey(StringPool.BPN)).launch(new ForbiddenException("Invalid token, BPN not found"));
-//        return claims.get(StringPool.BPN).toString();
+        Object principal1 = ((JwtAuthenticationToken) principal).getPrincipal();
+        Jwt jwt = (Jwt) principal1;
+
+        //this will misbehave if we have more then one claims with different case
+        // ie. BPN=123456 and bpn=789456
+        Map<String, Object> claims = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+        claims.putAll(jwt.getClaims());
+        Validate.isFalse(claims.containsKey(StringPool.BPN)).launch(new ForbiddenException("Invalid token, BPN not found"));
+        return claims.get(StringPool.BPN).toString();
     }
 }

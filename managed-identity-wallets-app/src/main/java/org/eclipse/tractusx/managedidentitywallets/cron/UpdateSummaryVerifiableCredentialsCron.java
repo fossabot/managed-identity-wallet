@@ -33,6 +33,7 @@ import org.springframework.stereotype.Component;
 @Component
 @RequiredArgsConstructor
 @Slf4j
+// TODO Disable again or do this with all CX Verifiable Credentials
 public class UpdateSummaryVerifiableCredentialsCron {
 
     private static final int PAGE_SIZE = 200;

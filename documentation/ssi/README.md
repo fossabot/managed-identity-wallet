@@ -14,3 +14,15 @@
 </div>
 
 [« Up](../../README.md)
+
+## Introduction to Self-Sovereign Identity (SSI)
+
+## Special Verifiable Credentials
+
+### Membership Verifiable Credential
+
+### Business Partner Number Verifiable Credential
+
+### Dismantler Verifiable Credential
+
+### 

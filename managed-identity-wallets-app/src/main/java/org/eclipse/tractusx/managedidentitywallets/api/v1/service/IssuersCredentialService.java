@@ -21,6 +21,7 @@
 
 package org.eclipse.tractusx.managedidentitywallets.api.v1.service;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringEscapeUtils;
@@ -201,7 +202,7 @@ public class IssuersCredentialService {
         validateAccess(callerBPN, issuerWallet);
 
         //check duplicate
-        isCredentialExit(holderWallet.getDid(), MIWVerifiableCredentialType.DISMANTLER_CREDENTIAL);
+        isCredentialExit(holderWallet.getBpn(), MIWVerifiableCredentialType.DISMANTLER_CREDENTIAL);
 
 
         final String activityType = request.getActivityType();
@@ -237,7 +238,7 @@ public class IssuersCredentialService {
         Wallet holderWallet = commonService.getWalletByIdentifier(issueMembershipCredentialRequest.getBpn());
 
         //check duplicate
-        isCredentialExit(holderWallet.getDid(), VerifiableCredentialType.MEMBERSHIP_CREDENTIAL);
+        isCredentialExit(holderWallet.getBpn(), VerifiableCredentialType.MEMBERSHIP_CREDENTIAL);
 
         // Fetch Issuer Wallet
         Wallet issuerWallet = commonService.getWalletByIdentifier(miwSettings.getAuthorityWalletBpn());
@@ -338,9 +339,9 @@ public class IssuersCredentialService {
         Validate.isFalse(issuerWallet.getBpn().equals(miwSettings.getAuthorityWalletBpn())).launch(new ForbiddenException(BASE_WALLET_BPN_IS_NOT_MATCHING_WITH_REQUEST_BPN_FROM_TOKEN));
     }
 
-    private void isCredentialExit(String holderDid, String credentialType) {
+    private void isCredentialExit(String holderBpn, String credentialType) {
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
-                .holderWalletId(new WalletId(holderDid))
+                .holderWalletId(new WalletId(holderBpn))
                 .verifiableCredentialTypes(List.of(new org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType(credentialType)))
                 .build();
         if (verifiableCredentialService.exists(verifiableCredentialQuery)) {
