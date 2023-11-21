@@ -180,7 +180,6 @@ public abstract class MiwTestCase {
         return genericVerifiableCredentialFactory.createVerifiableCredential(args);
     }
 
-
     protected HttpHeaders getValidUserHttpHeaders(String bpn) {
         String token = getApiV1JwtToken(StringPool.VALID_USER_NAME, bpn);
         HttpHeaders headers = new HttpHeaders();

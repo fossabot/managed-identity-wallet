@@ -60,29 +60,24 @@ public class GenericVerifiableCredentialFactory extends AbstractVerifiableDocume
 
         final List<VerifiableCredentialType> verifiableCredentialTypes = new ArrayList<>();
         Optional.ofNullable(args.getAdditionalVerifiableCredentialTypes()).ifPresent(verifiableCredentialTypes::addAll);
-        if (!verifiableCredentialTypes.contains(VerifiableCredentialType.VERIFIABLE_CREDENTIAL)) {
-            verifiableCredentialTypes.add(VerifiableCredentialType.VERIFIABLE_CREDENTIAL);
-        }
+        // add standard verifiable credential type
+        verifiableCredentialTypes.add(VerifiableCredentialType.VERIFIABLE_CREDENTIAL);
 
         final List<VerifiableCredentialContext> verifiableCredentialContexts = new ArrayList<>();
         Optional.ofNullable(args.getAdditionalContexts()).ifPresent(verifiableCredentialContexts::addAll);
-        if (!verifiableCredentialContexts.contains(VerifiableCredentialContext.CREDENTIALS_V1)) {
-            verifiableCredentialContexts.add(VerifiableCredentialContext.CREDENTIALS_V1);
-        }
+        // add standard contexts for verifiable credential and signature/proof
+        verifiableCredentialContexts.add(VerifiableCredentialContext.CREDENTIALS_V1);
+        verifiableCredentialContexts.add(VerifiableCredentialContext.JWS_2020_V1);
 
-        // if the credential does not contain the JWS proof-context add it
-        // this proof context is used to sign the credential
-        if (!verifiableCredentialContexts.contains(VerifiableCredentialContext.JWS_2020_V1))
-            verifiableCredentialContexts.add(VerifiableCredentialContext.JWS_2020_V1);
-
-        final List<URI> contexts = verifiableCredentialContexts.stream().map(VerifiableCredentialContext::getUri).toList();
-        final List<String> types = verifiableCredentialTypes.stream().map(VerifiableCredentialType::getText).toList();
+        final URI id = Optional.ofNullable(args.getVerifiableCredentialId()).orElse(URI.create(issuerDid + "#" + UUID.randomUUID()));
+        final List<URI> distinctContexts = verifiableCredentialContexts.stream().map(VerifiableCredentialContext::getUri).distinct().toList();
+        final List<String> distinctTypes = verifiableCredentialTypes.stream().map(VerifiableCredentialType::getText).distinct().toList();
 
         final VerifiableCredentialBuilder builder =
                 new VerifiableCredentialBuilder()
-                        .context(contexts)
-                        .id(URI.create(issuerDid + "#" + UUID.randomUUID()))
-                        .type(types)
+                        .context(distinctContexts)
+                        .id(id)
+                        .type(distinctTypes)
                         .issuer(issuerDid.toUri())
                         .expirationDate(expirationDate)
                         .issuanceDate(Instant.now())
@@ -102,6 +97,7 @@ public class GenericVerifiableCredentialFactory extends AbstractVerifiableDocume
         Wallet issuerWallet;
 
         /* Optional */
+        URI verifiableCredentialId;
         @Singular
         List<VerifiableCredentialContext> additionalContexts;
         @Singular

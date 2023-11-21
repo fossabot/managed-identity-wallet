@@ -26,9 +26,11 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialAlreadyStoredInWalletException;
+import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.Ed25519KeyEntity;
@@ -56,6 +58,7 @@ import java.util.stream.Collectors;
 public class WalletRepository {
 
     private final WalletJpaRepository walletJpaRepository;
+    private final VerifiableCredentialJpaRepository verifiableCredentialJpaRepository;
     private final VerifiableCredentialWalletIntersectionJpaRepository verifiableCredentialWalletIntersectionJpaRepository;
     private final Ed25519KeyJpaRepository ed25519KeyJpaRepository;
     private final WalletMap walletMap;
@@ -230,6 +233,14 @@ public class WalletRepository {
             if (log.isTraceEnabled()) {
                 log.trace("storeVerifiableCredentialInWallet: wallet={}, verifiableCredential={}", wallet, verifiableCredential);
             }
+
+            if (!walletJpaRepository.existsById(wallet.getWalletId().getText())) {
+                throw new WalletNotFoundException(wallet.getWalletId());
+            }
+            if (!verifiableCredentialJpaRepository.existsById(verifiableCredential.getId().toString())) {
+                throw new VerifiableCredentialNotFoundException(new VerifiableCredentialId(verifiableCredential.getId().toString()));
+            }
+
             verifiableCredentialWalletIntersectionJpaRepository.save(verifiableCredentialWalletIntersectionEntity);
         } else {
             throw new VerifiableCredentialAlreadyStoredInWalletException(wallet, verifiableCredential);

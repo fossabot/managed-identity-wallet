@@ -26,8 +26,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.text.StringEscapeUtils;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.ForbiddenException;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
+import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
@@ -56,6 +56,7 @@ public class HoldersCredentialService {
     private final VerifiableCredentialService verifiableCredentialService;
     private final WalletService walletService;
     private final GenericVerifiableCredentialFactory genericVerifiableCredentialFactory;
+    private final DidFactory didFactory;
 
 
     /**
@@ -126,16 +127,23 @@ public class HoldersCredentialService {
      */
     public VerifiableCredential issueCredential(Map<String, Object> data, String callerBpn) {
         final VerifiableCredential verifiableCredential = new VerifiableCredential(data);
-        final Wallet issuerWallet = walletService.findById(new WalletId(callerBpn)).orElseThrow();
+        final String issuerDid = new VerifiableCredential(data).getIssuer().toString();
+        final String callerDid = didFactory.generateDid(new WalletId(callerBpn)).toString();
 
         //validate BPN access, Holder must be caller of API
-        if (!callerBpn.equals(issuerWallet.getWalletId())) {
+        if (!callerDid.equals(issuerDid)) {
             throw new ForbiddenException(BASE_WALLET_BPN_IS_NOT_MATCHING_WITH_REQUEST_BPN_FROM_TOKEN);
         }
 
+        final Wallet issuerWallet = walletService.findById(new WalletId(callerBpn)).orElseThrow();
+
         final GenericVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs factoryArgs =
                 GenericVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs.builder()
+                        .verifiableCredentialId(verifiableCredential.getId())
                         .subjects(verifiableCredential.getCredentialSubject())
+                        .additionalContexts(verifiableCredential.getContext().stream().map(VerifiableCredentialContext::new).toList())
+                        .additionalVerifiableCredentialTypes(verifiableCredential.getTypes().stream().map(VerifiableCredentialType::new).toList())
+                        .expirationDate(verifiableCredential.getExpirationDate())
                         .issuerWallet(issuerWallet)
                         .build();
 
