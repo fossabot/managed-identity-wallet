@@ -63,6 +63,10 @@ The Managed Identity Wallets (MIW) service implements the Self-Sovereign-Identit
 | Operations Documentation  | Find comprehensive information on the deployment and operational aspects of the MIW service.                                     | [Operations Documentation](/documentation/operations)      |
 | SSI Documentation         | Explore a detailed overview of the Self-Sovereign Identity (SSI) concept and its specific implementation within the MIW service. | [SSI Documentation](/documentation/ssi)                    |
 
+If you find any gaps in our documentation, please don't hesitate to open a ticket. Let us know which topics you feel are
+not adequately covered, and we'll address them promptly. Your feedback is valuable in ensuring comprehensive
+documentation.
+
 ## Project Structure
 
 | Directory                                   | Description                                                                                 | 
@@ -80,6 +84,8 @@ The Managed Identity Wallets (MIW) service implements the Self-Sovereign-Identit
 | `/managed-identity-wallets-resttemplate-v2` | OpenAPI-generated projects with the API v2 RestTemplate client for the MIW service.         |
 
 ## Reference of external lib
+
+Sometimes the utilized libraries provides valuable insights into the implementation. Here's a compilation of the key libraries employed in this project:
 
 1. https://spring.io/projects/spring-boot
 2. https://github.com/querydsl/querydsl
