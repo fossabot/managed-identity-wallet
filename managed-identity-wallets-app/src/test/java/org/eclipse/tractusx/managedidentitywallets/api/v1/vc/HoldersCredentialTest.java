@@ -122,12 +122,10 @@ class HoldersCredentialTest extends MiwTestCase {
     void getCredentials200() throws com.fasterxml.jackson.core.JsonProcessingException {
         String baseDID = miwSettings.getAuthorityWalletDid();
         String bpn = UUID.randomUUID().toString();
-        String did = DidWebFactory.fromHostnameAndPath(miwSettings.getHost(), bpn).toString();
         HttpHeaders headers = getValidUserHttpHeaders(bpn);
         //save wallet
         final Wallet wallet = newWalletPersisted(bpn);
         newVerifiableCredential(wallet);
-//        TestUtils.issueMembershipVC(restTemplate, bpn, miwSettings.authorityWalletBpn());
         String vcList = """
                 [
                 {"type":"TraceabilityCredential"},
@@ -286,19 +284,6 @@ class HoldersCredentialTest extends MiwTestCase {
 
 
     private ResponseEntity<String> issueVC(Wallet wallet, HttpHeaders headers) throws JsonProcessingException {
-        //save wallet
-//        Wallet wallet = newWalletPersisted(bpn);
-//        VerifiableCredential verifiableCredential = newVerifiableCredential(wallet);
-//        verifiableCredentialService.create(verifiableCredential);
-//        walletService.storeVerifiableCredential(wallet, verifiableCredential);
-//
-//        return new ResponseEntity<>(objectMapper.writeValueAsString(verifiableCredential), headers, HttpStatus.CREATED);
-
-
-//        String baseBpn = miwSettings.getAuthorityWalletBpn();
-//        Wallet wallet = newWalletPersisted(bpn);
-
-//        final Wallet authorityWallet = walletService.findById(new WalletId(baseBpn)).orElseThrow();
 
         VerifiableCredential verifiableCredential = newVerifiableCredential(wallet);
 

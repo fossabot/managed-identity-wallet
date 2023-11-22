@@ -160,10 +160,16 @@ public class CommonService {
         return dateValidation;
     }
 
-    private String asBpn(String identifier) {
+    public String asBpn(String identifier) {
         try {
             Did did = DidParser.parse(identifier);
-            return did.getMethodIdentifier().getValue();
+            final String methodIdentifier = did.getMethodIdentifier().toString();
+            // workaround for https://github.com/eclipse-tractusx/SSI-agent-lib/issues/49
+            if (methodIdentifier.contains("%3A")) {
+                return methodIdentifier.substring(methodIdentifier.indexOf(":")+1, methodIdentifier.length());
+            } else {
+                return methodIdentifier;
+            }
         } catch (Exception e) {
             // not a did ->  ignore
             return identifier;

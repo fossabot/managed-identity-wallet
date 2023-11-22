@@ -37,6 +37,7 @@ import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.ForbiddenExc
 import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.WalletNotFoundProblem;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.utils.Validate;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
+import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
@@ -51,6 +52,7 @@ import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.M
 import org.eclipse.tractusx.ssi.lib.did.resolver.DidResolver;
 import org.eclipse.tractusx.ssi.lib.did.web.DidWebResolver;
 import org.eclipse.tractusx.ssi.lib.did.web.util.DidWebParser;
+import org.eclipse.tractusx.ssi.lib.model.did.Did;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialType;
 import org.eclipse.tractusx.ssi.lib.proof.LinkedDataProofValidation;
@@ -83,6 +85,7 @@ public class IssuersCredentialService {
 
 
     private final CommonService commonService;
+    private final DidFactory didFactory;
 
     private final VerifiableCredentialService verifiableCredentialService;
     private final MembershipVerifiableCredentialFactory membershipVerifiableCredentialFactory;
@@ -105,13 +108,6 @@ public class IssuersCredentialService {
      */
     public Page<VerifiableCredential> getCredentials(String credentialId, String holderIdentifier, List<String> type, String sortColumn, String sortType, int pageNumber, int size, String callerBPN) {
 
-        if (holderIdentifier != null) {
-            // addition when refactoring the API to API v2: It should not be possible to query credentials from
-            // another wallet than the caller's wallet. This would leak sensitive information
-            log.debug("Querying credentials from another wallet than the caller's wallet is not allowed.");
-            return Page.empty();
-        }
-
         Sort sort = Sort.unsorted();
         if (sortColumn != null) {
             final Sort.Direction direction = Sort.Direction.fromOptionalString(sortType.toUpperCase())
@@ -119,7 +115,7 @@ public class IssuersCredentialService {
 
             switch (sortColumn) {
                 case "createdAt":
-                    sort = Sort.by(direction, VerifiableCredentialEntity.COLUMN_CREATED_AT);
+                    sort = Sort.by(direction, "createdAt");
                     break;
                 case "credentialId":
                     sort = Sort.by(direction, VerifiableCredentialEntity.COLUMN_ID);
@@ -136,10 +132,12 @@ public class IssuersCredentialService {
             }
         }
 
+        final Did issuerDid = didFactory.generateDid(new WalletId(commonService.asBpn(callerBPN)));
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
-                .verifiableCredentialId(new VerifiableCredentialId(credentialId))
-                .verifiableCredentialTypes(type.stream().map(org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType::new).toList())
-                .verifiableCredentialIssuer(new VerifiableCredentialIssuer(callerBPN))
+                .holderWalletId(Optional.ofNullable(commonService.asBpn(holderIdentifier)).map(WalletId::new).orElse(null))
+                .verifiableCredentialId(Optional.ofNullable(credentialId).map(VerifiableCredentialId::new).orElse(null))
+                .verifiableCredentialTypes(Optional.ofNullable(type).orElse(List.of()).stream().map(org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType::new).toList())
+                .verifiableCredentialIssuer(new VerifiableCredentialIssuer(issuerDid.toString()))
                 .build();
 
         return verifiableCredentialService
