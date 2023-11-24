@@ -65,7 +65,6 @@ public abstract class AbstractVerifiableDocumentFactory {
         return createdIssuedCredential(subject, verifiableCredentialType, Collections.emptyList(), miwSettings.getVcExpiryDate().toInstant());
     }
 
-
     protected VerifiableCredential createdIssuedCredential(@NonNull VerifiableCredentialSubject subject, @NonNull List<String> verifiableCredentialTypes, @NonNull List<URI> additionalContexts) {
         return createdIssuedCredential(subject, verifiableCredentialTypes, additionalContexts, miwSettings.getVcExpiryDate().toInstant());
     }
@@ -117,12 +116,12 @@ public abstract class AbstractVerifiableDocumentFactory {
 
     protected Proof generateProof(@NonNull Wallet issuerWallet, @NonNull Verifiable verifiable) throws UnsupportedSignatureTypeException, InvalidePrivateKeyFormat {
         if (issuerWallet.getStoredEd25519Keys().isEmpty()) {
-            throw new RuntimeException("No key found for wallet " + issuerWallet.getWalletId());
+            throw new RuntimeException("No key registered for wallet " + issuerWallet.getWalletId());
         }
 
         final Did issuerDid = didFactory.generateDid(issuerWallet);
 
-        final ResolvedEd25519Key key = issuerWallet.getStoredEd25519Keys()
+        final ResolvedEd25519Key latestKey = issuerWallet.getStoredEd25519Keys()
                 .stream()
                 .max(Comparator.comparing(StoredEd25519Key::getCreatedAt))
                 .map(k -> vaultService.resolveKey(issuerWallet, k))
@@ -130,8 +129,8 @@ public abstract class AbstractVerifiableDocumentFactory {
                 .map(Optional::get)
                 .orElseThrow();
 
-        final x21559PrivateKey privateKey = new x21559PrivateKey(key.getPrivateKey());
-        final URI verificationMethod = URI.create(issuerDid + "#" + key.getDidFragment());
+        final x21559PrivateKey privateKey = new x21559PrivateKey(latestKey.getPrivateKey());
+        final URI verificationMethod = URI.create(issuerDid + "#" + latestKey.getDidFragment());
         final LinkedDataProofGenerator generator = LinkedDataProofGenerator.newInstance(SignatureType.JWS);
 
         return generator.createProof(verifiable, verificationMethod, privateKey);

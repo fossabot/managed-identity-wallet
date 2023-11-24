@@ -68,6 +68,7 @@ public class VerifiablePresentationFactory extends AbstractVerifiableDocumentFac
 
         final VerifiablePresentationBuilder verifiablePresentationBuilder =
                 new VerifiablePresentationBuilder()
+                        .context(List.of(VerifiablePresentation.DEFAULT_CONTEXT))
                         .id(URI.create(issuerDid + "#" + UUID.randomUUID()))
                         .type(List.of(VerifiablePresentationType.VERIFIABLE_PRESENTATION))
                         .verifiableCredentials(verifiableCredentials);
@@ -90,8 +91,8 @@ public class VerifiablePresentationFactory extends AbstractVerifiableDocumentFac
                 .orElseThrow();
 
         final x21559PrivateKey privateKey = new x21559PrivateKey(key.getPrivateKey());
-
         final SignedJWT signedJwt = factory.createPresentation(issuerDid, credentials, audience.getText(), privateKey);
+
         return new JsonWebToken(signedJwt.serialize());
     }
 

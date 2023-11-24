@@ -28,6 +28,7 @@ import java.util.List;
 
 @Builder
 @AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
+@ToString
 public class VerifiablePresentationValidationResult {
 
     @Getter

@@ -26,10 +26,8 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.GenericVerifiableCredentialFactory;
-import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
-import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
+import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.VerifiablePresentationFactory;
+import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
@@ -37,6 +35,7 @@ import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialS
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialSubject;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.presentation.VerifiablePresentation;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
@@ -72,6 +71,9 @@ public abstract class MiwTestCase {
 
     @Autowired
     private GenericVerifiableCredentialFactory genericVerifiableCredentialFactory;
+
+    @Autowired
+    private VerifiablePresentationFactory verifiablePresentationFactory;
 
     @Autowired
     private WalletRepository walletRepository;
@@ -128,6 +130,21 @@ public abstract class MiwTestCase {
     protected VerifiableCredential newWalletPlusVerifiableCredentialPersisted() {
         final Wallet wallet = newWalletPersisted();
         return newWalletPlusVerifiableCredentialPersisted(wallet);
+    }
+
+
+    @SneakyThrows
+    protected VerifiablePresentation newWalletPlusVerifiablePresentationPersisted() {
+        final Wallet wallet = newWalletPersisted();
+        final VerifiableCredential verifiableCredential = newWalletPlusVerifiableCredentialPersisted(wallet);
+        return verifiablePresentationFactory.createPresentation(wallet, List.of(verifiableCredential));
+    }
+
+    @SneakyThrows
+    protected JsonWebToken newWalletPlusVerifiablePresentationJwtPersisted() {
+        final Wallet wallet = newWalletPersisted();
+        final VerifiableCredential verifiableCredential = newWalletPlusVerifiableCredentialPersisted(wallet);
+        return verifiablePresentationFactory.createPresentationAsJwt(wallet, List.of(verifiableCredential), new JsonWebTokenAudience("audience"));
     }
 
     @SneakyThrows
