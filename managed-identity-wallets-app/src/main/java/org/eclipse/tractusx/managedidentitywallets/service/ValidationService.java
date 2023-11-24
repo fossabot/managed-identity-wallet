@@ -21,9 +21,15 @@
 
 package org.eclipse.tractusx.managedidentitywallets.service;
 
+import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
+import org.eclipse.tractusx.ssi.lib.did.resolver.DidResolver;
+import org.eclipse.tractusx.ssi.lib.did.web.DidWebResolver;
+import org.eclipse.tractusx.ssi.lib.jwt.SignedJwtValidator;
+import org.eclipse.tractusx.ssi.lib.jwt.SignedJwtVerifier;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.Verifiable;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.presentation.VerifiablePresentation;
@@ -31,9 +37,11 @@ import org.eclipse.tractusx.ssi.lib.proof.LinkedDataProofValidation;
 import org.eclipse.tractusx.ssi.lib.validation.JsonLdValidator;
 import org.springframework.stereotype.Service;
 
+import java.text.ParseException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Slf4j
 @Service
@@ -42,6 +50,44 @@ public class ValidationService {
 
     private final LinkedDataProofValidation proofValidation;
     private final JsonLdValidator jsonLdValidator;
+    private final DidResolver didResolver;
+
+    public VerifiablePresentationValidationResult validate(JsonWebToken vpJsonWebToken) throws ParseException {
+
+
+        final List<VerifiablePresentationValidationResult.Type> violations = new ArrayList<>();
+
+        if (isExpired(vpJsonWebToken)) {
+            violations.add(VerifiablePresentationValidationResult.Type.EXPIRED);
+        }
+        if (!isSignatureValid(vpJsonWebToken)) {
+            violations.add(VerifiablePresentationValidationResult.Type.INVALID_SIGNATURE);
+        }
+
+        final SignedJWT signedJWT = SignedJWT.parse(vpJsonWebToken.getText());
+        final VerifiablePresentation verifiablePresentation;
+        try {
+            verifiablePresentation = new VerifiablePresentation((Map<String, Object>) signedJWT.getPayload().toJSONObject().get("vp"));
+        } catch (Exception e) {
+            throw new ParseException("Can not parse vp from jwt", 0);
+        }
+
+
+        if (!isJsonLdValid(verifiablePresentation)) {
+            violations.add(VerifiablePresentationValidationResult.Type.INVALID_JSONLD_FORMAT);
+        }
+        if (verifiablePresentation.containsKey(VerifiableCredential.PROOF) && !isSignatureValid(verifiablePresentation)) {
+            violations.add(VerifiablePresentationValidationResult.Type.INVALID_SIGNATURE);
+        }
+
+        final VerifiableCredentialValidationResult validationResult = validate(verifiablePresentation.getVerifiableCredentials());
+
+        return VerifiablePresentationValidationResult.builder()
+                .verifiablePresentationViolations(violations)
+                .verifiableCredentialViolations(validationResult.getVerifiableCredentialViolations())
+                .isValid(violations.isEmpty() && validationResult.isValid())
+                .build();
+    }
 
     public VerifiablePresentationValidationResult validate(VerifiablePresentation verifiablePresentation) {
         final List<VerifiablePresentationValidationResult.Type> violations = new ArrayList<>();
@@ -129,6 +175,20 @@ public class ValidationService {
         return isExpired;
     }
 
+
+    public boolean isExpired(JsonWebToken jsonWebToken) {
+        try {
+            final SignedJWT signedJWT = SignedJWT.parse(jsonWebToken.getText());
+            final SignedJwtValidator jwtValidator = new SignedJwtValidator();
+            jwtValidator.validateDate(signedJWT);
+            return false;
+        } catch (Exception e) {
+            log.error("Can not expiry date ", e);
+            return false;
+        }
+    }
+
+
     public boolean isJsonLdValid(List<VerifiableCredential> verifiableCredentials) {
         return verifiableCredentials.stream().allMatch(this::isJsonLdValid);
     }
@@ -149,7 +209,6 @@ public class ValidationService {
         return result;
     }
 
-
     public boolean isJsonLdValid(VerifiablePresentation presentation) {
         boolean result;
         try {
@@ -159,12 +218,23 @@ public class ValidationService {
             result = false;
         }
 
-
         if (log.isTraceEnabled()) {
             log.trace(result ? "VerifiablePresentation is JSON-LD valid. (id={})" : "VerifiablePresentation is not JSON-LD valid. (id={})", presentation.getId());
         }
 
         return result;
+    }
+
+    private boolean isSignatureValid(JsonWebToken jsonWebToken) {
+        //validate jwt signature
+        try {
+            final SignedJWT signedJWT = SignedJWT.parse(jsonWebToken.getText());
+            final SignedJwtVerifier jwtVerifier = new SignedJwtVerifier(didResolver);
+            return jwtVerifier.verify(signedJWT);
+        } catch (Exception e) {
+            log.error("Can not verify signature of jwt", e);
+            return false;
+        }
     }
 
     public <T extends Verifiable> boolean isSignatureValid(List<T> verifiableCredentials) {

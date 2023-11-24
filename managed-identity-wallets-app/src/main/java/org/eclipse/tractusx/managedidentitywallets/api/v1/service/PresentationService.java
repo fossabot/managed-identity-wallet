@@ -31,9 +31,8 @@ import org.eclipse.tractusx.managedidentitywallets.api.v1.entity.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.BadDataException;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.utils.Validate;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
-import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
-import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.models.*;
+import org.eclipse.tractusx.managedidentitywallets.service.ValidationService;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.ssi.lib.crypt.octet.OctetKeyPairFactory;
@@ -77,6 +76,7 @@ public class PresentationService {
 
     private final VaultService vaultService;
     private final WalletService walletService;
+    private final ValidationService validationService;
 
     private final MIWSettings miwSettings;
 
@@ -115,7 +115,6 @@ public class PresentationService {
                     new SignedJwtFactory(new OctetKeyPairFactory()), new JsonLdSerializerImpl(), vpIssuerDid);
 
             //Build JWT
-
             final org.eclipse.tractusx.managedidentitywallets.models.Wallet domainWallet = walletService.findById(new WalletId(callerBpn)).orElseThrow();
             final StoredEd25519Key latestKey = domainWallet.getStoredEd25519Keys().stream().max(Comparator.comparing(org.eclipse.tractusx.managedidentitywallets.models.Ed25519Key::getCreatedAt)).orElseThrow();
             final ResolvedEd25519Key resolvedEd25519Key = vaultService.resolveKey(domainWallet, latestKey).orElseThrow();
@@ -133,12 +132,14 @@ public class PresentationService {
             // Build VP
             VerifiablePresentation verifiablePresentation =
                     verifiablePresentationBuilder
-                            .id(URI.create(miwSettings.getAuthorityWalletDid() + "#" + UUID.randomUUID().toString()))
+                            .id(URI.create(miwSettings.getAuthorityWalletDid() + "#" + UUID.randomUUID()))
                             .type(List.of(VerifiablePresentationType.VERIFIABLE_PRESENTATION))
                             .verifiableCredentials(verifiableCredentials)
                             .build();
             response.put(StringPool.VP, verifiablePresentation);
         }
+
+
         return response;
     }
 
@@ -161,76 +162,33 @@ public class PresentationService {
             //verify as jwt
             Validate.isNull(vp.get(StringPool.VP)).launch(new BadDataException("Can not find JWT"));
             String jwt = vp.get(StringPool.VP).toString();
-            response.put(StringPool.VP, jwt);
 
-            SignedJWT signedJWT = SignedJWT.parse(jwt);
-
-            boolean validateSignature = validateSignature(signedJWT);
+            VerifiablePresentationValidationResult result = validationService.validate(new JsonWebToken(jwt));
 
             //validate audience
+            SignedJWT signedJWT = SignedJWT.parse(jwt);
             boolean validateAudience = validateAudience(audience, signedJWT);
 
             //validate jwt date
-            boolean validateJWTExpiryDate = validateJWTExpiryDate(signedJWT);
+            boolean validateJWTExpiryDate = result.getVerifiablePresentationViolations().stream().anyMatch(v -> v.equals(VerifiablePresentationValidationResult.Type.EXPIRED)) &&
+                    result.getVerifiablePresentationViolations().stream().anyMatch(v -> v.equals(VerifiablePresentationValidationResult.Type.EXPIRED));
+            boolean validateExpiryDate = result.getVerifiablePresentationViolations().stream().anyMatch(v -> v.equals(VerifiablePresentationValidationResult.Type.EXPIRED));
             response.put(StringPool.VALIDATE_JWT_EXPIRY_DATE, validateJWTExpiryDate);
+            response.put(StringPool.VALIDATE_EXPIRY_DATE, validateExpiryDate);
 
-            boolean validCredential = true;
-            boolean validateExpiryDate = true;
-            try {
-                ObjectMapper mapper = new ObjectMapper();
-                Map<String, Object> claims = mapper.readValue(signedJWT.getPayload().toBytes(), Map.class);
-                String vpClaim = mapper.writeValueAsString(claims.get("vp"));
-
-                JsonLdSerializerImpl jsonLdSerializer = new JsonLdSerializerImpl();
-                VerifiablePresentation presentation = jsonLdSerializer.deserializePresentation(new SerializedVerifiablePresentation(vpClaim));
-
-                for (VerifiableCredential credential : presentation.getVerifiableCredentials()) {
-                    validateExpiryDate = CommonService.validateExpiry(withCredentialExpiryDate, credential, response);
-                    if (!validateCredential(credential)) {
-                        validCredential = false;
-                    }
-                }
-            } catch (InvalidJsonLdException e) {
-                throw new BadDataException(String.format("Validation of VP in form of JSON-LD is not supported. Invalid Json-LD: %s", e.getMessage()));
-            }
-
-            response.put(StringPool.VALID, (validateSignature && validateAudience && validateExpiryDate && validCredential && validateJWTExpiryDate));
+            response.put(StringPool.VALID, result.isValid());
 
             if (StringUtils.hasText(audience)) {
                 response.put(StringPool.VALIDATE_AUDIENCE, validateAudience);
-
             }
 
+            response.put(StringPool.VP, jwt);
         } else {
             log.debug("Validating VP as json-ld");
             throw new BadDataException("Validation of VP in form of JSON-LD is not supported");
         }
 
         return response;
-    }
-
-    private boolean validateSignature(SignedJWT signedJWT) {
-        //validate jwt signature
-        try {
-            final DidResolver didResolver = new DidWebResolver(HttpClient.newHttpClient(), new DidWebParser(), miwSettings.isEnforceHttps());
-
-            SignedJwtVerifier jwtVerifier = new SignedJwtVerifier(didResolver);
-            return jwtVerifier.verify(signedJWT);
-        } catch (Exception e) {
-            log.error("Can not verify signature of jwt", e);
-            return false;
-        }
-    }
-
-    private boolean validateJWTExpiryDate(SignedJWT signedJWT) {
-        try {
-            SignedJwtValidator jwtValidator = new SignedJwtValidator();
-            jwtValidator.validateDate(signedJWT);
-            return true;
-        } catch (Exception e) {
-            log.error("Can not expiry date ", e);
-            return false;
-        }
     }
 
     private boolean validateAudience(String audience, SignedJWT signedJWT) {
@@ -246,19 +204,5 @@ public class PresentationService {
         } else {
             return true;
         }
-    }
-
-    private boolean validateCredential(VerifiableCredential credential) throws UnsupportedSignatureTypeException {
-
-        final DidResolver didResolver = new DidWebResolver(HttpClient.newHttpClient(), new DidWebParser(), miwSettings.isEnforceHttps());
-        final LinkedDataProofValidation linkedDataProofValidation = LinkedDataProofValidation.newInstance(didResolver);
-
-        boolean isValid = linkedDataProofValidation.verifiy(credential);
-        if (isValid) {
-            log.debug("Credential validation result: (valid: {}, credential-id: {})", isValid, credential.getId());
-        } else {
-            log.info("Credential validation result: (valid: {}, credential-id: {})", isValid, credential.getId());
-        }
-        return isValid;
     }
 }

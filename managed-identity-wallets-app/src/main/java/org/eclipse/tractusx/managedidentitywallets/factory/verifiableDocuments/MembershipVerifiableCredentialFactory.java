@@ -39,6 +39,7 @@ import org.springframework.stereotype.Component;
 
 import java.net.URI;
 import java.time.Instant;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -68,5 +69,24 @@ public class MembershipVerifiableCredentialFactory extends AbstractVerifiableDoc
 
         final URI context = verifiableCredentialContextConfiguration.getMembershipVerifiableCredentialContext();
         return createdIssuedCredential(verifiableCredentialSubject, MIWVerifiableCredentialType.MEMBERSHIP_CREDENTIAL, List.of(context));
+    }
+
+    public VerifiableCredential createMembershipVerifiableCredential(@NonNull Wallet wallet, OffsetDateTime expirationDate) {
+
+        final WalletId newMemberWalletId = wallet.getWalletId();
+        final WalletId issuerWalletId = new WalletId(miwSettings.getAuthorityWalletBpn());
+        final Wallet issuerWallet = walletService.findById(issuerWalletId).orElseThrow(() -> new RuntimeException("Issuer wallet not found"));
+        final Did did = didFactory.generateDid(wallet);
+
+        final VerifiableCredentialSubject verifiableCredentialSubject = new VerifiableCredentialSubject(Map.of(
+                StringPool.TYPE, VerifiableCredentialType.MEMBERSHIP_CREDENTIAL,
+                StringPool.ID, did.toString(),
+                StringPool.HOLDER_IDENTIFIER, newMemberWalletId.getText(),
+                StringPool.MEMBER_OF, issuerWallet.getWalletName().getText(),
+                StringPool.STATUS, "Active",
+                StringPool.START_TIME, Instant.now().toString()));
+
+        final URI context = verifiableCredentialContextConfiguration.getMembershipVerifiableCredentialContext();
+        return createdIssuedCredential(verifiableCredentialSubject, MIWVerifiableCredentialType.MEMBERSHIP_CREDENTIAL, List.of(context), expirationDate.toInstant());
     }
 }
