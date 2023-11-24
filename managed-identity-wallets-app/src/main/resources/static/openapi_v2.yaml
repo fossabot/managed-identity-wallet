@@ -201,7 +201,7 @@ paths:
         '400':
           description: Bad Request.
 
-  /verifiable-presentations-validation:
+  /verifiable-presentation-validation:
     post:
       tags:
         - User
@@ -222,7 +222,7 @@ paths:
         '400':
           description: Bad Request.
 
-  /verifiable-presentations-jwt-validation:
+  /verifiable-presentation-jwt-validation:
     post:
       tags:
         - User
@@ -719,7 +719,7 @@ components:
             properties:
               id:
                 type: string
-                description: ID
+                description: The ID of the Verifiable Credential.
               type:
                 type: array
                 items:
@@ -735,7 +735,26 @@ components:
         isValid:
           description: Whether all Verifiable Presentations are valid.
           type: boolean
-        violations:
+        verifiableCredentialResult:
+          $ref: '#/components/schemas/VerifiableCredentialValidationResult'
+        verifiablePresentationViolations:
+          type: array
+          items:
+            type: string
+            enum:
+              - incorrect_json_ld_format
+              - incorrect_signature
+              - no_embedded_signature
+              - expired
+    VerifiablePresentationJwtValidationResult:
+      type: object
+      properties:
+        isValid:
+          description: Whether all Verifiable Presentations are valid.
+          type: boolean
+        verifiableCredentialResult:
+          $ref: '#/components/schemas/VerifiableCredential'
+        verifiablePresentationViolations:
           type: array
           items:
             type: string
@@ -750,15 +769,12 @@ components:
     ValidateVerifiablePresentationRequestPayload:
       description: Verifiable Presentation Validation Payload
       type: object
-      required: [ verifiableCredentials ]
+      required: [ verifiablePresentation ]
       properties:
-        verifiableCredentials:
-          description: Verifiable Credentials
-          type: array
-          items:
-            description: key value map
-            type: object
-            additionalProperties: true
+        verifiablePresentation:
+          description: Verifiable Presentation
+          type: object
+          additionalProperties: true
     ValidateVerifiablePresentationResponsePayload:
       description: Verifiable Presentation Validation Response
       allOf:

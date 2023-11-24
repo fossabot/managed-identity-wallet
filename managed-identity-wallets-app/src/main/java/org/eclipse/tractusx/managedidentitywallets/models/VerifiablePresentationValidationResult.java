@@ -33,9 +33,9 @@ public class VerifiablePresentationValidationResult {
     @Getter
     private final boolean isValid;
 
-    @Singular
     @NonNull
-    private final List<VerifiableCredentialValidationResultViolation> verifiableCredentialViolations;
+    @Getter
+    private final VerifiableCredentialValidationResult verifiableCredentialResult;
 
     @Singular
     @NonNull
@@ -44,12 +44,8 @@ public class VerifiablePresentationValidationResult {
     public enum Type {
         INVALID_JSONLD_FORMAT,
         INVALID_SIGNATURE,
+        NO_EMBEDDED_SIGNATURE,
         EXPIRED
-    }
-
-
-    public List<VerifiableCredentialValidationResultViolation> getVerifiableCredentialViolations() {
-        return Collections.unmodifiableList(verifiableCredentialViolations);
     }
 
     public List<VerifiablePresentationValidationResult.Type> getVerifiablePresentationViolations() {

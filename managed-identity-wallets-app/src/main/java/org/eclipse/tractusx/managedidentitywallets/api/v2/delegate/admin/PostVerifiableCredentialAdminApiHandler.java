@@ -45,7 +45,7 @@ class PostVerifiableCredentialAdminApiHandler extends AbstractApiHandler {
     private final VerifiableCredentialService verifiableCredentialService;
 
     public ResponseEntity<Map<String, Object>> execute(Map<String, Object> requestBody) {
-        logInvocationIfDebug("createVerifiableCredential(requestBody={})", requestBody);
+        logIfDebug("createVerifiableCredential(requestBody={})", requestBody);
 
         if (!verifiableCredentialsMapper.isVerifiableCredential(requestBody)) {
             return ResponseEntity.badRequest().build();

@@ -53,7 +53,7 @@ class GetIssuedVerifiableCredentialsUserApiHandler extends AbstractApiHandler {
     private final ApiV2Mapper apiMapper;
 
     public ResponseEntity<VerifiableCredentialListResponsePayloadV2> execute(Integer page, Integer perPage, String type) {
-        logInvocationIfDebug("userGetIssuedVerifiableCredentials(walletId={}, page={}, perPage={}, type={})", TMP_WALLET_ID, page, perPage, type);
+        logIfDebug("userGetIssuedVerifiableCredentials(walletId={}, page={}, perPage={}, type={})", TMP_WALLET_ID, page, perPage, type);
 
         page = Optional.ofNullable(page).orElse(0);
         perPage = Optional.ofNullable(perPage).orElse(miwSettings.getApiDefaultPageSize());

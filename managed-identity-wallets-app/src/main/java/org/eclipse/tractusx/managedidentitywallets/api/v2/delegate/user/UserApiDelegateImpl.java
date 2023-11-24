@@ -46,6 +46,8 @@ public class UserApiDelegateImpl implements UserApiDelegate {
     private final PostSignedVerifiablePresentationUserApiHandler postSignedVerifiablePresentationUserApiHandler;
     private final PostSignedVerifiablePresentationJwtUserApiHandler postSignedVerifiablePresentationJwtUserApiHandler;
     private final PostVerifiableCredentialsValidationUserApiHandler postVerifiableCredentialsValidationUserApiHandler;
+    private final PostVerifiablePresentationsValidationUserApiHandler postVerifiablePresentationsValidationUserApiHandler;
+    private final PostVerifiablePresentationsJwtValidationUserApiHandler postVerifiablePresentationsJwtValidationUserApiHandler;
 
     @Override
     public ResponseEntity<Map<String, Object>> userCreateVerifiableCredential(Map<String, Object> payload) {
@@ -98,12 +100,12 @@ public class UserApiDelegateImpl implements UserApiDelegate {
     }
 
     @Override
-    public ResponseEntity<ValidateVerifiablePresentationJwtResponsePayloadV2> verifiablePresentationsJwtValidationPost(ValidateVerifiablePresentationJwtRequestPayloadV2 validateVerifiablePresentationJwtRequestPayloadV2) {
-        return UserApiDelegate.super.verifiablePresentationsJwtValidationPost(validateVerifiablePresentationJwtRequestPayloadV2);
+    public ResponseEntity<ValidateVerifiablePresentationJwtResponsePayloadV2> verifiablePresentationJwtValidationPost(ValidateVerifiablePresentationJwtRequestPayloadV2 validateVerifiablePresentationJwtRequestPayloadV2) {
+        return postVerifiablePresentationsJwtValidationUserApiHandler.execute(validateVerifiablePresentationJwtRequestPayloadV2);
     }
 
     @Override
-    public ResponseEntity<ValidateVerifiablePresentationResponsePayloadV2> verifiablePresentationsValidationPost(ValidateVerifiablePresentationRequestPayloadV2 validateVerifiablePresentationRequestPayloadV2) {
-        return UserApiDelegate.super.verifiablePresentationsValidationPost(validateVerifiablePresentationRequestPayloadV2);
+    public ResponseEntity<ValidateVerifiablePresentationResponsePayloadV2> verifiablePresentationValidationPost(ValidateVerifiablePresentationRequestPayloadV2 validateVerifiablePresentationRequestPayloadV2) {
+        return postVerifiablePresentationsValidationUserApiHandler.execute(validateVerifiablePresentationRequestPayloadV2);
     }
 }

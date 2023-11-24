@@ -45,7 +45,7 @@ class GetWalletsAdminApiHandler extends AbstractApiHandler {
     private final MIWSettings miwSettings;
 
     public ResponseEntity<ListWalletsResponsePayloadV2> execute(Integer page, Integer perPage) {
-        logInvocationIfDebug("getWallets(page={}, perPage={})", page, perPage);
+        logIfDebug("getWallets(page={}, perPage={})", page, perPage);
 
         page = Optional.ofNullable(page).orElse(0);
         perPage = Optional.ofNullable(perPage).orElse(miwSettings.getApiDefaultPageSize());

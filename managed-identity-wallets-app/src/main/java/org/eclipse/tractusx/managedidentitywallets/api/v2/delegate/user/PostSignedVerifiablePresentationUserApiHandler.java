@@ -47,7 +47,7 @@ class PostSignedVerifiablePresentationUserApiHandler extends AbstractApiHandler 
     private final VerifiablePresentationFactory verifiablePresentationFactory;
 
     public ResponseEntity<Map<String, Object>> execute(@NonNull IssueVerifiablePresentationRequestPayloadV2 issueVerifiablePresentationRequestPayloadV2) {
-        logInvocationIfDebug("userIssuedVerifiablePresentation(issueVerifiablePresentationRequestPayloadV2={})", issueVerifiablePresentationRequestPayloadV2);
+        logIfDebug("userIssuedVerifiablePresentation(issueVerifiablePresentationRequestPayloadV2={})", issueVerifiablePresentationRequestPayloadV2);
 
         final Wallet wallet = walletService.findById(TMP_WALLET_ID).orElseThrow();
 

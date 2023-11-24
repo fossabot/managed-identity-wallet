@@ -44,7 +44,7 @@ class GetWalletByIdAdminApiHandler extends AbstractApiHandler {
     private final WalletService walletService;
 
     public ResponseEntity<WalletResponsePayloadV2> execute(@NonNull String walletId) {
-        logInvocationIfDebug("getWalletById(walletId={})", walletId);
+        logIfDebug("getWalletById(walletId={})", walletId);
 
         final Optional<Wallet> wallet = walletService.findById(new WalletId(walletId));
         if (wallet.isPresent()) {

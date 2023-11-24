@@ -53,7 +53,7 @@ class GetVerifiableCredentialsAdminApiHandler extends AbstractApiHandler {
     public ResponseEntity<VerifiableCredentialListResponsePayloadV2> execute
             (Integer page, Integer perPage, String id, String type, String issuer, String holder) {
 
-        logInvocationIfDebug("getWallets(page={}, perPage={})", page, perPage);
+        logIfDebug("getWallets(page={}, perPage={})", page, perPage);
 
         page = Optional.ofNullable(page).orElse(0);
         perPage = Optional.ofNullable(perPage).orElse(miwSettings.getApiDefaultPageSize());

@@ -51,7 +51,7 @@ class PostSignedVerifiableCredentialUserApiHandler extends AbstractApiHandler {
     private final GenericVerifiableCredentialFactory genericVerifiableCredentialFactory;
 
     public ResponseEntity<Map<String, Object>> execute(IssueVerifiableCredentialRequestPayloadV2 issueVerifiableCredentialRequestPayloadV2) {
-        logInvocationIfDebug("userIssuedVerifiableCredential(issueVerifiableCredentialRequestPayloadV2={})", issueVerifiableCredentialRequestPayloadV2);
+        logIfDebug("userIssuedVerifiableCredential(issueVerifiableCredentialRequestPayloadV2={})", issueVerifiableCredentialRequestPayloadV2);
 
         final GenericVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs.GenericVerifiableCredentialFactoryArgsBuilder credentialFactoryArgsBuilder =
                 GenericVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs.builder();

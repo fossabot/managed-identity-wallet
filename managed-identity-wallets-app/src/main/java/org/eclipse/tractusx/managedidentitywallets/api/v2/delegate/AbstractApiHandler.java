@@ -37,32 +37,32 @@ public class AbstractApiHandler {
     /* Used as long as there is no authentication */
     protected static final WalletId TMP_WALLET_ID = new WalletId("BPNL000000000000");
 
-    protected void logInvocationIfDebug(String string, Object arg) {
+    protected void logIfDebug(String string, Object arg) {
         if (log.isDebugEnabled()) {
             log.debug(string, arg);
         }
     }
 
-    protected void logInvocationIfDebug(String string, Object arg1, Object arg2) {
+    protected void logIfDebug(String string, Object arg1, Object arg2) {
         if (log.isDebugEnabled()) {
             log.debug(string, arg1, arg2);
         }
     }
 
 
-    protected void logInvocationIfDebug(String string, Object arg1, Object arg2, Object arg3) {
+    protected void logIfDebug(String string, Object arg1, Object arg2, Object arg3) {
         if (log.isDebugEnabled()) {
             log.debug(string, arg1, arg2, arg3);
         }
     }
 
-    protected void logInvocationIfDebug(String string, Object arg1, Object arg2, Object arg3, Object arg4) {
+    protected void logIfDebug(String string, Object arg1, Object arg2, Object arg3, Object arg4) {
         if (log.isDebugEnabled()) {
             log.debug(string, arg1, arg2, arg3, arg4);
         }
     }
 
-    protected void logInvocationIfDebug(String string, Object arg1, Object arg2, Object arg3, Object arg4, Object arg5) {
+    protected void logIfDebug(String string, Object arg1, Object arg2, Object arg3, Object arg4, Object arg5) {
         if (log.isDebugEnabled()) {
             log.debug(string, arg1, arg2, arg3, arg4, arg5);
         }

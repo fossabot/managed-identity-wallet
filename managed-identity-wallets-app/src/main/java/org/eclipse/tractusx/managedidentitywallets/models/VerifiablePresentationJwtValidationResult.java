@@ -19,26 +19,35 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
+package org.eclipse.tractusx.managedidentitywallets.models;
 
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
-import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiHandler;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
-import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
-import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
+import lombok.*;
 
-@RequiredArgsConstructor
-@Component
-class DeleteWalletApiAdminApiHandler extends AbstractApiHandler {
+import java.util.Collections;
+import java.util.List;
 
-    private final WalletService walletService;
+@Builder
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class VerifiablePresentationJwtValidationResult {
 
-    public ResponseEntity<Void> execute(@NonNull String walletId) {
-        logIfDebug("deleteWalletById(walletId={})", walletId);
+    @Getter
+    private final boolean isValid;
 
-        walletService.findById(new WalletId(walletId)).ifPresent(walletService::delete);
-        return ResponseEntity.noContent().build();
+    @NonNull
+    @Getter
+    private final VerifiableCredentialValidationResult verifiableCredentialResult;
+
+    @Singular
+    @NonNull
+    private final List<VerifiablePresentationJwtValidationResult.Type> verifiablePresentationViolations;
+
+    public enum Type {
+        INVALID_JSONLD_FORMAT,
+        INVALID_SIGNATURE,
+        EXPIRED
+    }
+
+    public List<VerifiablePresentationJwtValidationResult.Type> getVerifiablePresentationViolations() {
+        return Collections.unmodifiableList(verifiablePresentationViolations);
     }
 }

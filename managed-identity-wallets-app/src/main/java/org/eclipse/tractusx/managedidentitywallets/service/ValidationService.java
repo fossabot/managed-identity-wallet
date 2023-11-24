@@ -24,10 +24,8 @@ package org.eclipse.tractusx.managedidentitywallets.service;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.ssi.lib.did.resolver.DidResolver;
-import org.eclipse.tractusx.ssi.lib.did.web.DidWebResolver;
 import org.eclipse.tractusx.ssi.lib.jwt.SignedJwtValidator;
 import org.eclipse.tractusx.ssi.lib.jwt.SignedJwtVerifier;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.Verifiable;
@@ -52,16 +50,16 @@ public class ValidationService {
     private final JsonLdValidator jsonLdValidator;
     private final DidResolver didResolver;
 
-    public VerifiablePresentationValidationResult validate(JsonWebToken vpJsonWebToken) throws ParseException {
+    public VerifiablePresentationJwtValidationResult validate(JsonWebToken vpJsonWebToken) throws ParseException {
 
 
-        final List<VerifiablePresentationValidationResult.Type> violations = new ArrayList<>();
+        final List<VerifiablePresentationJwtValidationResult.Type> violations = new ArrayList<>();
 
         if (isExpired(vpJsonWebToken)) {
-            violations.add(VerifiablePresentationValidationResult.Type.EXPIRED);
+            violations.add(VerifiablePresentationJwtValidationResult.Type.EXPIRED);
         }
         if (!isSignatureValid(vpJsonWebToken)) {
-            violations.add(VerifiablePresentationValidationResult.Type.INVALID_SIGNATURE);
+            violations.add(VerifiablePresentationJwtValidationResult.Type.INVALID_SIGNATURE);
         }
 
         final SignedJWT signedJWT = SignedJWT.parse(vpJsonWebToken.getText());
@@ -74,17 +72,17 @@ public class ValidationService {
 
 
         if (!isJsonLdValid(verifiablePresentation)) {
-            violations.add(VerifiablePresentationValidationResult.Type.INVALID_JSONLD_FORMAT);
+            violations.add(VerifiablePresentationJwtValidationResult.Type.INVALID_JSONLD_FORMAT);
         }
         if (verifiablePresentation.containsKey(VerifiableCredential.PROOF) && !isSignatureValid(verifiablePresentation)) {
-            violations.add(VerifiablePresentationValidationResult.Type.INVALID_SIGNATURE);
+            violations.add(VerifiablePresentationJwtValidationResult.Type.INVALID_SIGNATURE);
         }
 
         final VerifiableCredentialValidationResult validationResult = validate(verifiablePresentation.getVerifiableCredentials());
 
-        return VerifiablePresentationValidationResult.builder()
+        return VerifiablePresentationJwtValidationResult.builder()
                 .verifiablePresentationViolations(violations)
-                .verifiableCredentialViolations(validationResult.getVerifiableCredentialViolations())
+                .verifiableCredentialResult(validationResult)
                 .isValid(violations.isEmpty() && validationResult.isValid())
                 .build();
     }
@@ -98,7 +96,9 @@ public class ValidationService {
         if (!isJsonLdValid(verifiablePresentation)) {
             violations.add(VerifiablePresentationValidationResult.Type.INVALID_JSONLD_FORMAT);
         }
-        if (!isSignatureValid(verifiablePresentation)) {
+        if (!verifiablePresentation.containsKey(VerifiableCredential.PROOF)) {
+            violations.add(VerifiablePresentationValidationResult.Type.NO_EMBEDDED_SIGNATURE);
+        } else if (!isSignatureValid(verifiablePresentation)) {
             violations.add(VerifiablePresentationValidationResult.Type.INVALID_SIGNATURE);
         }
 
@@ -106,7 +106,7 @@ public class ValidationService {
 
         return VerifiablePresentationValidationResult.builder()
                 .verifiablePresentationViolations(violations)
-                .verifiableCredentialViolations(validationResult.getVerifiableCredentialViolations())
+                .verifiableCredentialResult(validationResult)
                 .isValid(violations.isEmpty() && validationResult.isValid())
                 .build();
     }

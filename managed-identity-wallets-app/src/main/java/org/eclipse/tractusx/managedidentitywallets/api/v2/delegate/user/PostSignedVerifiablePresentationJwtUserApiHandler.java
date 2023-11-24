@@ -48,7 +48,7 @@ class PostSignedVerifiablePresentationJwtUserApiHandler extends AbstractApiHandl
     private final VerifiablePresentationFactory verifiablePresentationFactory;
 
     public ResponseEntity<IssueVerifiablePresentationJwtResponsePayloadV2> execute(@NonNull IssueVerifiablePresentationJwtRequestPayloadV2 issueVerifiablePresentationJwtRequestPayloadV2) {
-        logInvocationIfDebug("userIssuedVerifiablePresentationJwt(issueVerifiablePresentationJwtRequestPayloadV2={})", issueVerifiablePresentationJwtRequestPayloadV2);
+        logIfDebug("userIssuedVerifiablePresentationJwt(issueVerifiablePresentationJwtRequestPayloadV2={})", issueVerifiablePresentationJwtRequestPayloadV2);
 
         if (issueVerifiablePresentationJwtRequestPayloadV2.getAudience() == null) {
             return ResponseEntity.badRequest().build();

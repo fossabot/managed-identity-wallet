@@ -163,16 +163,16 @@ public class PresentationService {
             Validate.isNull(vp.get(StringPool.VP)).launch(new BadDataException("Can not find JWT"));
             String jwt = vp.get(StringPool.VP).toString();
 
-            VerifiablePresentationValidationResult result = validationService.validate(new JsonWebToken(jwt));
+            VerifiablePresentationJwtValidationResult result = validationService.validate(new JsonWebToken(jwt));
 
             //validate audience
             SignedJWT signedJWT = SignedJWT.parse(jwt);
             boolean validateAudience = validateAudience(audience, signedJWT);
 
             //validate jwt date
-            boolean validateJWTExpiryDate = result.getVerifiablePresentationViolations().stream().anyMatch(v -> v.equals(VerifiablePresentationValidationResult.Type.EXPIRED)) &&
-                    result.getVerifiablePresentationViolations().stream().anyMatch(v -> v.equals(VerifiablePresentationValidationResult.Type.EXPIRED));
-            boolean validateExpiryDate = result.getVerifiablePresentationViolations().stream().anyMatch(v -> v.equals(VerifiablePresentationValidationResult.Type.EXPIRED));
+            boolean validateJWTExpiryDate = result.getVerifiablePresentationViolations().stream().anyMatch(v -> v.equals(VerifiablePresentationJwtValidationResult.Type.EXPIRED)) &&
+                    result.getVerifiablePresentationViolations().stream().anyMatch(v -> v.equals(VerifiablePresentationJwtValidationResult.Type.EXPIRED));
+            boolean validateExpiryDate = result.getVerifiablePresentationViolations().stream().anyMatch(v -> v.equals(VerifiablePresentationJwtValidationResult.Type.EXPIRED));
             response.put(StringPool.VALIDATE_JWT_EXPIRY_DATE, validateJWTExpiryDate);
             response.put(StringPool.VALIDATE_EXPIRY_DATE, validateExpiryDate);
 

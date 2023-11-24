@@ -42,7 +42,7 @@ class DeleteVerifiableCredentialByIdUserApiHandler extends AbstractApiHandler {
     private final VerifiableCredentialService verifiableCredentialService;
 
     public ResponseEntity<Void> execute(String verifiableCredentialId) {
-        logInvocationIfDebug("userDeleteVerifiableCredentialById(walletId={}, verifiableCredentialId={})", TMP_WALLET_ID, verifiableCredentialId);
+        logIfDebug("userDeleteVerifiableCredentialById(walletId={}, verifiableCredentialId={})", TMP_WALLET_ID, verifiableCredentialId);
 
         final VerifiableCredentialId id = new VerifiableCredentialId(verifiableCredentialId);
         final VerifiableCredential verifiableCredential = verifiableCredentialService.findById(id)

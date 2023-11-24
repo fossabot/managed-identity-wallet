@@ -47,7 +47,7 @@ class PostVerifiableCredentialUserApiHandler extends AbstractApiHandler {
     private final VerifiableCredentialService verifiableCredentialService;
 
     public ResponseEntity<Map<String, Object>> execute(Map<String, Object> payload) {
-        logInvocationIfDebug("userCreateVerifiableCredential(payload={})", payload);
+        logIfDebug("userCreateVerifiableCredential(payload={})", payload);
 
         final Optional<VerifiableCredential> verifiableCredentialOptional = readVerifiableCredentialArg(payload);
         if (verifiableCredentialOptional.isEmpty()) {

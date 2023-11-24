@@ -45,7 +45,7 @@ class PostWalletApiAdminApiHandler extends AbstractApiHandler {
     private final WalletService walletService;
 
     public ResponseEntity<CreateWalletResponsePayloadV2> execute(CreateWalletRequestPayloadV2 request) {
-        logInvocationIfDebug("adminCreateWallet(request={})", request);
+        logIfDebug("adminCreateWallet(request={})", request);
 
         final Wallet wallet = apiMapper.mapCreateWalletResponsePayloadV2(request);
 

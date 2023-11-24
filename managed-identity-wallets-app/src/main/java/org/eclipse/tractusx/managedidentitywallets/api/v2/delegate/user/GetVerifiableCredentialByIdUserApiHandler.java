@@ -41,7 +41,7 @@ class GetVerifiableCredentialByIdUserApiHandler extends AbstractApiHandler {
     private final VerifiableCredentialService verifiableCredentialService;
 
     public ResponseEntity<Map<String, Object>> execute(String verifiableCredentialId) {
-        logInvocationIfDebug("userGetVerifiableCredentialById(walletId={}, verifiableCredentialId={})", TMP_WALLET_ID, verifiableCredentialId);
+        logIfDebug("userGetVerifiableCredentialById(walletId={}, verifiableCredentialId={})", TMP_WALLET_ID, verifiableCredentialId);
 
         final VerifiableCredentialId id = new VerifiableCredentialId(verifiableCredentialId);
         final Optional<VerifiableCredential> verifiableCredential = verifiableCredentialService.findById(id);

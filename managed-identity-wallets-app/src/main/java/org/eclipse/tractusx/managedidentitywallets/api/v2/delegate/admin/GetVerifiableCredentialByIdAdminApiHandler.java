@@ -41,7 +41,7 @@ class GetVerifiableCredentialByIdAdminApiHandler extends AbstractApiHandler {
     private final VerifiableCredentialService verifiableCredentialService;
 
     public ResponseEntity<Map<String, Object>> execute(String verifiableCredentialId) {
-        logInvocationIfDebug("deleteVerifiableCredentialById(verifiableCredentialId={})", verifiableCredentialId);
+        logIfDebug("deleteVerifiableCredentialById(verifiableCredentialId={})", verifiableCredentialId);
 
         final Optional<VerifiableCredential> wallet = verifiableCredentialService.findById(new VerifiableCredentialId(verifiableCredentialId));
         return wallet

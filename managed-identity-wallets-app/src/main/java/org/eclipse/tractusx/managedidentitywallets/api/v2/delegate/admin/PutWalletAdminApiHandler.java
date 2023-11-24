@@ -47,7 +47,7 @@ class PutWalletAdminApiHandler extends AbstractApiHandler {
     private final WalletService walletService;
 
     public ResponseEntity<UpdateWalletResponsePayloadV2> execute(@NonNull UpdateWalletRequestPayloadV2 updateWalletRequestPayloadV2) {
-        logInvocationIfDebug("updateWalletById(updateWalletRequestPayloadV2={})", updateWalletRequestPayloadV2);
+        logIfDebug("updateWalletById(updateWalletRequestPayloadV2={})", updateWalletRequestPayloadV2);
 
         if (updateWalletRequestPayloadV2.getName() == null || updateWalletRequestPayloadV2.getId() == null) {
             return ResponseEntity.badRequest().build();
