@@ -23,17 +23,14 @@ package org.eclipse.tractusx.managedidentitywallets.api.v1.utils;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.MIWVerifiableCredentialType;
+import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.RestURI;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.dto.IssueFrameworkCredentialRequest;
+import org.eclipse.tractusx.managedidentitywallets.api.v1.dto.IssueMembershipCredentialRequest;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
-import org.eclipse.tractusx.ssi.lib.model.did.DidDocument;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialSubject;
 import org.jetbrains.annotations.NotNull;
-import org.json.JSONArray;
-import org.json.JSONObject;
 import org.junit.jupiter.api.Assertions;
 import org.springframework.boot.test.web.client.TestRestTemplate;
 import org.springframework.http.HttpEntity;
@@ -41,7 +38,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -53,13 +49,12 @@ public class TestUtils {
         Assertions.assertEquals(0, verifiableCredential.getExpirationDate().compareTo(miwSettings.getVcExpiryDate().toInstant()));
     }
 
-//    public static ResponseEntity<String> issueMembershipVC(TestRestTemplate restTemplate, String bpn, String baseWalletBpn) {
-//        HttpHeaders headers = AuthenticationUtils.getValidUserHttpHeaders(baseWalletBpn);
-//        IssueMembershipCredentialRequest request = IssueMembershipCredentialRequest.builder().bpn(bpn).build();
-//        HttpEntity<IssueMembershipCredentialRequest> entity = new HttpEntity<>(request, headers);
-//
-//        return restTemplate.exchange(RestURI.CREDENTIALS_ISSUER_MEMBERSHIP, HttpMethod.POST, entity, String.class);
-//    }
+    public static ResponseEntity<String> issueMembershipVC(TestRestTemplate restTemplate, String bpn, HttpHeaders headers) {
+        IssueMembershipCredentialRequest request = IssueMembershipCredentialRequest.builder().bpn(bpn).build();
+        HttpEntity<IssueMembershipCredentialRequest> entity = new HttpEntity<>(request, headers);
+
+        return restTemplate.exchange(RestURI.CREDENTIALS_ISSUER_MEMBERSHIP, HttpMethod.POST, entity, String.class);
+    }
 
     public static IssueFrameworkCredentialRequest getIssueFrameworkCredentialRequest(String bpn, String type) {
         IssueFrameworkCredentialRequest twinRequest = IssueFrameworkCredentialRequest.builder()
