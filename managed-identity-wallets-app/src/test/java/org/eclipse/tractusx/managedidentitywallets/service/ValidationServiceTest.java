@@ -22,7 +22,6 @@
 package org.eclipse.tractusx.managedidentitywallets.service;
 
 import lombok.SneakyThrows;
-import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.MembershipVerifiableCredentialFactory;
 import org.eclipse.tractusx.managedidentitywallets.models.JsonWebToken;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialValidationResult;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiablePresentationJwtValidationResult;
@@ -52,7 +51,7 @@ public class ValidationServiceTest extends MiwTestCase {
 
     @SneakyThrows
     @Test
-    public void testVerifiablePresentationJwtValidation() {
+    public void testVerifiablePresentationValidation() {
         final VerifiablePresentation verifiablePresentation = newWalletPlusVerifiablePresentationPersisted();
 
         final VerifiablePresentationValidationResult result = validationService.validate(verifiablePresentation);
@@ -62,7 +61,7 @@ public class ValidationServiceTest extends MiwTestCase {
 
     @SneakyThrows
     @Test
-    public void testVerifiablePresentationValidation() {
+    public void testVerifiablePresentationJwtValidation() {
         final JsonWebToken jwt = newWalletPlusVerifiablePresentationJwtPersisted();
 
         final VerifiablePresentationJwtValidationResult result = validationService.validate(jwt);

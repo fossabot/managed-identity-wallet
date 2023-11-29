@@ -52,7 +52,6 @@ public class ValidationService {
 
     public VerifiablePresentationJwtValidationResult validate(JsonWebToken vpJsonWebToken) throws ParseException {
 
-
         final List<VerifiablePresentationJwtValidationResult.Type> violations = new ArrayList<>();
 
         if (isExpired(vpJsonWebToken)) {
@@ -74,7 +73,9 @@ public class ValidationService {
         if (!isJsonLdValid(verifiablePresentation)) {
             violations.add(VerifiablePresentationJwtValidationResult.Type.INVALID_JSONLD_FORMAT);
         }
-        if (verifiablePresentation.containsKey(VerifiableCredential.PROOF) && !isSignatureValid(verifiablePresentation)) {
+        if (verifiablePresentation.containsKey(VerifiableCredential.PROOF) &&
+                verifiablePresentation.get(VerifiableCredential.PROOF) != null &&
+                !isSignatureValid(verifiablePresentation)) {
             violations.add(VerifiablePresentationJwtValidationResult.Type.INVALID_SIGNATURE);
         }
 

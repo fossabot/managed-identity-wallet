@@ -48,10 +48,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.validation.annotation.Validated;
 
 import java.net.URI;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Component
 @RequiredArgsConstructor
@@ -66,9 +63,16 @@ public class VerifiablePresentationFactory extends AbstractVerifiableDocumentFac
                                                      @NonNull @IsJsonLdValid @IsSignatureValid List<VerifiableCredential> verifiableCredentials) {
         final Did issuerDid = didFactory.generateDid(issuer);
 
+
+        // if the credential does not contain the JWS proof-context add it
+        final List<URI> contexts = new ArrayList<>(List.of(VerifiablePresentation.DEFAULT_CONTEXT));
+        final URI jwsUri = URI.create("https://w3id.org/security/suites/jws-2020/v1");
+        if (!contexts.contains(jwsUri))
+            contexts.add(jwsUri);
+
         final VerifiablePresentationBuilder verifiablePresentationBuilder =
                 new VerifiablePresentationBuilder()
-                        .context(List.of(VerifiablePresentation.DEFAULT_CONTEXT))
+                        .context(contexts)
                         .id(URI.create(issuerDid + "#" + UUID.randomUUID()))
                         .type(List.of(VerifiablePresentationType.VERIFIABLE_PRESENTATION))
                         .verifiableCredentials(verifiableCredentials);

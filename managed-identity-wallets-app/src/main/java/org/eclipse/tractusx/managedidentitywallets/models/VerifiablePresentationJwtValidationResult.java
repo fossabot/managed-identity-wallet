@@ -27,6 +27,7 @@ import java.util.Collections;
 import java.util.List;
 
 @Builder
+@ToString
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class VerifiablePresentationJwtValidationResult {
 
