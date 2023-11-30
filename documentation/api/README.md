@@ -21,9 +21,35 @@ This chapter contains the documentation of the API of the Tractus-X Managed Iden
 
 It is intended for the users of the API. For a more detailed API documentation, from a developer's point of view, please
 refer to
-the [Application API Documentation](../../managed-identity-wallets-app/documentation/api) page.
+the [Application API Documentation](../../managed-identity-wallets-app/documentation/api/README.md) page.
+
+## Libraries
+
+<sub>TBD - Will be documented once the API libraries are published to Maven Central</sub>
+
+### Setup
+
+<sub>TBD</sub>
+
+#### Maven
+
+<sub>TBD</sub>
+
+#### Gradle
+
+<sub>TBD</sub>
+
+### Usage
+
+<sub>TBD</sub>
+
+#### Java
+
+<sub>TBD</sub>
 
 ## Documentation
+
+The API documentation is available in the following formats:
 
 ### Markdown
 

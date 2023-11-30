@@ -15,10 +15,13 @@
 
 [« Up](../../README.md)
 
-# Overview
+## Summary
 
-TBD
+This chapter contains the documentation of the API of the Tractus-X Managed Identity Wallets.
 
-For a more general documentation regarding the API please refer to
-the [API Documentation](../../documentation/api) page.
+It is intended for Managed-Identity-Wallets developers/contributors. For a more API documentation from a users' point of
+view please refer to the [API Documentation](../../../documentation/api/README.md) page.
 
+## Code/Documentation Generation
+
+<sub>TBD</sub>
