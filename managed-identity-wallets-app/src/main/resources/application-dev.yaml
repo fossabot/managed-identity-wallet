@@ -19,7 +19,7 @@ spring:
 # log level
 logging:
   level:
-    root: INFO
+    root: DEBUG
 
 miw:
   host: localhost:8080
