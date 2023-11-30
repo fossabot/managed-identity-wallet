@@ -33,49 +33,49 @@ public class RestURI {
     /**
      * The constant WALLETS.
      */
-    public static final String WALLETS = "/api/v1/wallets";
+    public static final String WALLETS = "/api/wallets";
 
     /**
      * The constant DID_DOCUMENTS.
      */
-    public static final String DID_DOCUMENTS = "/api/v1/didDocuments/{identifier}";
+    public static final String DID_DOCUMENTS = "/api/didDocuments/{identifier}";
     public static final String DID_RESOLVE = "/{bpn}/did.json";
     /** q
      * The constant WALLETS_BY_BPN.
      */
-    public static final String API_WALLETS_IDENTIFIER = "/api/v1/wallets/{identifier}";
+    public static final String API_WALLETS_IDENTIFIER = "/api/wallets/{identifier}";
 
     /**
      * The constant API_WALLETS_IDENTIFIER_CREDENTIALS.
      */
-    public static final String API_WALLETS_IDENTIFIER_CREDENTIALS = "/api/v1/wallets/{identifier}/credentials";
+    public static final String API_WALLETS_IDENTIFIER_CREDENTIALS = "/api/wallets/{identifier}/credentials";
     /**
      * The constant CREDENTIALS.
      */
-    public static final String CREDENTIALS = "/api/v1/credentials";
+    public static final String CREDENTIALS = "/api/credentials";
 
 
-    public static final String CREDENTIALS_VALIDATION = "/api/v1/credentials/validation";
+    public static final String CREDENTIALS_VALIDATION = "/api/credentials/validation";
 
 
-    public static final String ISSUERS_CREDENTIALS = "/api/v1/credentials/issuer";
+    public static final String ISSUERS_CREDENTIALS = "/api/credentials/issuer";
 
     /**
      * The constant CREDENTIALS_ISSUER_MEMBERSHIP.
      */
-    public static final String CREDENTIALS_ISSUER_MEMBERSHIP = "/api/v1/credentials/issuer/membership";
+    public static final String CREDENTIALS_ISSUER_MEMBERSHIP = "/api/credentials/issuer/membership";
 
     /**
      * The constant CREDENTIALS_ISSUER_DISMANTLER.
      */
-    public static final String CREDENTIALS_ISSUER_DISMANTLER = "/api/v1/credentials/issuer/dismantler";
+    public static final String CREDENTIALS_ISSUER_DISMANTLER = "/api/credentials/issuer/dismantler";
 
     /**
      * The constant API_CREDENTIALS_ISSUER_FRAMEWORK.
      */
-    public static final String API_CREDENTIALS_ISSUER_FRAMEWORK = "/api/v1/credentials/issuer/framework";
+    public static final String API_CREDENTIALS_ISSUER_FRAMEWORK = "/api/credentials/issuer/framework";
 
-    public static final String API_PRESENTATIONS = "/api/v1/presentations";
-    public static final String API_PRESENTATIONS_VALIDATION = "/api/v1/presentations/validation";
+    public static final String API_PRESENTATIONS = "/api/presentations";
+    public static final String API_PRESENTATIONS_VALIDATION = "/api/presentations/validation";
 
 }
