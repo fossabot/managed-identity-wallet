@@ -55,6 +55,7 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -184,11 +185,20 @@ public abstract class MiwTestCase {
                 .build();
     }
 
+    protected VerifiablePresentation newVerifiablePresentation(Wallet wallet, VerifiableCredential verifiableCredential) {
+        return verifiablePresentationFactory.createPresentation(wallet, List.of(verifiableCredential));
+    }
+
     protected VerifiableCredential newVerifiableCredential(Wallet issuer) {
+        return newVerifiableCredential(issuer, Instant.now().plusSeconds(600 /* 10 minutes */));
+    }
+
+    protected VerifiableCredential newVerifiableCredential(Wallet issuer, Instant expirationDate) {
 
         final GenericVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs args
                 = GenericVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs.builder()
                 .issuerWallet(issuer)
+                .expirationDate(expirationDate)
                 .subject(new VerifiableCredentialSubject(Map.of(
                         VerifiableCredentialSubject.ID, "" + UUID.randomUUID()
                 )))
@@ -196,6 +206,7 @@ public abstract class MiwTestCase {
 
         return genericVerifiableCredentialFactory.createVerifiableCredential(args);
     }
+
 
     protected HttpHeaders getValidUserHttpHeaders(String bpn) {
         String token = getApiV1JwtToken(StringPool.VALID_USER_NAME, bpn);

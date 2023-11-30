@@ -22,10 +22,9 @@
 package org.eclipse.tractusx.managedidentitywallets.service;
 
 import lombok.SneakyThrows;
-import org.eclipse.tractusx.managedidentitywallets.models.JsonWebToken;
-import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialValidationResult;
-import org.eclipse.tractusx.managedidentitywallets.models.VerifiablePresentationJwtValidationResult;
-import org.eclipse.tractusx.managedidentitywallets.models.VerifiablePresentationValidationResult;
+import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.GenericVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.VerifiablePresentationFactory;
+import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.presentation.VerifiablePresentation;
@@ -33,6 +32,7 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.Instant;
 import java.util.List;
 
 public class ValidationServiceTest extends MiwTestCase {
@@ -41,6 +41,7 @@ public class ValidationServiceTest extends MiwTestCase {
     private ValidationService validationService;
 
     @Test
+
     public void testVerifiableCredentialValidation() {
         final VerifiableCredential verifiableCredential = newWalletPlusVerifiableCredentialPersisted();
 
@@ -68,4 +69,19 @@ public class ValidationServiceTest extends MiwTestCase {
 
         Assertions.assertTrue(result.isValid(), "VerifiablePresentation validation should succeed. " + result);
     }
+
+    @SneakyThrows
+    @Test
+    public void testVerifiablePresentationJwtValidationWithExpiredVerifiableCredential() {
+        final Wallet wallet = newWalletPersisted();
+        final VerifiableCredential verifiableCredential = newVerifiableCredential(wallet, Instant.now().minusSeconds(5));
+        final VerifiablePresentation verifiablePresentation = newVerifiablePresentation(wallet, verifiableCredential);
+
+        final VerifiablePresentationValidationResult result = validationService.validate(verifiablePresentation);
+
+        Assertions.assertFalse(result.isValid(), "VerifiablePresentation validation should not succeed. " + result);
+        Assertions.assertTrue(result.getVerifiableCredentialResult().getVerifiableCredentialViolations().stream().anyMatch(violation -> violation.getTypes().stream()
+                .anyMatch(t -> t.equals(VerifiableCredentialValidationResultViolation.Type.EXPIRED))), "Must contain expired verifiable credential violation. " + result);
+    }
+
 }

@@ -145,12 +145,8 @@ class PresentationValidationTest extends MiwTestCase {
 
     @Test
     public void testValidationFailureOfCredentialWitInvalidExpirationDateInSecondCredential() {
-        // test is related to this old issue where the signature check still succeeded
-        // https://github.com/eclipse-tractusx/SSI-agent-lib/issues/4
-        final VerifiableCredential copyCredential = new VerifiableCredential(membershipCredential_1);
-        final JsonWebToken presentation = createPresentationJwt(List.of(membershipCredential_1, copyCredential), tenant_1);
-        // e.g. an attacker tries to extend the validity of a verifiable credential
-        copyCredential.put(VerifiableCredential.EXPIRATION_DATE, "2500-09-30T22:00:00Z");
+        final VerifiableCredential expiredCredential = membershipVerifiableCredentialFactory.createMembershipVerifiableCredential(tenant_1, OffsetDateTime.now().minusSeconds(1));
+        final JsonWebToken presentation = createPresentationJwt(List.of(membershipCredential_1, expiredCredential), tenant_1);
         VerifiablePresentationValidationResponse response = validateJwtOfCredential(presentation);
         Assertions.assertFalse(response.valid);
     }

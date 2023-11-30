@@ -38,6 +38,7 @@ import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.WalletNotFou
 import org.eclipse.tractusx.managedidentitywallets.api.v1.utils.Validate;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialContext;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
@@ -63,6 +64,7 @@ import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.net.URI;
 import java.net.http.HttpClient;
 import java.util.*;
 
@@ -265,7 +267,6 @@ public class IssuersCredentialService {
      * @param callerBpn the caller bpn
      * @return the verifiable credential
      */
-    @Transactional(isolation = Isolation.READ_UNCOMMITTED, propagation = Propagation.REQUIRED)
     public VerifiableCredential issueCredentialUsingBaseWallet(String holderDid, Map<String, Object> data, String callerBpn) {
         // Fetch Holder Wallet
         Wallet holderWallet = commonService.getWalletByIdentifier(holderDid);
@@ -284,8 +285,12 @@ public class IssuersCredentialService {
 
         final GenericVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs factoryArgs =
                 GenericVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs.builder()
+                        .verifiableCredentialId(verifiableCredential.getId())
+                        .additionalVerifiableCredentialTypes(verifiableCredential.getTypes().stream().map(org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType::new).toList())
+                        .additionalContexts(verifiableCredential.getContext().stream().map(VerifiableCredentialContext::new).toList())
                         .subjects(verifiableCredential.getCredentialSubject())
                         .issuerWallet(issuerWalletRealDomain)
+                        .expirationDate(verifiableCredential.getExpirationDate())
                         .build();
 
         // Create Credential
@@ -293,7 +298,7 @@ public class IssuersCredentialService {
 
         //save in holder wallet
         verifiableCredentialService.create(holdersCredential);
-        var wallet = walletService.findById(new WalletId(holderDid))
+        var wallet = walletService.findById(new WalletId(holderWallet.getBpn()))
                 .orElseThrow(() -> new WalletNotFoundProblem("Wallet not found"));
         walletService.storeVerifiableCredential(wallet, holdersCredential);
 

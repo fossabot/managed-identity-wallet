@@ -42,6 +42,7 @@ import org.eclipse.tractusx.ssi.lib.did.web.DidWebResolver;
 import org.eclipse.tractusx.ssi.lib.did.web.util.DidWebParser;
 import org.eclipse.tractusx.ssi.lib.exception.InvalidJsonLdException;
 import org.eclipse.tractusx.ssi.lib.exception.InvalidePrivateKeyFormat;
+import org.eclipse.tractusx.ssi.lib.exception.JwtAudienceCheckFailedException;
 import org.eclipse.tractusx.ssi.lib.exception.UnsupportedSignatureTypeException;
 import org.eclipse.tractusx.ssi.lib.jwt.SignedJwtFactory;
 import org.eclipse.tractusx.ssi.lib.jwt.SignedJwtValidator;
@@ -165,18 +166,22 @@ public class PresentationService {
 
             VerifiablePresentationJwtValidationResult result = validationService.validate(new JsonWebToken(jwt));
 
+            // is valid
+            response.put(StringPool.VALID, result.isValid());
+
             //validate audience
             SignedJWT signedJWT = SignedJWT.parse(jwt);
             boolean validateAudience = validateAudience(audience, signedJWT);
 
             //validate jwt date
-            boolean validateJWTExpiryDate = result.getVerifiablePresentationViolations().stream().anyMatch(v -> v.equals(VerifiablePresentationJwtValidationResult.Type.EXPIRED)) &&
-                    result.getVerifiablePresentationViolations().stream().anyMatch(v -> v.equals(VerifiablePresentationJwtValidationResult.Type.EXPIRED));
-            boolean validateExpiryDate = result.getVerifiablePresentationViolations().stream().anyMatch(v -> v.equals(VerifiablePresentationJwtValidationResult.Type.EXPIRED));
-            response.put(StringPool.VALIDATE_JWT_EXPIRY_DATE, validateJWTExpiryDate);
-            response.put(StringPool.VALIDATE_EXPIRY_DATE, validateExpiryDate);
+            boolean isJwtExpired = result.getVerifiablePresentationViolations().stream().anyMatch(v -> v.equals(VerifiablePresentationJwtValidationResult.Type.EXPIRED));
+            response.put(StringPool.VALIDATE_JWT_EXPIRY_DATE, !isJwtExpired);
 
-            response.put(StringPool.VALID, result.isValid());
+            boolean isVerifiableCredentialExpired = result.getVerifiableCredentialResult().getVerifiableCredentialViolations().stream().anyMatch(v -> v.getTypes().stream().anyMatch(t -> t.equals(VerifiableCredentialValidationResultViolation.Type.EXPIRED)));
+
+            if (withCredentialExpiryDate) {
+                response.put(StringPool.VALIDATE_EXPIRY_DATE, !isVerifiableCredentialExpired);
+            }
 
             if (StringUtils.hasText(audience)) {
                 response.put(StringPool.VALIDATE_AUDIENCE, validateAudience);
@@ -198,7 +203,12 @@ public class PresentationService {
                 jwtValidator.validateAudiences(signedJWT, audience);
                 return true;
             } catch (Exception e) {
-                log.error("Can not validate audience ", e);
+                // ignore compiler warning. getting this exception here IS possible
+                if (e instanceof JwtAudienceCheckFailedException) {
+                    return false;
+                }
+
+                log.error("Can not validate audience.", e);
                 return false;
             }
         } else {

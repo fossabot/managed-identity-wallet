@@ -26,6 +26,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.ssi.lib.did.resolver.DidResolver;
+import org.eclipse.tractusx.ssi.lib.exception.JwtExpiredException;
 import org.eclipse.tractusx.ssi.lib.jwt.SignedJwtValidator;
 import org.eclipse.tractusx.ssi.lib.jwt.SignedJwtVerifier;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.Verifiable;
@@ -184,8 +185,13 @@ public class ValidationService {
             jwtValidator.validateDate(signedJWT);
             return false;
         } catch (Exception e) {
-            log.error("Can not expiry date ", e);
-            return false;
+            // ignore compiler warning. It IS possible to get a JwtExpiredException here
+            if (e instanceof JwtExpiredException) {
+                return true;
+            }
+
+            log.error("Cannot evaluate expiration date of JWT. In doubt evaluating to 'isExpired=true'.", e);
+            return true;
         }
     }
 
