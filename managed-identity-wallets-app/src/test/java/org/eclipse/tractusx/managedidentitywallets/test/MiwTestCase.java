@@ -208,6 +208,14 @@ public abstract class MiwTestCase {
     }
 
 
+    protected HttpHeaders getValidUserHttpHeaders() {
+        Wallet wallet = newWalletPersisted();
+        String token = getApiV1JwtToken(StringPool.VALID_USER_NAME, wallet.getWalletId().toString());
+        HttpHeaders headers = new HttpHeaders();
+        headers.set(HttpHeaders.AUTHORIZATION, token);
+        return headers;
+    }
+
     protected HttpHeaders getValidUserHttpHeaders(String bpn) {
         String token = getApiV1JwtToken(StringPool.VALID_USER_NAME, bpn);
         HttpHeaders headers = new HttpHeaders();

@@ -198,7 +198,8 @@ public class WalletServiceV1 {
                         .build();
         walletService.create(wallet);
 
-        return walletMapV1.map(wallet);
+        final org.eclipse.tractusx.managedidentitywallets.models.Wallet persistedWallet = walletService.findById(walletId).orElseThrow();
+        return walletMapV1.map(persistedWallet);
     }
 
     private void validateCreateWallet(CreateWalletRequest request, String callerBpn) {
