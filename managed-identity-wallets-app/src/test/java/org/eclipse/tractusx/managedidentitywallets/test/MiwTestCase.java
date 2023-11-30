@@ -25,6 +25,7 @@ import dasniko.testcontainers.keycloak.KeycloakContainer;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
+import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.GenericVerifiableCredentialFactory;
 import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.VerifiablePresentationFactory;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
@@ -93,6 +94,9 @@ public abstract class MiwTestCase {
 
     @Autowired
     private WalletEventTracker walletEventTracker;
+
+    @Autowired
+    private MIWSettings miwSettings;
 
     @BeforeAll
     public static void beforeAll() {
@@ -190,7 +194,7 @@ public abstract class MiwTestCase {
     }
 
     protected VerifiableCredential newVerifiableCredential(Wallet issuer) {
-        return newVerifiableCredential(issuer, Instant.now().plusSeconds(600 /* 10 minutes */));
+        return newVerifiableCredential(issuer, miwSettings.getVcExpiryDate().toInstant());
     }
 
     protected VerifiableCredential newVerifiableCredential(Wallet issuer, Instant expirationDate) {

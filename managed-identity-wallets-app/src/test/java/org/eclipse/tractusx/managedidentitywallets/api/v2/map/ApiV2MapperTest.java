@@ -32,7 +32,7 @@ public class ApiV2MapperTest {
     private final ApiV2Mapper apiV2Mapper = new ApiV2MapperImpl();
 
     @Test
-    public void testMapper() {
+    public void testWalletMap() {
         final WalletId walletId = new WalletId("foo");
         final WalletName walletName = new WalletName("bar");
         final Wallet originalWallet = Wallet.builder()
