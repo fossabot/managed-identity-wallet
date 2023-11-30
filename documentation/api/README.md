@@ -15,16 +15,22 @@
 
 [« Up](../../README.md)
 
+## Summary
 
-# Overview
+This chapter contains the documentation of the API of the Tractus-X Managed Identity Wallets.
 
-TBD
-
-
-For a more detailed documentation regarding the API please refer to
+It is intended for the users of the API. For a more detailed API documentation, from a developer's point of view, please
+refer to
 the [Application API Documentation](../../managed-identity-wallets-app/documentation/api) page.
 
-# Open API Specification
+## Documentation
 
-- [Open API v1 YAML](../../managed-identity-wallets-app/src/main/resources/static/openapi_v1.yaml)
-- [Open API v2 YAML](../../managed-identity-wallets-app/src/main/resources/static/openapi_v2.yaml)
+### Markdown
+
+- [API v1](./v1/README.md)
+- [API v2](./v2/README.md)
+
+### YAML
+
+- [API v1](../../managed-identity-wallets-app/src/main/resources/static/openapi_v1.yaml)
+- [API v2](../../managed-identity-wallets-app/src/main/resources/static/openapi_v2.yaml)
