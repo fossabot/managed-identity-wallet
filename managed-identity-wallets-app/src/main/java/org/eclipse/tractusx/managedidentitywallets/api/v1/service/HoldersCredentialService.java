@@ -110,6 +110,10 @@ public class HoldersCredentialService {
             builder.verifiableCredentialTypes(type.stream().map(VerifiableCredentialType::new).toList());
         }
         if (issuerIdentifier != null) {
+            if (!issuerIdentifier.startsWith("did")) {
+                issuerIdentifier = didFactory.generateDid(new WalletId(issuerIdentifier)).toString();
+            }
+
             builder.verifiableCredentialIssuer(new VerifiableCredentialIssuer(issuerIdentifier));
         }
 
