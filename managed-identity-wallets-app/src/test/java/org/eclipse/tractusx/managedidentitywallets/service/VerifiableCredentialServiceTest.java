@@ -26,8 +26,8 @@ import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentia
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
-import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.VerifiableCredentialRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
 import org.eclipse.tractusx.managedidentitywallets.test.VerifiableCredentialEventTracker;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;

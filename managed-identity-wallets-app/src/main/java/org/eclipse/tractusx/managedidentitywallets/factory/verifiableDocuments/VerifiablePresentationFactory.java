@@ -94,7 +94,7 @@ public class VerifiablePresentationFactory extends AbstractVerifiableDocumentFac
                 .map(Optional::get)
                 .orElseThrow();
 
-        final x21559PrivateKey privateKey = new x21559PrivateKey(key.getPrivateKey());
+        final x21559PrivateKey privateKey = new x21559PrivateKey(key.getPrivateKey().getBytes());
         final SignedJWT signedJwt = factory.createPresentation(issuerDid, credentials, audience.getText(), privateKey);
 
         return new JsonWebToken(signedJwt.serialize());

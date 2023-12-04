@@ -39,6 +39,8 @@ public class Ed25519KeyEntity extends AbstractEntity {
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_WALLET_ID = "wallet_id";
     public static final String COLUMN_DID_FRAGMENT = "did_fragment";
+    public static final String COLUMN_PUBLIC_KEY_CYPHER_TEXT_BASE_64 = "public_key_cypher_text_base64";
+    public static final String COLUMN_PRIVATE_KEY_CYPHER_TEXT_BASE_64 = "private_key_cypher_text_base64";
 
     @Id
     @ToString.Include
@@ -47,6 +49,13 @@ public class Ed25519KeyEntity extends AbstractEntity {
 
     @Column(name = COLUMN_DID_FRAGMENT, nullable = false, updatable = false)
     private String didFragment;
+
+    @Column(name = COLUMN_PUBLIC_KEY_CYPHER_TEXT_BASE_64, nullable = false, updatable = false)
+    private String publicKeyCypherTextBase64;
+
+    @Column(name = COLUMN_PRIVATE_KEY_CYPHER_TEXT_BASE_64, nullable = false, updatable = false)
+    @ToString.Exclude
+    private String privateKeyCypherTextBase64;
 
     @ManyToOne
     @JoinColumn(name = COLUMN_WALLET_ID, nullable = false, updatable = false)

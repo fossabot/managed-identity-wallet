@@ -19,31 +19,19 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.models;
+package org.eclipse.tractusx.managedidentitywallets.repository.vault;
 
-import lombok.*;
+import lombok.NonNull;
+import org.eclipse.tractusx.managedidentitywallets.models.Ed25519KeyId;
+import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
+import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 
-import java.time.Instant;
-import java.time.OffsetDateTime;
+import java.util.Optional;
 
-@Getter
-@AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
-@Builder
-@ToString
-public class StoredEd25519Key implements Ed25519Key {
+public interface VaultRepository {
 
-    @NonNull
-    private final Ed25519KeyId id;
-    @NonNull
-    private final DidFragment didFragment;
-    @NonNull
-    private final OffsetDateTime createdAt;
+    Optional<ResolvedEd25519Key> resolveKey(@NonNull WalletId walletId, StoredEd25519Key storedEd25519Key);
 
-    @NonNull
-    private final CypherText publicKey;
-
-    @NonNull
-    @ToString.Exclude
-    private final CypherText privateKey;
+    StoredEd25519Key storeKey(@NonNull WalletId walletId, @NonNull ResolvedEd25519Key resolvedEd25519Key);
 }
-

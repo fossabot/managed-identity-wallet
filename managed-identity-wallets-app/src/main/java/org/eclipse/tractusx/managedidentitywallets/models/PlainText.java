@@ -19,13 +19,32 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository;
+package org.eclipse.tractusx.managedidentitywallets.models;
 
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialIssuerIntersectionEntity;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import io.ipfs.multibase.binary.Base64;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
-@Repository
-interface VerifiableCredentialIssuerIntersectionJpaRepository
-        extends CrudRepository<VerifiableCredentialIssuerIntersectionEntity, VerifiableCredentialIssuerIntersectionEntity.VerifiableCredentialIssuerIntersectionEntityId> {
+@Getter
+@EqualsAndHashCode
+@RequiredArgsConstructor
+public class PlainText {
+
+    public PlainText(byte[] bytes) {
+        this.base64 = Base64.encodeBase64String(bytes);
+    }
+
+    @NonNull
+    private final String base64;
+
+    @Override
+    public String toString() {
+        return base64;
+    }
+
+    public byte[] getBytes() {
+        return org.bouncycastle.util.encoders.Base64.decode(base64);
+    }
 }

@@ -23,7 +23,7 @@ package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
 
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.VerifiableCredentialRepository;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;

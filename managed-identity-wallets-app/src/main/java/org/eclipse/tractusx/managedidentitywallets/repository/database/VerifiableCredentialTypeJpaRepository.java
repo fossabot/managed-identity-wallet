@@ -19,16 +19,17 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository.query;
+package org.eclipse.tractusx.managedidentitywallets.repository.database;
 
-import lombok.Builder;
-import lombok.Value;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialTypeEntity;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.data.repository.PagingAndSortingRepository;
+import org.springframework.stereotype.Repository;
 
-@Value
-@Builder
-public class WalletQuery {
-    WalletId walletId;
-    WalletName name;
+@Repository
+public interface VerifiableCredentialTypeJpaRepository
+        extends PagingAndSortingRepository<VerifiableCredentialTypeEntity, String>,
+        CrudRepository<VerifiableCredentialTypeEntity, String>,
+        QuerydslPredicateExecutor<VerifiableCredentialTypeEntity> {
 }

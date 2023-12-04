@@ -76,10 +76,10 @@ public class DidDocumentFactory {
                 continue;
             }
 
-            final byte[] privateKey = resolvedEd25519Key.get().getPrivateKey();
+            final byte[] privateKey = resolvedEd25519Key.get().getPrivateKey().getBytes();
             final IPrivateKey x21559PrivateKey = new x21559PrivateKey(privateKey);
 
-            final byte[] publicKey = resolvedEd25519Key.get().getPublicKey();
+            final byte[] publicKey = resolvedEd25519Key.get().getPublicKey().getBytes();
             final IPublicKey x21559PublicKey = new x21559PublicKey(publicKey);
 
             final String keyId = key.getDidFragment().getText();

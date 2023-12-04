@@ -53,8 +53,10 @@ public class WalletEntity extends AbstractEntity {
     private String name;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "wallet", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private List<Ed25519KeyEntity> ed25519Keys;
 
     @OneToMany(mappedBy = "id.wallet", cascade = CascadeType.ALL, orphanRemoval = true)
+    @ToString.Exclude
     private Set<VerifiableCredentialWalletIntersectionEntity> credentialIntersections;
 }

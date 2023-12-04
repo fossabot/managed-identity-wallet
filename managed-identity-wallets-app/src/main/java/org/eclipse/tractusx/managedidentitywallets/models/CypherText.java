@@ -19,29 +19,24 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository.query;
+package org.eclipse.tractusx.managedidentitywallets.models;
 
-import lombok.Builder;
-import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
-import lombok.Value;
-import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
-import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
-import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
+import org.bouncycastle.util.encoders.Base64;
 
-import java.util.List;
-
-@Data
 @Getter
-@Builder
-public class VerifiableCredentialQuery {
-    List<VerifiableCredentialType> verifiableCredentialTypes;
-    WalletId holderWalletId;
-    VerifiableCredentialIssuer verifiableCredentialIssuer;
-    VerifiableCredentialId verifiableCredentialId;
-    Boolean isExpired = null;
+@EqualsAndHashCode
+@RequiredArgsConstructor
+public class CypherText {
+
+    @NonNull
+    private final String base64;
+
+    @Override
+    public String toString() {
+        return base64;
+    }
 }
-
-
-

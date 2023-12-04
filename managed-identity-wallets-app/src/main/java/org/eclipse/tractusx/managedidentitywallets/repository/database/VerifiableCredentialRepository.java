@@ -19,7 +19,7 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository;
+package org.eclipse.tractusx.managedidentitywallets.repository.database;
 
 import com.querydsl.core.types.Predicate;
 import lombok.NonNull;
@@ -32,11 +32,11 @@ import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.*;
 import org.eclipse.tractusx.managedidentitywallets.repository.map.VerifiableCredentialEntityMap;
-import org.eclipse.tractusx.managedidentitywallets.repository.predicate.WalletPredicate;
-import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
-import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.predicate.WalletPredicate;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.query.VerifiableCredentialQuery;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.query.WalletQuery;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
-import org.eclipse.tractusx.managedidentitywallets.repository.predicate.VerifiableCredentialPredicate;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.predicate.VerifiableCredentialPredicate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Component;

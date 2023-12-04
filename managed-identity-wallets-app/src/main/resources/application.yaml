@@ -94,6 +94,8 @@ miw:
     checkSpecialCredentialIssuable: true
   cron:
     updateSummaryVerifiableCredentials: ${CRON_UPDATE_SUMMARY_VC:0 0 * * * *}
+  vault:
+    mountName: ${VAULT_MOUNT_NAME:miw}
   verifiable:
     credential:
       contexts:

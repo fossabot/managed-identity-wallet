@@ -21,10 +21,12 @@
 
 package org.eclipse.tractusx.managedidentitywallets.factory;
 
+import io.ipfs.multibase.binary.Base64;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.models.DidFragment;
 import org.eclipse.tractusx.managedidentitywallets.models.Ed25519KeyId;
+import org.eclipse.tractusx.managedidentitywallets.models.PlainText;
 import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
 import org.eclipse.tractusx.ssi.lib.crypt.IKeyGenerator;
 import org.eclipse.tractusx.ssi.lib.crypt.KeyPair;
@@ -52,8 +54,8 @@ public class Ed25519KeyFactory {
 
         return ResolvedEd25519Key.builder()
                 .id(keyId)
-                .privateKey(keyPair.getPrivateKey().asByte())
-                .publicKey(keyPair.getPublicKey().asByte())
+                .privateKey(new PlainText(keyPair.getPrivateKey().asByte()))
+                .publicKey(new PlainText(keyPair.getPublicKey().asByte()))
                 .didFragment(didFragment)
                 .createdAt(OffsetDateTime.now())
                 .build();

@@ -19,31 +19,16 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.models;
+package org.eclipse.tractusx.managedidentitywallets.repository.database;
 
-import lombok.*;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialWalletIntersectionEntity;
+import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.repository.CrudRepository;
+import org.springframework.stereotype.Repository;
 
-import java.time.Instant;
-import java.time.OffsetDateTime;
+@Repository
+interface VerifiableCredentialWalletIntersectionJpaRepository
+        extends CrudRepository<VerifiableCredentialWalletIntersectionEntity, VerifiableCredentialWalletIntersectionEntity.VerifiableCredentialIntersectionEntityId>,
+        JpaRepository<VerifiableCredentialWalletIntersectionEntity, VerifiableCredentialWalletIntersectionEntity.VerifiableCredentialIntersectionEntityId> {
 
-@Getter
-@AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
-@Builder
-@ToString
-public class StoredEd25519Key implements Ed25519Key {
-
-    @NonNull
-    private final Ed25519KeyId id;
-    @NonNull
-    private final DidFragment didFragment;
-    @NonNull
-    private final OffsetDateTime createdAt;
-
-    @NonNull
-    private final CypherText publicKey;
-
-    @NonNull
-    @ToString.Exclude
-    private final CypherText privateKey;
 }
-

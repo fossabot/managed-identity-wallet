@@ -30,10 +30,10 @@ import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.WalletNotFou
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
-import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
-import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
-import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
-import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.VerifiableCredentialRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.WalletRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.query.VerifiableCredentialQuery;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.query.WalletQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
 import org.eclipse.tractusx.ssi.lib.crypt.IPrivateKey;
 import org.eclipse.tractusx.ssi.lib.crypt.IPublicKey;
@@ -41,7 +41,6 @@ import org.eclipse.tractusx.ssi.lib.crypt.jwk.JsonWebKey;
 import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559PrivateKey;
 import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559PublicKey;
 import org.eclipse.tractusx.ssi.lib.did.web.DidWebFactory;
-import org.eclipse.tractusx.ssi.lib.exception.DidParseException;
 import org.eclipse.tractusx.ssi.lib.model.did.*;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.data.domain.Page;
@@ -116,10 +115,10 @@ public class CommonService {
         for (var key : wallet.getStoredEd25519Keys()) {
 
             final ResolvedEd25519Key resolvedEd25519Key = vaultService.resolveKey(wallet, key).orElseThrow();
-            final byte[] privateKey = resolvedEd25519Key.getPrivateKey();
+            final byte[] privateKey = resolvedEd25519Key.getPrivateKey().getBytes();
             IPrivateKey x21559PrivateKey = new x21559PrivateKey(privateKey);
 
-            final byte[] publicKey = resolvedEd25519Key.getPublicKey();
+            final byte[] publicKey = resolvedEd25519Key.getPublicKey().getBytes();
             IPublicKey x21559PublicKey = new x21559PublicKey(publicKey);
 
             final String keyId = key.getDidFragment().getText();

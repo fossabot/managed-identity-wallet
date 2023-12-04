@@ -19,7 +19,7 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository;
+package org.eclipse.tractusx.managedidentitywallets.repository.database;
 
 import com.querydsl.core.types.Predicate;
 import lombok.NonNull;
@@ -38,8 +38,8 @@ import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableC
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialWalletIntersectionEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.map.WalletMap;
-import org.eclipse.tractusx.managedidentitywallets.repository.predicate.WalletPredicate;
-import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.predicate.WalletPredicate;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.query.WalletQuery;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -80,6 +80,8 @@ public class WalletRepository {
                     keyEntity.setId(UUID.randomUUID().toString());
                     keyEntity.setWallet(walletEntity);
                     keyEntity.setDidFragment(k.getDidFragment().getText());
+                    keyEntity.setPublicKeyCypherTextBase64(k.getPublicKey().getBase64());
+                    keyEntity.setPrivateKeyCypherTextBase64(k.getPrivateKey().getBase64());
                     return keyEntity;
                 }).collect(Collectors.toList());
         walletEntity.setEd25519Keys(ed25519KeyEntities);
@@ -126,6 +128,8 @@ public class WalletRepository {
                         keyEntity.setWallet(walletEntity);
                         keyEntity.setDidFragment(storedEd25519Key.getDidFragment().getText());
                         keyEntity.setCreatedAt(storedEd25519Key.getCreatedAt());
+                        keyEntity.setPublicKeyCypherTextBase64(storedEd25519Key.getPublicKey().getBase64());
+                        keyEntity.setPrivateKeyCypherTextBase64(storedEd25519Key.getPrivateKey().getBase64());
                         ed25519KeyEntities.add(keyEntity);
                     });
         }

@@ -19,22 +19,16 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository.entity;
+package org.eclipse.tractusx.managedidentitywallets.repository.database.query;
 
-import lombok.*;
-import org.eclipse.tractusx.managedidentitywallets.models.Ed25519KeyId;
+import lombok.Builder;
+import lombok.Value;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
 
-@Getter
-@ToString
-@EqualsAndHashCode(onlyExplicitlyIncluded = true)
-public class VaultPath {
-
-    public VaultPath(WalletId walletId, Ed25519KeyId keyId) {
-        this.path = String.format("%s/%s", walletId, keyId);
-    }
-
-    @NonNull
-    @EqualsAndHashCode.Include
-    private final String path;
+@Value
+@Builder
+public class WalletQuery {
+    WalletId walletId;
+    WalletName name;
 }

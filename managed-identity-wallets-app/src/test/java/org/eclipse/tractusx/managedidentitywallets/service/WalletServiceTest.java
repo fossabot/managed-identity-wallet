@@ -26,8 +26,8 @@ import org.eclipse.tractusx.managedidentitywallets.exception.WalletAlreadyExists
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
-import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
-import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.WalletRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.query.WalletQuery;
 import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
 import org.eclipse.tractusx.managedidentitywallets.test.WalletEventTracker;
 import org.junit.jupiter.api.Assertions;

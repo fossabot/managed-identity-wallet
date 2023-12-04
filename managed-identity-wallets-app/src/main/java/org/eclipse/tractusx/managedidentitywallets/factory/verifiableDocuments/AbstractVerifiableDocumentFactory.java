@@ -129,7 +129,7 @@ public abstract class AbstractVerifiableDocumentFactory {
                 .map(Optional::get)
                 .orElseThrow();
 
-        final x21559PrivateKey privateKey = new x21559PrivateKey(latestKey.getPrivateKey());
+        final x21559PrivateKey privateKey = new x21559PrivateKey(latestKey.getPrivateKey().getBytes());
         final URI verificationMethod = URI.create(issuerDid + "#" + latestKey.getDidFragment());
         final LinkedDataProofGenerator generator = LinkedDataProofGenerator.newInstance(SignatureType.JWS);
 

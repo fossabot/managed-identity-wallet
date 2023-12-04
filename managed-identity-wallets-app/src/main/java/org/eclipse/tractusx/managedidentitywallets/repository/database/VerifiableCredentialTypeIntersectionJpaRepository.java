@@ -19,19 +19,13 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository;
+package org.eclipse.tractusx.managedidentitywallets.repository.database;
 
-import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialIssuerEntity;
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialTypeEntity;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialTypeIntersectionEntity;
 import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface VerifiableCredentialTypeJpaRepository
-        extends PagingAndSortingRepository<VerifiableCredentialTypeEntity, String>,
-        CrudRepository<VerifiableCredentialTypeEntity, String>,
-        QuerydslPredicateExecutor<VerifiableCredentialTypeEntity> {
+interface VerifiableCredentialTypeIntersectionJpaRepository
+        extends CrudRepository<VerifiableCredentialTypeIntersectionEntity, VerifiableCredentialTypeIntersectionEntity.VerifiableCredentialTypeIntersectionEntityId> {
 }

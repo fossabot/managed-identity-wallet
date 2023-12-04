@@ -19,16 +19,29 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository;
+package org.eclipse.tractusx.managedidentitywallets.repository.database.query;
 
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialWalletIntersectionEntity;
-import org.springframework.data.jpa.repository.JpaRepository;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.stereotype.Repository;
+import lombok.Builder;
+import lombok.Data;
+import lombok.Getter;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 
-@Repository
-interface VerifiableCredentialWalletIntersectionJpaRepository
-        extends CrudRepository<VerifiableCredentialWalletIntersectionEntity, VerifiableCredentialWalletIntersectionEntity.VerifiableCredentialIntersectionEntityId>,
-        JpaRepository<VerifiableCredentialWalletIntersectionEntity, VerifiableCredentialWalletIntersectionEntity.VerifiableCredentialIntersectionEntityId> {
+import java.util.List;
 
+@Data
+@Getter
+@Builder
+public class VerifiableCredentialQuery {
+    List<VerifiableCredentialType> verifiableCredentialTypes;
+    WalletId holderWalletId;
+    VerifiableCredentialIssuer verifiableCredentialIssuer;
+    VerifiableCredentialId verifiableCredentialId;
+    @Builder.Default
+    Boolean isExpired = null;
 }
+
+
+

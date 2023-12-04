@@ -39,8 +39,10 @@ public class ResolvedEd25519Key implements Ed25519Key {
     @NonNull
     private final OffsetDateTime createdAt;
 
-    private final byte @NonNull [] publicKey;
+    @NonNull
+    private final PlainText publicKey;
 
+    @NonNull
     @ToString.Exclude
-    private final byte @NonNull [] privateKey;
+    private final PlainText privateKey;
 }

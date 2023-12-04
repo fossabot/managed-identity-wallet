@@ -24,7 +24,7 @@ package org.eclipse.tractusx.managedidentitywallets.service;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
-import org.eclipse.tractusx.managedidentitywallets.repository.VaultRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.vault.VaultRepository;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
@@ -33,6 +33,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class VaultService {
 
+    @NonNull
     private final VaultRepository vaultRepository;
 
     public Optional<ResolvedEd25519Key> resolveKey(@NonNull Wallet wallet, @NonNull final Ed25519Key key) {
@@ -43,11 +44,10 @@ public class VaultService {
         return wallet.getStoredEd25519Keys().stream()
                 .filter(k -> k.getId().equals(keyId))
                 .findFirst()
-                .flatMap(k -> vaultRepository.resolveKey(wallet.getWalletId(), k.getId()));
+                .flatMap(k -> vaultRepository.resolveKey(wallet.getWalletId(), k));
     }
 
     public StoredEd25519Key storeKey(@NonNull Wallet wallet, @NonNull final ResolvedEd25519Key key) {
         return vaultRepository.storeKey(wallet.getWalletId(), key);
     }
-
 }

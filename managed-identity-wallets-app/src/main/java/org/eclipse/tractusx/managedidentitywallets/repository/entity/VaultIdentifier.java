@@ -19,17 +19,26 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository;
+package org.eclipse.tractusx.managedidentitywallets.repository.entity;
 
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialIssuerEntity;
-import org.springframework.data.querydsl.QuerydslPredicateExecutor;
-import org.springframework.data.repository.CrudRepository;
-import org.springframework.data.repository.PagingAndSortingRepository;
-import org.springframework.stereotype.Repository;
+import lombok.*;
+import org.eclipse.tractusx.managedidentitywallets.models.Ed25519KeyId;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 
-@Repository
-public interface VerifiableCredentialIssuerJpaRepository
-        extends PagingAndSortingRepository<VerifiableCredentialIssuerEntity, String>,
-        CrudRepository<VerifiableCredentialIssuerEntity, String>,
-        QuerydslPredicateExecutor<VerifiableCredentialIssuerEntity> {
+@Getter
+@EqualsAndHashCode(onlyExplicitlyIncluded = true)
+public class VaultIdentifier {
+
+    public VaultIdentifier(WalletId walletId, Ed25519KeyId keyId) {
+        this.identifier = String.format("%s_%s", walletId, keyId);
+    }
+
+    @NonNull
+    @EqualsAndHashCode.Include
+    private final String identifier;
+
+    @Override
+    public String toString() {
+        return identifier;
+    }
 }

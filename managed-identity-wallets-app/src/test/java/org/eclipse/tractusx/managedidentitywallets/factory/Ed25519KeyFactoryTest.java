@@ -35,6 +35,9 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.net.http.HttpClient;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 
 public class Ed25519KeyFactoryTest {
 
@@ -47,8 +50,8 @@ public class Ed25519KeyFactoryTest {
     @Test
     public void testGeneratedKeyWithProof() {
         final ResolvedEd25519Key key = ed25519KeyFactory.generateNewEd25519Key();
-        final x21559PrivateKey privateKey = new x21559PrivateKey(key.getPrivateKey());
-        final x21559PublicKey publicKey = new x21559PublicKey(key.getPublicKey());
+        final x21559PrivateKey privateKey = new x21559PrivateKey(key.getPrivateKey().getBytes());
+        final x21559PublicKey publicKey = new x21559PublicKey(key.getPublicKey().getBytes());
 
         final HashedLinkedData data = new HashedLinkedData("foo".getBytes());
         final byte[] signature = ed25519ProofSigner.sign(data, privateKey);

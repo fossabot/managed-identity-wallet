@@ -19,43 +19,40 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository;
+package org.eclipse.tractusx.managedidentitywallets.repository.vault;
 
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.managedidentitywallets.models.Ed25519KeyId;
-import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
-import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.VaultPath;
-import org.springframework.stereotype.Component;
+import org.eclipse.tractusx.managedidentitywallets.models.*;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.VaultIdentifier;
 
 import java.util.*;
 
-@Component
 @Slf4j
 @RequiredArgsConstructor
-public class VaultRepository {
+public class InMemoryVaultRepository implements VaultRepository {
 
-    private final Map<VaultPath, ResolvedEd25519Key> keys = new HashMap<>();
+    private final Map<VaultIdentifier, ResolvedEd25519Key> keys = new HashMap<>();
 
-    public Optional<ResolvedEd25519Key> resolveKey(@NonNull final WalletId walletId, Ed25519KeyId keyId) {
-        if (log.isTraceEnabled()) {
-            log.trace("resolveKey {}: {}", walletId, keyId);
+    @Override
+    public Optional<ResolvedEd25519Key> resolveKey(@NonNull final WalletId walletId, @NonNull StoredEd25519Key storedEd25519Key) {
+        final VaultIdentifier vaultIdentifier = new VaultIdentifier(walletId, storedEd25519Key.getId());
+        if(log.isTraceEnabled()){
+            log.trace("Resolving key with identifier {}", vaultIdentifier);
         }
 
-        final VaultPath vaultPath = new VaultPath(walletId, keyId);
-        return Optional.ofNullable(keys.getOrDefault(vaultPath, null));
+        return Optional.ofNullable(keys.getOrDefault(vaultIdentifier, null));
     }
 
+    @Override
     public StoredEd25519Key storeKey(@NonNull final WalletId walletId, @NonNull final ResolvedEd25519Key resolvedEd25519Key) {
-        if (log.isTraceEnabled()) {
-            log.trace("storeKey {}: {}", walletId, resolvedEd25519Key);
+        final VaultIdentifier vaultIdentifier = new VaultIdentifier(walletId, resolvedEd25519Key.getId());
+        if(log.isTraceEnabled()){
+            log.trace("Storing key with identifier {}", vaultIdentifier);
         }
 
-        final VaultPath vaultPath = new VaultPath(walletId, resolvedEd25519Key.getId());
-        keys.put(vaultPath, resolvedEd25519Key);
+        keys.put(vaultIdentifier, resolvedEd25519Key);
         return mapToStoredKey(resolvedEd25519Key);
     }
 
@@ -64,6 +61,12 @@ public class VaultRepository {
                 .id(resolvedEd25519Key.getId())
                 .createdAt(resolvedEd25519Key.getCreatedAt())
                 .didFragment(resolvedEd25519Key.getDidFragment())
+                .publicKey(mapToCypherText(resolvedEd25519Key.getPublicKey()))
+                .privateKey(mapToCypherText(resolvedEd25519Key.getPrivateKey()))
                 .build();
+    }
+
+    private static CypherText mapToCypherText(@NonNull final PlainText plainText) {
+        return new CypherText(plainText.getBase64());
     }
 }

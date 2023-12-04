@@ -57,12 +57,15 @@ public class VerifiableCredentialEntity extends AbstractEntity {
     private OffsetDateTime expirationDate;
 
     @OneToMany(mappedBy = "id.verifiableCredential", cascade = CascadeType.REMOVE)
+    @ToString.Exclude
     private Set<VerifiableCredentialWalletIntersectionEntity> walletIntersections;
 
     @OneToMany(mappedBy = "id.verifiableCredential", cascade = CascadeType.REMOVE)
+    @ToString.Exclude
     private Set<VerifiableCredentialTypeIntersectionEntity> credentialTypeIntersections;
 
     @OneToMany(mappedBy = "id.verifiableCredential", cascade = CascadeType.REMOVE)
+    @ToString.Exclude
     private Set<VerifiableCredentialIssuerIntersectionEntity> credentialIssuerIntersections;
 
 }
