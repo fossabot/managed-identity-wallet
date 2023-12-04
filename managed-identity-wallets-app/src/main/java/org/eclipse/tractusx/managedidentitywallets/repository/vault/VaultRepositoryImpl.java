@@ -26,21 +26,16 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.VaultIdentifier;
-import org.springframework.vault.core.VaultSysOperations;
 import org.springframework.vault.core.VaultTemplate;
 import org.springframework.vault.core.VaultTransitOperations;
-import org.springframework.vault.support.VaultMount;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
 
 @RequiredArgsConstructor
 @Slf4j
 public class VaultRepositoryImpl implements VaultRepository {
 
-    private final String managedIdentityWalletsMount;
-
+    @NonNull
     private final VaultTemplate vaultTemplate;
 
     public Optional<ResolvedEd25519Key> resolveKey(@NonNull final WalletId walletId, @NonNull StoredEd25519Key storedEd25519Key) {
@@ -96,16 +91,12 @@ public class VaultRepositoryImpl implements VaultRepository {
     }
 
     private boolean existsKey(@NonNull VaultIdentifier vaultIdentifier) {
-        prepareVaultMount();
-
         final VaultTransitOperations transitOperations = vaultTemplate.opsForTransit();
         var key = transitOperations.getKey(vaultIdentifier.getIdentifier());
         return key != null;
     }
 
     private VaultTransitOperations prepareEncryptKey(@NonNull VaultIdentifier vaultIdentifier) {
-        prepareVaultMount();
-
         final VaultTransitOperations transitOperations = vaultTemplate.opsForTransit();
         var key = transitOperations.getKey(vaultIdentifier.getIdentifier());
         if (key == null) {
@@ -113,19 +104,9 @@ public class VaultRepositoryImpl implements VaultRepository {
                 log.trace("Creating key with identifier {}", vaultIdentifier);
             }
             transitOperations.createKey(vaultIdentifier.getIdentifier());
-        } else if (!key.supportsDecryption() || key.supportsEncryption()) {
-            throw new RuntimeException("Key does not support encryption and decryption");
+        } else if (!key.supportsDecryption() || !key.supportsEncryption()) {
+            throw new RuntimeException("Key does not support encryption and/or decryption");
         }
         return transitOperations;
-    }
-
-    private void prepareVaultMount() {
-        final VaultSysOperations sysOperations = vaultTemplate.opsForSys();
-        if (!sysOperations.getMounts().containsKey(managedIdentityWalletsMount)) {
-            if (log.isTraceEnabled()) {
-                log.trace("Creating mount with identifier {}", managedIdentityWalletsMount);
-            }
-            sysOperations.mount(managedIdentityWalletsMount, VaultMount.create(managedIdentityWalletsMount));
-        }
     }
 }

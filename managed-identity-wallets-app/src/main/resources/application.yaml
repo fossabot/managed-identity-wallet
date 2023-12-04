@@ -28,6 +28,9 @@ spring:
           #Issuer-uri indicates the iss claims from jwt token
           issuer-uri: ${miw.security.auth-server-url}/realms/${miw.security.realm}
           jwk-set-uri: ${miw.security.auth-server-url}/realms/${miw.security.realm}/protocol/openid-connect/certs
+  cloud:
+    vault:
+      enabled: false
 
 ## only needed if you want to enable API doc
 springdoc:
@@ -94,8 +97,6 @@ miw:
     checkSpecialCredentialIssuable: true
   cron:
     updateSummaryVerifiableCredentials: ${CRON_UPDATE_SUMMARY_VC:0 0 * * * *}
-  vault:
-    mountName: ${VAULT_MOUNT_NAME:miw}
   verifiable:
     credential:
       contexts:

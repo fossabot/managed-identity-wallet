@@ -21,12 +21,9 @@
 
 package org.eclipse.tractusx.managedidentitywallets.repository.vault;
 
-import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.vault.core.VaultTemplate;
@@ -35,27 +32,20 @@ import org.springframework.vault.core.VaultTemplate;
 public class VaultRepositoryConfiguration {
 
     @Configuration
-    @ConditionalOnMissingBean(VaultTemplate.class)
+    @RequiredArgsConstructor
     public static class InMemoryConfiguration {
 
         @Bean
-        public VaultRepository vaultRepository() {
+        @ConditionalOnProperty(value = "spring.cloud.vault.enabled", havingValue = "false", matchIfMissing = true)
+        public VaultRepository inMemoryVaultRepository() {
             return new InMemoryVaultRepository();
         }
-    }
-
-    @Configuration
-    @ConditionalOnBean(VaultTemplate.class)
-    @RequiredArgsConstructor
-    public static class VaultConfiguration {
-
-        private final VaultTemplate vaultTemplate;
-        @Value("${miw.vault.mountName}")
-        private String managedIdentityWalletsMount;
 
         @Bean
-        public VaultRepository vaultRepository() {
-            return new VaultRepositoryImpl(managedIdentityWalletsMount, vaultTemplate);
+        @Autowired
+        @ConditionalOnProperty(value = "spring.cloud.vault.enabled", havingValue = "true")
+        public VaultRepository vaultRepository(VaultTemplate vaultTemplate) {
+            return new VaultRepositoryImpl(vaultTemplate);
         }
     }
 }

@@ -55,6 +55,7 @@ import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
+import org.testcontainers.vault.VaultContainer;
 
 import java.time.Instant;
 import java.util.List;
@@ -62,14 +63,23 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 
-
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ActiveProfiles("dev")
 // TODO Clean Up this class
 public abstract class MiwTestCase {
 
+    private static final String VAULT_TOKEN = "00000000-0000-0000-0000-000000000foo";
+
     public static final KeycloakContainer KEYCLOAK_CONTAINER = new KeycloakContainer().withRealmImportFile("miw-test-realm.json");
+    public static VaultContainer<?> VAULT_CONTAINER = new VaultContainer<>("hashicorp/vault:1.13")
+            .withVaultToken(VAULT_TOKEN)
+            .withInitCommand(
+                    "secrets enable transit",
+                    "write -f transit/keys/my-key",
+                    "kv put secret/testing1 top_secret=password123",
+                    "kv put secret/testing2 secret_one=password1 secret_two=password2 secret_three=password3 secret_three=password3 secret_four=password4"
+            );
 
     @Autowired
     private GenericVerifiableCredentialFactory genericVerifiableCredentialFactory;
@@ -101,6 +111,7 @@ public abstract class MiwTestCase {
     @BeforeAll
     public static void beforeAll() {
         KEYCLOAK_CONTAINER.start();
+        VAULT_CONTAINER.start();
     }
 
     @BeforeEach
@@ -129,6 +140,11 @@ public abstract class MiwTestCase {
         registry.add("miw.security.refresh-token-url", () -> "${miw.security.token-url}");
         registry.add("spring.security.oauth2.resourceserver.jwt.issuer-uri", () -> "${miw.security.auth-server-url}realms/${miw.security.realm}");
         registry.add("spring.security.oauth2.resourceserver.jwk-set-uri", () -> "${miw.security.auth-server-url}realms/${miw.security.realm}/protocol/openid-connect/certs");
+        registry.add("spring.cloud.vault.enabled", () -> "true");
+        registry.add("spring.cloud.vault.token", () -> VAULT_TOKEN);
+        registry.add("spring.cloud.vault.host", () -> VAULT_CONTAINER.getHost());
+        registry.add("spring.cloud.vault.port", () -> VAULT_CONTAINER.getFirstMappedPort());
+        registry.add("spring.cloud.vault.scheme", () -> "http");
     }
 
     @SneakyThrows
@@ -136,7 +152,6 @@ public abstract class MiwTestCase {
         final Wallet wallet = newWalletPersisted();
         return newWalletPlusVerifiableCredentialPersisted(wallet);
     }
-
 
     @SneakyThrows
     protected VerifiablePresentation newWalletPlusVerifiablePresentationPersisted() {

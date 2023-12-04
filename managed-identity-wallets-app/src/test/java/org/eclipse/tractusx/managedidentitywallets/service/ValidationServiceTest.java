@@ -41,7 +41,6 @@ public class ValidationServiceTest extends MiwTestCase {
     private ValidationService validationService;
 
     @Test
-
     public void testVerifiableCredentialValidation() {
         final VerifiableCredential verifiableCredential = newWalletPlusVerifiableCredentialPersisted();
 

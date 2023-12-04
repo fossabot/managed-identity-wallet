@@ -107,6 +107,7 @@ dependencies {
     testAnnotationProcessor group: "com.querydsl", name: "querydsl-apt", classifier: "jakarta"
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
     testImplementation "org.testcontainers:testcontainers"
+    testImplementation "org.testcontainers:vault"
     testImplementation "org.testcontainers:junit-jupiter"
     testImplementation group: 'com.github.dasniko', name: 'testcontainers-keycloak', version: '2.5.0'
     testImplementation group: 'org.mockito', name: 'mockito-inline', version: '5.2.0'
