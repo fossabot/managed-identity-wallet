@@ -36,7 +36,7 @@ public class DeleteWalletAdminApiHandlerTest extends RestAssuredTestCase {
     private WalletRepository walletRepository;
 
     @Test
-    public void testGetWalletByIdAdminApiSuccess() {
+    public void testDeleteWalletByIdAdminApiSuccess() {
         final Wallet wallet = newWalletPersisted();
         newWalletPersisted();
 

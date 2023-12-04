@@ -70,7 +70,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests.requestMatchers(new AntPathRequestMatcher("/")).permitAll() // forwards to swagger
                         // TODO Remove this later again
 //                        .requestMatchers(new AntPathRequestMatcher("/api/v1/**")).permitAll()
-                        .requestMatchers(new AntPathRequestMatcher("/api/v2/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/v2/**")).authenticated()
                         .requestMatchers(new AntPathRequestMatcher("/docs/api-docs/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/ui/swagger-ui/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/actuator/health/**")).permitAll()

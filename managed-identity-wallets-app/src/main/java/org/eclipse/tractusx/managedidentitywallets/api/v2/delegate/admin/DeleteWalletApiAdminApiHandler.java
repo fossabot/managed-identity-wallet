@@ -27,10 +27,12 @@ import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiHa
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
+@Secured("ROLE_MIW_ADMIN")
 class DeleteWalletApiAdminApiHandler extends AbstractApiHandler {
 
     private final WalletService walletService;

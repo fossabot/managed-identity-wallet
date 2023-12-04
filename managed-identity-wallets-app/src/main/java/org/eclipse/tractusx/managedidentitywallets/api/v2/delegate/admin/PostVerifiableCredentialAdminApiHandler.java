@@ -29,6 +29,7 @@ import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -39,6 +40,7 @@ import java.util.Optional;
 @Component
 @Slf4j
 @RequiredArgsConstructor
+@Secured("ROLE_MIW_ADMIN")
 class PostVerifiableCredentialAdminApiHandler extends AbstractApiHandler {
 
     private final VerifiableCredentialsMapper verifiableCredentialsMapper;

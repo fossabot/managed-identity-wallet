@@ -27,11 +27,13 @@ import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiHa
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
 
 @Component
 @Slf4j
 @RequiredArgsConstructor
+@Secured("ROLE_MIW_ADMIN")
 class DeleteVerifiableCredentialByIdAdminApiHandler extends AbstractApiHandler {
 
     private final VerifiableCredentialService verifiableCredentialService;

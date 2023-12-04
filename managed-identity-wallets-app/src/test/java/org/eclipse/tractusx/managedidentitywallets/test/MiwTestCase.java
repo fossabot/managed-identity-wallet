@@ -118,7 +118,7 @@ public abstract class MiwTestCase {
     public void cleanUp() {
 
         walletEventTracker.clear();
-        verifiableCredentialEventTracker.clear();
+        verifiableCredentialEventTrackertestGetWalletByIdAdminApiSuccess.clear();
         verifiableCredentialRepository.deleteAll();
 
         // delete all except authority wallet

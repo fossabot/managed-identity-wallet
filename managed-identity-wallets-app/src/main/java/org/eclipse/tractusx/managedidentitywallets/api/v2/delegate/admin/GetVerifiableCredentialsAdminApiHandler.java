@@ -36,6 +36,7 @@ import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.VerifiableCr
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -44,6 +45,7 @@ import java.util.Optional;
 @Component
 @Slf4j
 @RequiredArgsConstructor
+@Secured("ROLE_MIW_ADMIN")
 class GetVerifiableCredentialsAdminApiHandler extends AbstractApiHandler {
 
     private final VerifiableCredentialService verifiableCredentialService;

@@ -31,6 +31,7 @@ import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.ListWalletsResponsePayloadV2;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
 
 import java.util.Optional;
@@ -38,6 +39,7 @@ import java.util.Optional;
 @Component
 @Slf4j
 @RequiredArgsConstructor
+@Secured("ROLE_MIW_ADMIN")
 class GetWalletsAdminApiHandler extends AbstractApiHandler {
 
     private final ApiV2Mapper apiMapper;
