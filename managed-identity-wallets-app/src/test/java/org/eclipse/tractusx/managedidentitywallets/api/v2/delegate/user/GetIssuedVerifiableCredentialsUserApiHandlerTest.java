@@ -26,6 +26,7 @@ import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.query.WalletQuery;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -36,6 +37,9 @@ public class GetIssuedVerifiableCredentialsUserApiHandlerTest extends RestAssure
 
     @Autowired
     private WalletRepository walletRepository;
+
+    @Autowired
+    private TestPersistenceUtil persistenceUtil;
 
     @Test
     public void testGetSignedVerifiableCredentialsUserApiSuccess() {
@@ -48,7 +52,7 @@ public class GetIssuedVerifiableCredentialsUserApiHandlerTest extends RestAssure
 
         final int MAX_CREDENTIALS = 10;
         for (var i = 0; i < MAX_CREDENTIALS; i++) {
-            newWalletPlusVerifiableCredentialPersisted(issuerWallet);
+            persistenceUtil.newWalletPlusVerifiableCredentialPersisted(issuerWallet);
         }
 
         when()

@@ -36,6 +36,8 @@ import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestAuthV1Util;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.eclipse.tractusx.ssi.lib.did.resolver.DidResolver;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialSubject;
@@ -60,6 +62,12 @@ import java.util.*;
 class HoldersCredentialTest extends MiwTestCase {
 
     @Autowired
+    private TestAuthV1Util authV1Util;
+
+    @Autowired
+    private TestPersistenceUtil persistenceUtil;
+
+    @Autowired
     private ObjectMapper objectMapper;
 
     @Autowired
@@ -80,8 +88,8 @@ class HoldersCredentialTest extends MiwTestCase {
     @Test
     void issueCredentialTestWithInvalidBPNAccess403() throws JsonProcessingException {
         String bpn = UUID.randomUUID().toString();
-        Wallet wallet = newWalletPersisted(bpn);
-        HttpHeaders headers = getValidUserHttpHeaders("not valid BPN");
+        Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
+        HttpHeaders headers = authV1Util.getValidUserHttpHeaders("not valid BPN");
 
         ResponseEntity<String> response = issueVC(wallet, headers);
 
@@ -91,8 +99,8 @@ class HoldersCredentialTest extends MiwTestCase {
     @Test
     void issueCredentialTest200() throws JsonProcessingException {
         String bpn = UUID.randomUUID().toString();
-        Wallet wallet = newWalletPersisted(bpn);
-        HttpHeaders headers = getValidUserHttpHeaders(bpn);
+        Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
+        HttpHeaders headers = authV1Util.getValidUserHttpHeaders(bpn);
 
         ResponseEntity<String> response = issueVC(wallet, headers);
 
@@ -108,7 +116,7 @@ class HoldersCredentialTest extends MiwTestCase {
 
     @Test
     void getCredentialsTest403() {
-        HttpHeaders headers = getInvalidUserHttpHeaders();
+        HttpHeaders headers = authV1Util.getInvalidUserHttpHeaders();
         HttpEntity<CreateWalletRequest> entity = new HttpEntity<>(headers);
         ResponseEntity<Map> response = restTemplate.exchange(RestURI.CREDENTIALS, HttpMethod.GET, entity, Map.class);
 
@@ -119,10 +127,10 @@ class HoldersCredentialTest extends MiwTestCase {
     void getCredentials200() throws com.fasterxml.jackson.core.JsonProcessingException {
         String baseDID = miwSettings.getAuthorityWalletDid();
         String bpn = UUID.randomUUID().toString();
-        HttpHeaders headers = getValidUserHttpHeaders(bpn);
+        HttpHeaders headers = authV1Util.getValidUserHttpHeaders(bpn);
         //save wallet
-        final Wallet wallet = newWalletPersisted(bpn);
-        newVerifiableCredential(wallet);
+        final Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
+        persistenceUtil.newVerifiableCredential(wallet);
         String vcList = """
                 [
                 {"type":"TraceabilityCredential"},
@@ -137,7 +145,7 @@ class HoldersCredentialTest extends MiwTestCase {
         for (int i = 0; i < jsonArray.length(); i++) {
             JSONObject jsonObject = jsonArray.getJSONObject(i);
             IssueFrameworkCredentialRequest request = TestUtils.getIssueFrameworkCredentialRequest(bpn, jsonObject.get(StringPool.TYPE).toString());
-            HttpEntity<IssueFrameworkCredentialRequest> entity = new HttpEntity<>(request, getValidUserHttpHeaders(miwSettings.getAuthorityWalletBpn())); //ony base wallet can issue VC
+            HttpEntity<IssueFrameworkCredentialRequest> entity = new HttpEntity<>(request, authV1Util.getValidUserHttpHeaders(miwSettings.getAuthorityWalletBpn())); //ony base wallet can issue VC
             ResponseEntity<String> exchange = restTemplate.exchange(RestURI.API_CREDENTIALS_ISSUER_FRAMEWORK, HttpMethod.POST, entity, String.class);
             Assertions.assertEquals(exchange.getStatusCode().value(), HttpStatus.CREATED.value());
         }
@@ -272,9 +280,9 @@ class HoldersCredentialTest extends MiwTestCase {
     private Map<String, Object> issueVC() throws JsonProcessingException {
         String bpn = UUID.randomUUID().toString();
         String baseBpn = miwSettings.getAuthorityWalletBpn();
-        final Wallet wallet = newWalletPersisted(bpn);
+        final Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
 
-        final VerifiableCredential verifiableCredential = newVerifiableCredential(wallet);
+        final VerifiableCredential verifiableCredential = persistenceUtil.newVerifiableCredential(wallet);
         Map<String, Object> map = objectMapper.readValue(verifiableCredential.toJson(), Map.class);
         return map;
     }
@@ -282,7 +290,7 @@ class HoldersCredentialTest extends MiwTestCase {
 
     private ResponseEntity<String> issueVC(Wallet wallet, HttpHeaders headers) throws JsonProcessingException {
 
-        VerifiableCredential verifiableCredential = newVerifiableCredential(wallet);
+        VerifiableCredential verifiableCredential = persistenceUtil.newVerifiableCredential(wallet);
 
         Map<String, Objects> map = objectMapper.readValue(verifiableCredential.toJson(), Map.class);
         HttpEntity<Map> entity = new HttpEntity<>(map, headers);

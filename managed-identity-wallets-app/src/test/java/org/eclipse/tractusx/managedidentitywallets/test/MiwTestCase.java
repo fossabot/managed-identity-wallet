@@ -22,57 +22,25 @@
 package org.eclipse.tractusx.managedidentitywallets.test;
 
 import dasniko.testcontainers.keycloak.KeycloakContainer;
-import lombok.NonNull;
-import lombok.SneakyThrows;
-import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
-import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
-import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.GenericVerifiableCredentialFactory;
-import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.VerifiablePresentationFactory;
-import org.eclipse.tractusx.managedidentitywallets.models.*;
-import org.eclipse.tractusx.managedidentitywallets.repository.database.VerifiableCredentialRepository;
-import org.eclipse.tractusx.managedidentitywallets.repository.database.WalletRepository;
-import org.eclipse.tractusx.managedidentitywallets.repository.database.query.WalletQuery;
-import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
-import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
-import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
-import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialSubject;
-import org.eclipse.tractusx.ssi.lib.model.verifiable.presentation.VerifiablePresentation;
+import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
-import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.KeycloakBuilder;
-import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.admin.client.resource.UserResource;
-import org.keycloak.representations.idm.UserRepresentation;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.data.domain.Pageable;
-import org.springframework.http.HttpHeaders;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.vault.VaultContainer;
 
-import java.time.Instant;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.UUID;
-
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ActiveProfiles("dev")
-// TODO Clean Up this class
 public abstract class MiwTestCase {
 
-    private static final String VAULT_TOKEN = "00000000-0000-0000-0000-000000000foo";
 
     public static final KeycloakContainer KEYCLOAK_CONTAINER = new KeycloakContainer().withRealmImportFile("miw-test-realm.json");
-    public static VaultContainer<?> VAULT_CONTAINER = new VaultContainer<>("hashicorp/vault:1.13")
+    private static final String VAULT_TOKEN = "00000000-0000-0000-0000-000000000foo";
+    private static final VaultContainer<?> VAULT_CONTAINER = new VaultContainer<>("hashicorp/vault:1.13")
             .withVaultToken(VAULT_TOKEN)
             .withInitCommand(
                     "secrets enable transit",
@@ -81,54 +49,16 @@ public abstract class MiwTestCase {
                     "kv put secret/testing2 secret_one=password1 secret_two=password2 secret_three=password3 secret_three=password3 secret_four=password4"
             );
 
-    @Autowired
-    private GenericVerifiableCredentialFactory genericVerifiableCredentialFactory;
-
-    @Autowired
-    private VerifiablePresentationFactory verifiablePresentationFactory;
-
-    @Autowired
-    private WalletRepository walletRepository;
-
-    @Autowired
-    private WalletService walletService;
-
-    @Autowired
-    private VerifiableCredentialRepository verifiableCredentialRepository;
-
-    @Autowired
-    private VerifiableCredentialService verifiableCredentialService;
-
-    @Autowired
-    private VerifiableCredentialEventTracker verifiableCredentialEventTracker;
-
-    @Autowired
-    private WalletEventTracker walletEventTracker;
-
-    @Autowired
-    private MIWSettings miwSettings;
-
     @BeforeAll
     public static void beforeAll() {
         KEYCLOAK_CONTAINER.start();
         VAULT_CONTAINER.start();
     }
 
-    @BeforeEach
-    public void cleanUp() {
-
-        walletEventTracker.clear();
-        verifiableCredentialEventTrackertestGetWalletByIdAdminApiSuccess.clear();
-        verifiableCredentialRepository.deleteAll();
-
-        // delete all except authority wallet
-        for (Wallet wallet : walletRepository.findAll(WalletQuery.builder().build(), Pageable.unpaged())) {
-            if (wallet.getWalletId().getText().equals("BPNL000000000000")) {
-                continue;
-            }
-
-            walletRepository.delete(wallet.getWalletId());
-        }
+    @AfterAll
+    public static void afterAll() {
+        KEYCLOAK_CONTAINER.stop();
+        VAULT_CONTAINER.stop();
     }
 
     @DynamicPropertySource
@@ -142,169 +72,8 @@ public abstract class MiwTestCase {
         registry.add("spring.security.oauth2.resourceserver.jwk-set-uri", () -> "${miw.security.auth-server-url}realms/${miw.security.realm}/protocol/openid-connect/certs");
         registry.add("spring.cloud.vault.enabled", () -> "true");
         registry.add("spring.cloud.vault.token", () -> VAULT_TOKEN);
-        registry.add("spring.cloud.vault.host", () -> VAULT_CONTAINER.getHost());
-        registry.add("spring.cloud.vault.port", () -> VAULT_CONTAINER.getFirstMappedPort());
+        registry.add("spring.cloud.vault.host", VAULT_CONTAINER::getHost);
+        registry.add("spring.cloud.vault.port", VAULT_CONTAINER::getFirstMappedPort);
         registry.add("spring.cloud.vault.scheme", () -> "http");
-    }
-
-    @SneakyThrows
-    protected VerifiableCredential newWalletPlusVerifiableCredentialPersisted() {
-        final Wallet wallet = newWalletPersisted();
-        return newWalletPlusVerifiableCredentialPersisted(wallet);
-    }
-
-    @SneakyThrows
-    protected VerifiablePresentation newWalletPlusVerifiablePresentationPersisted() {
-        final Wallet wallet = newWalletPersisted();
-        final VerifiableCredential verifiableCredential = newWalletPlusVerifiableCredentialPersisted(wallet);
-        return verifiablePresentationFactory.createPresentation(wallet, List.of(verifiableCredential));
-    }
-
-    @SneakyThrows
-    protected JsonWebToken newWalletPlusVerifiablePresentationJwtPersisted() {
-        final Wallet wallet = newWalletPersisted();
-        final VerifiableCredential verifiableCredential = newWalletPlusVerifiableCredentialPersisted(wallet);
-        return verifiablePresentationFactory.createPresentationAsJwt(wallet, List.of(verifiableCredential), new JsonWebTokenAudience("audience"));
-    }
-
-    @SneakyThrows
-    protected VerifiableCredential newWalletPlusVerifiableCredentialPersisted(@NonNull Wallet issuer) {
-        final VerifiableCredential verifiableCredential = newVerifiableCredential(issuer);
-
-        verifiableCredentialService.create(verifiableCredential);
-        return verifiableCredentialService.findById(new VerifiableCredentialId(verifiableCredential.getId().toString())).orElseThrow();
-    }
-
-    protected Wallet newWalletPersisted() {
-        final String random = UUID.randomUUID().toString();
-        return newWalletPersisted("id" + random, "name" + random);
-    }
-
-    @SneakyThrows
-    protected Wallet newWalletPersisted(String id) {
-        return newWalletPersisted(id, "name" + id);
-    }
-
-    @SneakyThrows
-    protected Wallet newWalletPersisted(String id, String name) {
-        final Wallet wallet = newWallet(id, name);
-
-        walletService.create(wallet);
-        return walletService.findById(wallet.getWalletId()).orElseThrow();
-    }
-
-    protected Wallet newWallet(String id, String name) {
-        final WalletId walletId = new WalletId(id == null ? UUID.randomUUID().toString() : id);
-        final WalletName walletName = new WalletName(name == null ? UUID.randomUUID().toString() : name);
-
-        return Wallet.builder()
-                .walletId(walletId)
-                .walletName(walletName)
-                .storedEd25519Keys(List.of())
-                .build();
-    }
-
-    protected VerifiablePresentation newVerifiablePresentation(Wallet wallet, VerifiableCredential verifiableCredential) {
-        return verifiablePresentationFactory.createPresentation(wallet, List.of(verifiableCredential));
-    }
-
-    protected VerifiableCredential newVerifiableCredential(Wallet issuer) {
-        return newVerifiableCredential(issuer, miwSettings.getVcExpiryDate().toInstant());
-    }
-
-    protected VerifiableCredential newVerifiableCredential(Wallet issuer, Instant expirationDate) {
-
-        final GenericVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs args
-                = GenericVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs.builder()
-                .issuerWallet(issuer)
-                .expirationDate(expirationDate)
-                .subject(new VerifiableCredentialSubject(Map.of(
-                        VerifiableCredentialSubject.ID, "" + UUID.randomUUID()
-                )))
-                .build();
-
-        return genericVerifiableCredentialFactory.createVerifiableCredential(args);
-    }
-
-
-    protected HttpHeaders getValidUserHttpHeaders() {
-        Wallet wallet = newWalletPersisted();
-        String token = getApiV1JwtToken(StringPool.VALID_USER_NAME, wallet.getWalletId().toString());
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, token);
-        return headers;
-    }
-
-    protected HttpHeaders getValidUserHttpHeaders(String bpn) {
-        String token = getApiV1JwtToken(StringPool.VALID_USER_NAME, bpn);
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, token);
-        return headers;
-    }
-
-    protected HttpHeaders getInvalidUserHttpHeaders() {
-        String token = getInvalidUserToken();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, token);
-        return headers;
-    }
-
-    protected String getInvalidUserToken() {
-        return getApiV1JwtToken(StringPool.INVALID_USER_NAME);
-    }
-
-    protected String getApiV1JwtToken(String username, String bpn) {
-
-        List<String> list = List.of("BPN", "bpn", "bPn"); //Do not add more field here, if you do make sure you change in keycloak realm file
-        Random randomizer = new Random();
-        String attributeName = list.get(randomizer.nextInt(list.size()));
-
-        Keycloak keycloak = KeycloakBuilder.builder()
-                .serverUrl(KEYCLOAK_CONTAINER.getAuthServerUrl())
-                .realm(StringPool.REALM)
-                .clientId(StringPool.CLIENT_ID)
-                .clientSecret(StringPool.CLIENT_SECRET)
-                .grantType(StringPool.CLIENT_CREDENTIALS)
-                .scope(StringPool.OPENID)
-                .build();
-
-        RealmResource realmResource = keycloak.realm(StringPool.REALM);
-
-        List<UserRepresentation> userRepresentations = realmResource.users().search(username, true);
-        UserRepresentation userRepresentation = userRepresentations.get(0);
-        UserResource userResource = realmResource.users().get(userRepresentations.get(0).getId());
-        userRepresentation.setEmailVerified(true);
-        userRepresentation.setEnabled(true);
-        userRepresentation.setAttributes(Map.of(attributeName, List.of(bpn)));
-        userResource.update(userRepresentation);
-        return getApiV1JwtToken(username);
-    }
-
-    protected String getApiV1JwtToken(String username) {
-
-        Keycloak keycloakAdminClient = KeycloakBuilder.builder()
-                .serverUrl(KEYCLOAK_CONTAINER.getAuthServerUrl())
-                .realm(StringPool.REALM)
-                .clientId(StringPool.CLIENT_ID)
-                .clientSecret(StringPool.CLIENT_SECRET)
-                .username(username)
-                .password(StringPool.USER_PASSWORD)
-                .build();
-        String access_token = keycloakAdminClient.tokenManager().getAccessToken().getToken();
-
-        return StringPool.BEARER_SPACE + access_token;
-    }
-
-    @Configuration
-    static class MiwTestCaseConfiguration {
-        @Bean
-        public VerifiableCredentialEventTracker getVerifiableCredentialEventTracker() {
-            return new VerifiableCredentialEventTracker();
-        }
-
-        @Bean
-        public WalletEventTracker getWalletEventTracker() {
-            return new WalletEventTracker();
-        }
     }
 }

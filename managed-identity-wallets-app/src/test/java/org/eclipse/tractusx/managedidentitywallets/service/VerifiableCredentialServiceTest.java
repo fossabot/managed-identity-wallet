@@ -30,6 +30,7 @@ import org.eclipse.tractusx.managedidentitywallets.repository.database.Verifiabl
 import org.eclipse.tractusx.managedidentitywallets.repository.database.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
 import org.eclipse.tractusx.managedidentitywallets.test.VerifiableCredentialEventTracker;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -39,6 +40,9 @@ import org.springframework.data.domain.Page;
 import java.util.Optional;
 
 public class VerifiableCredentialServiceTest extends MiwTestCase {
+
+    @Autowired
+    private TestPersistenceUtil persistenceUtil;
 
     @Autowired
     private VerifiableCredentialService verifiableCredentialService;
@@ -52,10 +56,10 @@ public class VerifiableCredentialServiceTest extends MiwTestCase {
     @Test
     @SneakyThrows
     public void testVerifiableCredentialCreation() {
-        final Wallet wallet = newWalletPersisted();
-        final VerifiableCredential vc1 = newVerifiableCredential(wallet);
-        final VerifiableCredential vc2 = newVerifiableCredential(wallet);
-        final VerifiableCredential vc3 = newVerifiableCredential(wallet);
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
+        final VerifiableCredential vc1 = persistenceUtil.newVerifiableCredential(wallet);
+        final VerifiableCredential vc2 = persistenceUtil.newVerifiableCredential(wallet);
+        final VerifiableCredential vc3 = persistenceUtil.newVerifiableCredential(wallet);
 
         verifiableCredentialEventTracker.clear();
         verifiableCredentialService.create(vc1);
@@ -76,9 +80,9 @@ public class VerifiableCredentialServiceTest extends MiwTestCase {
     @Test
     @SneakyThrows
     public void testVerifiableCredentialDeletion() {
-        final VerifiableCredential w1 = newWalletPlusVerifiableCredentialPersisted();
-        final VerifiableCredential w2 = newWalletPlusVerifiableCredentialPersisted();
-        final VerifiableCredential w3 = newWalletPlusVerifiableCredentialPersisted();
+        final VerifiableCredential w1 = persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
+        final VerifiableCredential w2 = persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
+        final VerifiableCredential w3 = persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
 
         verifiableCredentialEventTracker.clear();
         verifiableCredentialService.delete(w1);
@@ -99,9 +103,9 @@ public class VerifiableCredentialServiceTest extends MiwTestCase {
     @Test
     @SneakyThrows
     public void testVerifiableCredentialFindById() {
-        var c1 = newWalletPlusVerifiableCredentialPersisted();
-        newWalletPlusVerifiableCredentialPersisted();
-        newWalletPlusVerifiableCredentialPersisted();
+        var c1 = persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
+        persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
+        persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
 
         final Optional<VerifiableCredential> verifiableCredential =
                 verifiableCredentialService.findById(new VerifiableCredentialId(c1.getId().toString()));
@@ -112,9 +116,9 @@ public class VerifiableCredentialServiceTest extends MiwTestCase {
     @Test
     @SneakyThrows
     public void testVerifiableCredentialFindByIssuer() {
-        var c1 = newWalletPlusVerifiableCredentialPersisted();
-        newWalletPlusVerifiableCredentialPersisted();
-        newWalletPlusVerifiableCredentialPersisted();
+        var c1 = persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
+        persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
+        persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
 
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
                 .verifiableCredentialIssuer(new VerifiableCredentialIssuer(c1.getIssuer().toString()))

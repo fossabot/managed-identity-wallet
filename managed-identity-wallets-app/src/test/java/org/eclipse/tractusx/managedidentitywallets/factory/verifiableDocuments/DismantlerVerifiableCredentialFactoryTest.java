@@ -25,6 +25,7 @@ import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.config.VerifiableCredentialContextConfiguration;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.validation.JsonLdValidator;
 import org.junit.jupiter.api.Assertions;
@@ -34,6 +35,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 public class DismantlerVerifiableCredentialFactoryTest extends MiwTestCase {
 
     private static final String ACTIVITY_TYPE = "recycle";
+
+    @Autowired
+    private TestPersistenceUtil persistenceUtil;
 
     @Autowired
     public DismantlerVerifiableCredentialFactory factory;
@@ -46,7 +50,7 @@ public class DismantlerVerifiableCredentialFactoryTest extends MiwTestCase {
 
     @Test
     public void testContextSet() {
-        final Wallet wallet = newWalletPersisted();
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
 
         final VerifiableCredential verifiableCredential = factory.createDismantlerVerifiableCredential(wallet, ACTIVITY_TYPE);
 
@@ -60,7 +64,7 @@ public class DismantlerVerifiableCredentialFactoryTest extends MiwTestCase {
     @Test
     @SneakyThrows
     public void testJsonLdCompliant() {
-        final Wallet wallet = newWalletPersisted();
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
 
         final VerifiableCredential verifiableCredential = factory.createDismantlerVerifiableCredential(wallet, ACTIVITY_TYPE);
 

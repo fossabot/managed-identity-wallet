@@ -24,6 +24,7 @@ package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
 import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.eclipse.tractusx.ssi.lib.model.did.Did;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,6 +34,8 @@ import static org.hamcrest.Matchers.equalTo;
 
 public class GetVerifiableCredentialsAdminApiHandlerTest extends RestAssuredTestCase {
 
+    @Autowired
+    private TestPersistenceUtil persistenceUtil;
 
     @Autowired
     private DidFactory didFactory;
@@ -42,11 +45,11 @@ public class GetVerifiableCredentialsAdminApiHandlerTest extends RestAssuredTest
 
         final int MAX_CREDENTIALS = 10;
         for (var i = 0; i < MAX_CREDENTIALS; i++) {
-            newWalletPlusVerifiableCredentialPersisted();
+            persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
         }
 
-        final Wallet issuerWallet = newWalletPersisted();
-        newWalletPlusVerifiableCredentialPersisted(issuerWallet);
+        final Wallet issuerWallet = persistenceUtil.newWalletPersisted();
+        persistenceUtil.newWalletPlusVerifiableCredentialPersisted(issuerWallet);
 
         final Did issuerDid = didFactory.generateDid(issuerWallet);
         when()

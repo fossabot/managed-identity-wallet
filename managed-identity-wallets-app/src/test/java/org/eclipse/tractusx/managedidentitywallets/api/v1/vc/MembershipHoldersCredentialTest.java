@@ -37,6 +37,8 @@ import org.eclipse.tractusx.managedidentitywallets.repository.database.Verifiabl
 import org.eclipse.tractusx.managedidentitywallets.repository.database.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestAuthV1Util;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.eclipse.tractusx.ssi.lib.did.web.DidWebFactory;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.jetbrains.annotations.NotNull;
@@ -51,6 +53,11 @@ import org.testcontainers.shaded.org.apache.commons.lang3.StringUtils;
 import java.util.*;
 
 class MembershipHoldersCredentialTest extends MiwTestCase {
+
+    @Autowired
+    private TestAuthV1Util authV1Util;
+    @Autowired
+    private TestPersistenceUtil persistenceUtil;
 
     @Autowired
     private TestRestTemplate restTemplate;
@@ -76,7 +83,7 @@ class MembershipHoldersCredentialTest extends MiwTestCase {
 
         String did = DidWebFactory.fromHostnameAndPath(miwSettings.getHost(), bpn).toString();
 
-        HttpHeaders headers = getInvalidUserHttpHeaders();
+        HttpHeaders headers = authV1Util.getInvalidUserHttpHeaders();
 
         IssueMembershipCredentialRequest request = IssueMembershipCredentialRequest.builder().bpn(bpn).build();
 
@@ -93,13 +100,13 @@ class MembershipHoldersCredentialTest extends MiwTestCase {
         String baseBpn = miwSettings.getAuthorityWalletBpn();
 
         // create wallet, in background bpn and summary credential generated
-        Wallet wallet = newWalletPersisted(bpn);
+        Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
 
         //delete all VC
         verifiableCredentialRepository.deleteAll();
 
         //issue membership
-        HttpHeaders headers = getValidUserHttpHeaders(baseBpn);
+        HttpHeaders headers = authV1Util.getValidUserHttpHeaders(baseBpn);
         ResponseEntity<String> response = TestUtils.issueMembershipVC(restTemplate, bpn, headers);
         Assertions.assertEquals(response.getStatusCode().value(), HttpStatus.CREATED.value());
 
@@ -124,10 +131,10 @@ class MembershipHoldersCredentialTest extends MiwTestCase {
         String baseBpn = miwSettings.getAuthorityWalletBpn();
 
         // create wallet, in background bpn and summary credential generated
-        Wallet wallet = newWalletPersisted(bpn);
+        Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
 
         String vc = summaryVerifiableCredentialFactory.createSummaryVerifiableCredential(wallet).toJson();
-        HttpHeaders headers = getValidUserHttpHeaders(bpn);
+        HttpHeaders headers = authV1Util.getValidUserHttpHeaders(bpn);
 
         Map<String, Objects> map = objectMapper.readValue(vc, Map.class);
         HttpEntity<Map> entity = new HttpEntity<>(map, headers);
@@ -136,7 +143,7 @@ class MembershipHoldersCredentialTest extends MiwTestCase {
         Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatusCode().value());
 
         //issue  membership
-        HttpHeaders baseHeaders = getValidUserHttpHeaders(baseBpn);
+        HttpHeaders baseHeaders = authV1Util.getValidUserHttpHeaders(baseBpn);
         ResponseEntity<String> response1 = TestUtils.issueMembershipVC(restTemplate, bpn, baseHeaders);
         Assertions.assertEquals(HttpStatus.CREATED.value(), response1.getStatusCode().value());
 
@@ -153,9 +160,9 @@ class MembershipHoldersCredentialTest extends MiwTestCase {
     void issueMembershipCredentialToBaseWalletTest201() throws JsonProcessingException, JSONException {
 
         String bpn = UUID.randomUUID().toString();
-        Wallet wallet = newWalletPersisted(bpn);
+        Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
 
-        HttpHeaders baseHeaders = getValidUserHttpHeaders(miwSettings.getAuthorityWalletBpn());
+        HttpHeaders baseHeaders = authV1Util.getValidUserHttpHeaders(miwSettings.getAuthorityWalletBpn());
         ResponseEntity<String> response = TestUtils.issueMembershipVC(restTemplate, miwSettings.getAuthorityWalletBpn(), baseHeaders);
         Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatusCode().value());
 
@@ -184,10 +191,10 @@ class MembershipHoldersCredentialTest extends MiwTestCase {
         String baseBpn = miwSettings.getAuthorityWalletBpn();
 
         //create wallet
-        Wallet wallet = newWalletPersisted(bpn);
+        Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
 
 
-        HttpHeaders baseHeaders = getValidUserHttpHeaders(baseBpn);
+        HttpHeaders baseHeaders = authV1Util.getValidUserHttpHeaders(baseBpn);
         ResponseEntity<String> response = TestUtils.issueMembershipVC(restTemplate, bpn, baseHeaders);
         Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatusCode().value());
 
@@ -216,9 +223,9 @@ class MembershipHoldersCredentialTest extends MiwTestCase {
         String did = DidWebFactory.fromHostnameAndPath(miwSettings.getHost(), bpn).toString();
 
         //save wallet
-        Wallet wallet = newWalletPersisted(bpn);
+        Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
 
-        HttpHeaders headers = getValidUserHttpHeaders(bpn);
+        HttpHeaders headers = authV1Util.getValidUserHttpHeaders(bpn);
         IssueMembershipCredentialRequest request = IssueMembershipCredentialRequest.builder().bpn(bpn).build();
         HttpEntity<IssueMembershipCredentialRequest> entity = new HttpEntity<>(request, headers);
 
@@ -234,9 +241,9 @@ class MembershipHoldersCredentialTest extends MiwTestCase {
         String did = DidWebFactory.fromHostnameAndPath(miwSettings.getHost(), bpn).toString();
 
         //save wallet
-        Wallet wallet = newWalletPersisted(bpn);
+        Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
 
-        HttpHeaders baseHeaders = getValidUserHttpHeaders(miwSettings.getAuthorityWalletBpn());
+        HttpHeaders baseHeaders = authV1Util.getValidUserHttpHeaders(miwSettings.getAuthorityWalletBpn());
         ResponseEntity<String> response = TestUtils.issueMembershipVC(restTemplate, bpn, baseHeaders);
         Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatusCode().value());
 

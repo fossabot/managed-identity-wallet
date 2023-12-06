@@ -24,6 +24,7 @@ package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.VerifiableCredentialRepository;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -36,10 +37,13 @@ public class PostVerifiableCredentialAdminApiHandlerTest extends RestAssuredTest
     @Autowired
     private VerifiableCredentialRepository verifiableCredentialRepository;
 
+    @Autowired
+    private TestPersistenceUtil persistenceUtil;
+
     @Test
     public void testPostWalletAdminApiSuccess() {
-        final Wallet wallet = newWalletPersisted();
-        final VerifiableCredential verifiableCredential = newVerifiableCredential(wallet);
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
+        final VerifiableCredential verifiableCredential = persistenceUtil.newVerifiableCredential(wallet);
 
         given()
                 .contentType("application/json")

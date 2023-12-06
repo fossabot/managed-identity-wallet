@@ -22,17 +22,22 @@
 package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
 
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.equalTo;
 
 public class GetWalletsAdminApiHandlerTest extends RestAssuredTestCase {
 
+    @Autowired
+    private TestPersistenceUtil persistenceUtil;
+
     @Test
     public void testGetWalletByIdAdminApiSuccess() {
-        newWalletPersisted();
-        newWalletPersisted();
+        persistenceUtil.newWalletPersisted();
+        persistenceUtil.newWalletPersisted();
 
         when()
                 .get("/api/v2/admin/wallets?page=0&per_page=1")

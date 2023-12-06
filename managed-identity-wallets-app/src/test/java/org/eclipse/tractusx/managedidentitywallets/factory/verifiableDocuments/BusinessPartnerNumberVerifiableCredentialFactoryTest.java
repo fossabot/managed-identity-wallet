@@ -25,6 +25,7 @@ import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.config.VerifiableCredentialContextConfiguration;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.validation.JsonLdValidator;
 import org.junit.jupiter.api.Assertions;
@@ -37,6 +38,9 @@ public class BusinessPartnerNumberVerifiableCredentialFactoryTest extends MiwTes
     public BusinessPartnerNumberVerifiableCredentialFactory factory;
 
     @Autowired
+    private TestPersistenceUtil persistenceUtil;
+
+    @Autowired
     public JsonLdValidator jsonLdValidator;
 
     @Autowired
@@ -45,7 +49,7 @@ public class BusinessPartnerNumberVerifiableCredentialFactoryTest extends MiwTes
 
     @Test
     public void testContextSet() {
-        final Wallet wallet = newWalletPersisted();
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
 
         final VerifiableCredential verifiableCredential = factory.createBusinessPartnerNumberCredential(wallet);
 
@@ -59,7 +63,7 @@ public class BusinessPartnerNumberVerifiableCredentialFactoryTest extends MiwTes
     @Test
     @SneakyThrows
     public void testBusinessPartnerNumberCredentialJsonLdCompliant() {
-        final Wallet wallet = newWalletPersisted();
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
 
         final VerifiableCredential verifiableCredential = factory.createBusinessPartnerNumberCredential(wallet);
 

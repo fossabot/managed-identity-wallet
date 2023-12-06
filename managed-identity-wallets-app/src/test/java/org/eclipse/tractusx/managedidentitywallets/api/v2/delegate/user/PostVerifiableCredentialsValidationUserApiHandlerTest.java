@@ -22,8 +22,10 @@
 package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.user;
 
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Map;
@@ -32,9 +34,12 @@ import static io.restassured.RestAssured.given;
 
 public class PostVerifiableCredentialsValidationUserApiHandlerTest extends RestAssuredTestCase {
 
+    @Autowired
+    private TestPersistenceUtil persistenceUtil;
+
     @Test
     public void testPostSignedVerifiableCredentialUserApiHandler() {
-        final VerifiableCredential verifiableCredential = newWalletPlusVerifiableCredentialPersisted();
+        final VerifiableCredential verifiableCredential = persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
         final Map<String,Object> payload= Map.of(
                 "verifiableCredentials", List.of(verifiableCredential)
         );

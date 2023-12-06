@@ -22,12 +22,12 @@
 package org.eclipse.tractusx.managedidentitywallets.repository.database;
 
 import lombok.SneakyThrows;
-import org.eclipse.tractusx.managedidentitywallets.repository.database.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletName;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.query.WalletQuery;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,12 +40,15 @@ import java.util.Optional;
 public class WalletRepositoryTest extends MiwTestCase {
 
     @Autowired
+    private TestPersistenceUtil persistenceUtil;
+
+    @Autowired
     private WalletRepository walletRepository;
 
     @Test
     @SneakyThrows
     public void testWalletCreation() {
-        final Wallet wallet = newWalletPersisted();
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
         final WalletId walletId = wallet.getWalletId();
 
         final WalletQuery query = WalletQuery.builder()
@@ -112,9 +115,9 @@ public class WalletRepositoryTest extends MiwTestCase {
 
     @Test
     public void testFindById() {
-        final Wallet wallet = newWalletPersisted();
-        newWalletPersisted();
-        newWalletPersisted();
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
+        persistenceUtil.newWalletPersisted();
+        persistenceUtil.newWalletPersisted();
 
         final WalletQuery query = WalletQuery.builder()
                 .walletId(wallet.getWalletId())
@@ -126,10 +129,10 @@ public class WalletRepositoryTest extends MiwTestCase {
     @Test
     public void testFindByName() {
         final String name = "foo";
-        newWalletPersisted(null, name);
-        newWalletPersisted(null, name);
-        newWalletPersisted();
-        newWalletPersisted();
+        persistenceUtil.newWalletPersisted(null, name);
+        persistenceUtil.newWalletPersisted(null, name);
+        persistenceUtil.newWalletPersisted();
+        persistenceUtil.newWalletPersisted();
 
         final WalletQuery query = WalletQuery.builder()
                 .name(new WalletName(name))

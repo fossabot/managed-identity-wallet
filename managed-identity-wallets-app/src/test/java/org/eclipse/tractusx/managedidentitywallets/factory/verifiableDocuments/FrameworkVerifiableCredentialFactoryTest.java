@@ -26,6 +26,7 @@ import org.eclipse.tractusx.managedidentitywallets.config.VerifiableCredentialCo
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.validation.JsonLdValidator;
 import org.junit.jupiter.api.Assertions;
@@ -38,6 +39,9 @@ public class FrameworkVerifiableCredentialFactoryTest extends MiwTestCase {
     public FrameworkVerifiableCredentialFactory factory;
 
     @Autowired
+    private TestPersistenceUtil persistenceUtil;
+
+    @Autowired
     public JsonLdValidator jsonLdValidator;
 
     @Autowired
@@ -45,7 +49,7 @@ public class FrameworkVerifiableCredentialFactoryTest extends MiwTestCase {
 
     @Test
     public void testContextSet() {
-        final Wallet wallet = newWalletPersisted();
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
 
         final VerifiableCredentialType verifiableCredentialType = new VerifiableCredentialType("TestFrameworkCredential");
         final VerifiableCredential verifiableCredential = factory.createFrameworkVerifiableCredential(wallet,
@@ -61,7 +65,7 @@ public class FrameworkVerifiableCredentialFactoryTest extends MiwTestCase {
     @Test
     @SneakyThrows
     public void testJsonLdCompliant() {
-        final Wallet wallet = newWalletPersisted();
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
 
         final VerifiableCredentialType verifiableCredentialType = new VerifiableCredentialType("TestFrameworkCredential");
         final VerifiableCredential verifiableCredential = factory.createFrameworkVerifiableCredential(wallet,

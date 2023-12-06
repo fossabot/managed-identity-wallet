@@ -22,13 +22,13 @@
 package org.eclipse.tractusx.managedidentitywallets.repository.database;
 
 import lombok.SneakyThrows;
-import org.eclipse.tractusx.managedidentitywallets.repository.database.VerifiableCredentialRepository;
 import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.query.VerifiableCredentialQuery;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -42,11 +42,14 @@ import java.util.Optional;
 public class VerifiableCredentialRepositoryTest extends MiwTestCase {
 
     @Autowired
+    private TestPersistenceUtil persistenceUtil;
+
+    @Autowired
     private VerifiableCredentialRepository verifiableCredentialRepository;
 
     @Test
     public void testCreate() {
-        final VerifiableCredential verifiableCredential = newWalletPlusVerifiableCredentialPersisted();
+        final VerifiableCredential verifiableCredential = persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
                 .verifiableCredentialId(new VerifiableCredentialId(verifiableCredential.getId().toString()))
@@ -59,7 +62,7 @@ public class VerifiableCredentialRepositoryTest extends MiwTestCase {
     @Test
     @SneakyThrows
     public void testDelete() {
-        final VerifiableCredential verifiableCredential = newWalletPlusVerifiableCredentialPersisted();
+        final VerifiableCredential verifiableCredential = persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
 
         verifiableCredentialRepository.delete(verifiableCredential);
 
@@ -74,9 +77,9 @@ public class VerifiableCredentialRepositoryTest extends MiwTestCase {
     @Test
     @SneakyThrows
     public void testFindByIssuer() {
-        final VerifiableCredential verifiableCredential = newWalletPlusVerifiableCredentialPersisted();
-        newWalletPlusVerifiableCredentialPersisted();
-        newWalletPlusVerifiableCredentialPersisted();
+        final VerifiableCredential verifiableCredential = persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
+        persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
+        persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
                 .verifiableCredentialIssuer(new VerifiableCredentialIssuer(verifiableCredential.getIssuer().toString()))
@@ -90,8 +93,8 @@ public class VerifiableCredentialRepositoryTest extends MiwTestCase {
     @Test
     @SneakyThrows
     public void testFindByHolder() {
-        final Wallet wallet = newWalletPersisted();
-        final VerifiableCredential verifiableCredential = newWalletPlusVerifiableCredentialPersisted();
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
+        final VerifiableCredential verifiableCredential = persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
         final VerifiableCredentialId verifiableCredentialId = new VerifiableCredentialId(verifiableCredential.getId().toString());
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
@@ -106,9 +109,9 @@ public class VerifiableCredentialRepositoryTest extends MiwTestCase {
     @Test
     @SneakyThrows
     public void testFindByType() {
-        newWalletPlusVerifiableCredentialPersisted();
-        newWalletPlusVerifiableCredentialPersisted();
-        newWalletPlusVerifiableCredentialPersisted();
+        persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
+        persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
+        persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
                 .verifiableCredentialTypes(List.of(new VerifiableCredentialType("VerifiableCredential")))

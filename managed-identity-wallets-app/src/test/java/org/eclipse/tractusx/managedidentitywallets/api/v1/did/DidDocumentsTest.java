@@ -23,6 +23,7 @@ package org.eclipse.tractusx.managedidentitywallets.api.v1.did;
 
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.RestURI;
 import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,6 +38,9 @@ class DidDocumentsTest extends MiwTestCase {
     @Autowired
     private TestRestTemplate restTemplate;
 
+    @Autowired
+    private TestPersistenceUtil persistenceUtil;
+
     @Test
     void getDidDocumentInvalidBpn404() {
         ResponseEntity<String> response = restTemplate.getForEntity(RestURI.DID_DOCUMENTS, String.class, UUID.randomUUID().toString());
@@ -47,7 +51,7 @@ class DidDocumentsTest extends MiwTestCase {
     void getDidDocumentWithBpn200() {
 
         String bpn = UUID.randomUUID().toString();
-        newWalletPersisted(bpn);
+        persistenceUtil.newWalletPersisted(bpn);
 
         ResponseEntity<String> response = restTemplate.getForEntity(RestURI.DID_DOCUMENTS, String.class, bpn);
         Assertions.assertEquals(HttpStatus.OK.value(), response.getStatusCode().value());
@@ -65,7 +69,7 @@ class DidDocumentsTest extends MiwTestCase {
 
         String bpn = UUID.randomUUID().toString();
 
-        newWalletPersisted(bpn);
+        persistenceUtil.newWalletPersisted(bpn);
         ResponseEntity<String> response = restTemplate.getForEntity(RestURI.DID_RESOLVE, String.class, bpn);
         Assertions.assertEquals(HttpStatus.OK.value(), response.getStatusCode().value());
         Assertions.assertNotNull(response.getBody());

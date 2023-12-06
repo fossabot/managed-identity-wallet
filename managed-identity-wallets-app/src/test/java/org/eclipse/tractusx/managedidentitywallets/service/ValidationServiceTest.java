@@ -22,10 +22,9 @@
 package org.eclipse.tractusx.managedidentitywallets.service;
 
 import lombok.SneakyThrows;
-import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.GenericVerifiableCredentialFactory;
-import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.VerifiablePresentationFactory;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.presentation.VerifiablePresentation;
 import org.junit.jupiter.api.Assertions;
@@ -40,9 +39,12 @@ public class ValidationServiceTest extends MiwTestCase {
     @Autowired
     private ValidationService validationService;
 
+    @Autowired
+    private TestPersistenceUtil persistenceUtil;
+
     @Test
     public void testVerifiableCredentialValidation() {
-        final VerifiableCredential verifiableCredential = newWalletPlusVerifiableCredentialPersisted();
+        final VerifiableCredential verifiableCredential = persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
 
         final VerifiableCredentialValidationResult result = validationService.validate(List.of(verifiableCredential));
 
@@ -52,7 +54,7 @@ public class ValidationServiceTest extends MiwTestCase {
     @SneakyThrows
     @Test
     public void testVerifiablePresentationValidation() {
-        final VerifiablePresentation verifiablePresentation = newWalletPlusVerifiablePresentationPersisted();
+        final VerifiablePresentation verifiablePresentation = persistenceUtil.newWalletPlusVerifiablePresentationPersisted();
 
         final VerifiablePresentationValidationResult result = validationService.validate(verifiablePresentation);
 
@@ -62,7 +64,7 @@ public class ValidationServiceTest extends MiwTestCase {
     @SneakyThrows
     @Test
     public void testVerifiablePresentationJwtValidation() {
-        final JsonWebToken jwt = newWalletPlusVerifiablePresentationJwtPersisted();
+        final JsonWebToken jwt = persistenceUtil.newWalletPlusVerifiablePresentationJwtPersisted();
 
         final VerifiablePresentationJwtValidationResult result = validationService.validate(jwt);
 
@@ -72,9 +74,9 @@ public class ValidationServiceTest extends MiwTestCase {
     @SneakyThrows
     @Test
     public void testVerifiablePresentationJwtValidationWithExpiredVerifiableCredential() {
-        final Wallet wallet = newWalletPersisted();
-        final VerifiableCredential verifiableCredential = newVerifiableCredential(wallet, Instant.now().minusSeconds(5));
-        final VerifiablePresentation verifiablePresentation = newVerifiablePresentation(wallet, verifiableCredential);
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
+        final VerifiableCredential verifiableCredential = persistenceUtil.newVerifiableCredential(wallet, Instant.now().minusSeconds(5));
+        final VerifiablePresentation verifiablePresentation = persistenceUtil.newVerifiablePresentation(wallet, verifiableCredential);
 
         final VerifiablePresentationValidationResult result = validationService.validate(verifiablePresentation);
 

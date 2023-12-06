@@ -30,6 +30,7 @@ import org.eclipse.tractusx.managedidentitywallets.repository.database.WalletRep
 import org.eclipse.tractusx.managedidentitywallets.repository.database.query.WalletQuery;
 import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
 import org.eclipse.tractusx.managedidentitywallets.test.WalletEventTracker;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +39,9 @@ import org.springframework.data.domain.Page;
 import java.util.Optional;
 
 public class WalletServiceTest extends MiwTestCase {
+
+    @Autowired
+    private TestPersistenceUtil persistenceUtil;
 
     @Autowired
     private WalletService walletService;
@@ -51,9 +55,9 @@ public class WalletServiceTest extends MiwTestCase {
     @Test
     @SneakyThrows
     public void testWalletCreation() {
-        final Wallet w1 = newWallet("1", "1");
-        final Wallet w2 = newWallet("2", "2");
-        final Wallet w3 = newWallet("3", "3");
+        final Wallet w1 = persistenceUtil.newWallet("1", "1");
+        final Wallet w2 = persistenceUtil.newWallet("2", "2");
+        final Wallet w3 = persistenceUtil.newWallet("3", "3");
 
         walletService.create(w1);
         walletService.create(w2);
@@ -73,7 +77,7 @@ public class WalletServiceTest extends MiwTestCase {
     @Test
     @SneakyThrows
     public void testWalletUpdate() {
-        final Wallet originalWallet = newWalletPersisted();
+        final Wallet originalWallet = persistenceUtil.newWalletPersisted();
 
         final WalletId originalId = originalWallet.getWalletId();
         final WalletName newName = new WalletName("updatedName");
@@ -96,9 +100,9 @@ public class WalletServiceTest extends MiwTestCase {
     @SneakyThrows
     public void testWalletDeletion() {
 
-        final Wallet w1 = newWalletPersisted();
-        final Wallet w2 = newWalletPersisted();
-        final Wallet w3 = newWalletPersisted();
+        final Wallet w1 = persistenceUtil.newWalletPersisted();
+        final Wallet w2 = persistenceUtil.newWalletPersisted();
+        final Wallet w3 = persistenceUtil.newWalletPersisted();
 
         walletService.delete(w1);
         walletService.delete(w2);
@@ -118,9 +122,9 @@ public class WalletServiceTest extends MiwTestCase {
     @Test
     @SneakyThrows
     public void testWalletFindById() {
-        newWalletPersisted("1", "name");
-        newWalletPersisted("2", "name");
-        newWalletPersisted("3", "name");
+        persistenceUtil.newWalletPersisted("1", "name");
+        persistenceUtil.newWalletPersisted("2", "name");
+        persistenceUtil.newWalletPersisted("3", "name");
 
         final Optional<Wallet> wallet = walletService.findById(new WalletId("1"));
 
@@ -130,9 +134,9 @@ public class WalletServiceTest extends MiwTestCase {
     @Test
     @SneakyThrows
     public void testWalletFindByName() {
-        newWalletPersisted("1", "name");
-        newWalletPersisted("2", "name");
-        newWalletPersisted("3", "name");
+        persistenceUtil.newWalletPersisted("1", "name");
+        persistenceUtil.newWalletPersisted("2", "name");
+        persistenceUtil.newWalletPersisted("3", "name");
 
         final WalletQuery walletQuery = WalletQuery.builder()
                 .name(new WalletName("name"))

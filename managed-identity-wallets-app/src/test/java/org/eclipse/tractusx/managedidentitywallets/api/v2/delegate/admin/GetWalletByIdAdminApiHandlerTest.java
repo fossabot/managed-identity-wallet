@@ -23,17 +23,22 @@ package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
 
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 
 public class GetWalletByIdAdminApiHandlerTest extends RestAssuredTestCase {
 
+    @Autowired
+    private TestPersistenceUtil persistenceUtil;
+
     @Test
     public void testGetWalletByIdAdminApiSuccess() {
 
-        final Wallet wallet = newWalletPersisted();
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
 
         when()
                 .get("/api/v2/admin/wallets/" + wallet.getWalletId().getText())

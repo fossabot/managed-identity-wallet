@@ -37,6 +37,8 @@ import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestAuthV1Util;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.eclipse.tractusx.ssi.lib.did.web.DidWebFactory;
 import org.eclipse.tractusx.ssi.lib.model.did.Did;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
@@ -59,14 +61,15 @@ import java.util.stream.Stream;
 class FrameworkHoldersCredentialTest extends MiwTestCase {
 
     @Autowired
+    private TestAuthV1Util authV1Util;
+    @Autowired
+    private TestPersistenceUtil persistenceUtil;
+    @Autowired
     private VerifiableCredentialService verifiableCredentialService;
-
     @Autowired
     private TestRestTemplate restTemplate;
-
     @Autowired
     private MIWSettings miwSettings;
-
     @Autowired
     private DidFactory didFactory;
 
@@ -74,7 +77,7 @@ class FrameworkHoldersCredentialTest extends MiwTestCase {
     void issueFrameworkCredentialTest403() {
         String bpn = UUID.randomUUID().toString();
         String did = DidWebFactory.fromHostnameAndPath(miwSettings.getHost(), bpn).toString();
-        HttpHeaders headers = getInvalidUserHttpHeaders();
+        HttpHeaders headers = authV1Util.getInvalidUserHttpHeaders();
 
         IssueMembershipCredentialRequest request = IssueMembershipCredentialRequest.builder().bpn(bpn).build();
 
@@ -87,11 +90,11 @@ class FrameworkHoldersCredentialTest extends MiwTestCase {
     @Test
     void issueFrameworkCredentialWithInvalidBpnAccessTest403() throws JSONException {
         String bpn = UUID.randomUUID().toString();
-        newWalletPersisted(bpn);
+        persistenceUtil.newWalletPersisted(bpn);
 
         String type = "BehaviorTwinCredential";
 
-        HttpHeaders headers = getValidUserHttpHeaders(bpn);
+        HttpHeaders headers = authV1Util.getValidUserHttpHeaders(bpn);
 
         IssueFrameworkCredentialRequest twinRequest = TestUtils.getIssueFrameworkCredentialRequest(bpn, type);
 
@@ -106,7 +109,7 @@ class FrameworkHoldersCredentialTest extends MiwTestCase {
         String bpn = miwSettings.getAuthorityWalletBpn();
         String type = "PcfCredential";
 
-        HttpHeaders headers = getValidUserHttpHeaders(miwSettings.getAuthorityWalletBpn());
+        HttpHeaders headers = authV1Util.getValidUserHttpHeaders(miwSettings.getAuthorityWalletBpn());
 
         IssueFrameworkCredentialRequest twinRequest = TestUtils.getIssueFrameworkCredentialRequest(bpn, type);
 
@@ -130,7 +133,7 @@ class FrameworkHoldersCredentialTest extends MiwTestCase {
     @MethodSource("getTypes")
     void issueFrameWorkVCTest201(IssueFrameworkCredentialRequest request) throws JsonProcessingException, JSONException {
         String bpn = request.getHolderIdentifier();
-        newWalletPersisted(bpn);
+        persistenceUtil.newWalletPersisted(bpn);
 
         String type = request.getType();
         createAndValidateVC(bpn, type);
@@ -162,12 +165,12 @@ class FrameworkHoldersCredentialTest extends MiwTestCase {
     void issueFrameworkCredentialTest400() throws JsonProcessingException, JSONException {
         String bpn = UUID.randomUUID().toString();
         String did = DidWebFactory.fromHostnameAndPath(miwSettings.getHost(), bpn).toString();
-        Wallet wallet = newWalletPersisted(bpn);
+        Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
 
 
         String type = "cx-traceability1";
 
-        HttpHeaders headers = getValidUserHttpHeaders(miwSettings.getAuthorityWalletBpn());
+        HttpHeaders headers = authV1Util.getValidUserHttpHeaders(miwSettings.getAuthorityWalletBpn());
 
         IssueFrameworkCredentialRequest twinRequest = TestUtils.getIssueFrameworkCredentialRequest(bpn, type);
 
@@ -179,7 +182,7 @@ class FrameworkHoldersCredentialTest extends MiwTestCase {
     }
 
     private void createAndValidateVC(String bpn, String type) throws JsonProcessingException {
-        HttpHeaders headers = getValidUserHttpHeaders(miwSettings.getAuthorityWalletBpn());
+        HttpHeaders headers = authV1Util.getValidUserHttpHeaders(miwSettings.getAuthorityWalletBpn());
 
         IssueFrameworkCredentialRequest twinRequest = TestUtils.getIssueFrameworkCredentialRequest(bpn, type);
 

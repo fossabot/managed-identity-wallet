@@ -24,6 +24,7 @@ package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.WalletRepository;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,10 +36,13 @@ public class DeleteWalletAdminApiHandlerTest extends RestAssuredTestCase {
     @Autowired
     private WalletRepository walletRepository;
 
+    @Autowired
+    private TestPersistenceUtil persistenceUtil;
+
     @Test
     public void testDeleteWalletByIdAdminApiSuccess() {
-        final Wallet wallet = newWalletPersisted();
-        newWalletPersisted();
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
+        persistenceUtil.newWalletPersisted();
 
         when()
                 .delete("/api/v2/admin/wallets/" + wallet.getWalletId().getText())

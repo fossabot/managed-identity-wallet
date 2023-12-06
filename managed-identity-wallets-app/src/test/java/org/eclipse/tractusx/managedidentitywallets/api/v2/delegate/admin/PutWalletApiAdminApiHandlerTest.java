@@ -26,6 +26,7 @@ import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.query.WalletQuery;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.UpdateWalletRequestPayloadV2;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -37,10 +38,13 @@ public class PutWalletApiAdminApiHandlerTest extends RestAssuredTestCase {
     @Autowired
     private WalletRepository walletRepository;
 
+    @Autowired
+    private TestPersistenceUtil persistenceUtil;
+
     @Test
     public void testPutWalletAdminApiSuccess() {
 
-        final Wallet wallet = newWalletPersisted();
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
         final UpdateWalletRequestPayloadV2 payload = new UpdateWalletRequestPayloadV2();
         payload.id(wallet.getWalletId().getText());
         payload.name("foo");

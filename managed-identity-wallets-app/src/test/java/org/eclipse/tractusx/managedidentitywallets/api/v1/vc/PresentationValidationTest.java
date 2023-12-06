@@ -35,6 +35,8 @@ import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestAuthV1Util;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.presentation.VerifiablePresentation;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.presentation.VerifiablePresentationBuilder;
@@ -64,6 +66,10 @@ class PresentationValidationTest extends MiwTestCase {
             .configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
 
     @Autowired
+    private TestAuthV1Util authV1Util;
+    @Autowired
+    private TestPersistenceUtil persistenceUtil;
+    @Autowired
     private TestRestTemplate restTemplate;
     @Autowired
     private MIWSettings miwSettings;
@@ -89,12 +95,12 @@ class PresentationValidationTest extends MiwTestCase {
         CreateWalletRequest createWalletRequest = new CreateWalletRequest();
         createWalletRequest.setBpn(bpnTenant_1);
         createWalletRequest.setName("My Test Tenant Wallet");
-        tenant_1 = newWalletPersisted(bpnTenant_1);
+        tenant_1 = persistenceUtil.newWalletPersisted(bpnTenant_1);
 
         CreateWalletRequest createWalletRequest2 = new CreateWalletRequest();
         createWalletRequest2.setBpn(bpnTenant_2);
         createWalletRequest2.setName("My Test Tenant Wallet");
-        tenant_2 = newWalletPersisted(bpnTenant_2);
+        tenant_2 = persistenceUtil.newWalletPersisted(bpnTenant_2);
 
         IssueMembershipCredentialRequest issueMembershipCredentialRequest = new IssueMembershipCredentialRequest();
         issueMembershipCredentialRequest.setBpn(bpnTenant_1);
@@ -184,7 +190,7 @@ class PresentationValidationTest extends MiwTestCase {
 
     @SneakyThrows
     private VerifiablePresentationValidationResponse validateJwtOfCredential(JsonWebToken presentationJwt) {
-        HttpHeaders headers = getValidUserHttpHeaders(miwSettings.getAuthorityWalletBpn());
+        HttpHeaders headers = authV1Util.getValidUserHttpHeaders(miwSettings.getAuthorityWalletBpn());
         headers.set("Content-Type", "application/json");
         HttpEntity<Map> entity = new HttpEntity<>(Map.of(StringPool.VP, presentationJwt.getText()), headers);
 

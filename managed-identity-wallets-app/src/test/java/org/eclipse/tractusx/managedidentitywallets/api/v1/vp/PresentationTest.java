@@ -34,6 +34,8 @@ import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.B
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestAuthV1Util;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.eclipse.tractusx.ssi.lib.did.resolver.DidResolver;
 import org.eclipse.tractusx.ssi.lib.did.web.DidWebFactory;
 import org.eclipse.tractusx.ssi.lib.exception.DidDocumentResolverNotRegisteredException;
@@ -61,6 +63,11 @@ import java.util.*;
 class PresentationTest extends MiwTestCase {
 
     @Autowired
+    private TestAuthV1Util authV1Util;
+    @Autowired
+    private TestPersistenceUtil persistenceUtil;
+
+    @Autowired
     private TestRestTemplate restTemplate;
 
     @Autowired
@@ -82,13 +89,13 @@ class PresentationTest extends MiwTestCase {
     void validateVPAssJsonLd400() throws JsonProcessingException {
         //create VP
         String bpn = UUID.randomUUID().toString();
-        Wallet wallet = newWalletPersisted(bpn);
+        Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
         String audience = "companyA";
         ResponseEntity<Map> vpResponse = createBpnVCAsJwt(wallet, audience);
         Map body = vpResponse.getBody();
 
         //validate VP
-        HttpHeaders headers = getValidUserHttpHeaders(bpn);
+        HttpHeaders headers = authV1Util.getValidUserHttpHeaders(bpn);
         HttpEntity<Map> entity = new HttpEntity<>(body, headers);
 
         ResponseEntity<Map> validationResponse = restTemplate.exchange(RestURI.API_PRESENTATIONS_VALIDATION, HttpMethod.POST, entity, Map.class);
@@ -98,7 +105,7 @@ class PresentationTest extends MiwTestCase {
     @Test
     void validateVPAsJwt() throws JsonProcessingException {
         String bpn = UUID.randomUUID().toString();
-        Wallet wallet = newWalletPersisted(bpn);
+        Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
         String audience = "companyA";
         ResponseEntity<Map> vpResponse = createBpnVCAsJwt(wallet, audience);
         Map body = vpResponse.getBody();
@@ -118,7 +125,7 @@ class PresentationTest extends MiwTestCase {
     void validateVPAsJwtWithInvalidSignatureAndInValidAudienceAndExpiryDateValidation() throws JsonProcessingException, DidDocumentResolverNotRegisteredException, JwtException, InterruptedException {
         //create VP
         String bpn = UUID.randomUUID().toString();
-        Wallet wallet = newWalletPersisted(bpn);
+        Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
         String audience = "companyA";
         ResponseEntity<Map> vpResponse = createBpnVCAsJwt(wallet, audience);
         Map body = vpResponse.getBody();
@@ -149,7 +156,7 @@ class PresentationTest extends MiwTestCase {
     void validateVPAsJwtWithValidAudienceAndDateValidation() throws JsonProcessingException {
         //create VP
         String bpn = UUID.randomUUID().toString();
-        Wallet wallet = newWalletPersisted(bpn);
+        Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
         String audience = "companyA";
         ResponseEntity<Map> vpResponse = createBpnVCAsJwt(wallet, audience);
         Map body = vpResponse.getBody();
@@ -168,7 +175,7 @@ class PresentationTest extends MiwTestCase {
     void validateVPAsJwtWithInValidVCDateValidation() throws JsonProcessingException {
         //create VP
         String bpn = UUID.randomUUID().toString();
-        newWalletPersisted(bpn);
+        persistenceUtil.newWalletPersisted(bpn);
         String audience = "companyA";
 
         ResponseEntity<Map> vpResponse = getIssueVPRequestWithShortExpiry(bpn, audience);
@@ -189,7 +196,7 @@ class PresentationTest extends MiwTestCase {
     @Test
     void createPresentationAsJWT201() throws JsonProcessingException, ParseException {
         String bpn = UUID.randomUUID().toString();
-        Wallet wallet = newWalletPersisted(bpn);
+        Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
         String did = DidWebFactory.fromHostnameAndPath(miwSettings.getHost(), bpn).toString();
         String audience = "companyA";
         ResponseEntity<Map> vpResponse = createBpnVCAsJwt(wallet, audience);
@@ -206,7 +213,7 @@ class PresentationTest extends MiwTestCase {
     private ResponseEntity<Map> createBpnVCAsJwt(Wallet wallet, String audience) throws JsonProcessingException {
         Map<String, Object> request = getIssueVPRequest(wallet);
 
-        HttpHeaders headers = getValidUserHttpHeaders(wallet.getWalletId().toString());
+        HttpHeaders headers = authV1Util.getValidUserHttpHeaders(wallet.getWalletId().toString());
         headers.put(HttpHeaders.CONTENT_TYPE, List.of(MediaType.APPLICATION_JSON_VALUE));
 
         HttpEntity<String> entity = new HttpEntity<>(objectMapper.writeValueAsString(request), headers);
@@ -220,11 +227,11 @@ class PresentationTest extends MiwTestCase {
     void createPresentationAsJsonLD201() throws JsonProcessingException {
 
         String bpn = UUID.randomUUID().toString();
-        Wallet wallet = newWalletPersisted(bpn);
+        Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
 
         Map<String, Object> request = getIssueVPRequest(wallet);
 
-        HttpHeaders headers = getValidUserHttpHeaders(bpn);
+        HttpHeaders headers = authV1Util.getValidUserHttpHeaders(bpn);
         headers.put(HttpHeaders.CONTENT_TYPE, List.of(MediaType.APPLICATION_JSON_VALUE));
 
         HttpEntity<String> entity = new HttpEntity<>(objectMapper.writeValueAsString(request), headers);
@@ -237,11 +244,11 @@ class PresentationTest extends MiwTestCase {
     @Test
     void createPresentationWithInvalidBPNAccess403() throws JsonProcessingException {
         String bpn = UUID.randomUUID().toString();
-        Wallet wallet = newWalletPersisted(bpn);
+        Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
 
         Map<String, Object> request = getIssueVPRequest(wallet);
 
-        HttpHeaders headers = getValidUserHttpHeaders("invalid bpn");
+        HttpHeaders headers = authV1Util.getValidUserHttpHeaders("invalid bpn");
         headers.put(HttpHeaders.CONTENT_TYPE, List.of(MediaType.APPLICATION_JSON_VALUE));
 
         HttpEntity<String> entity = new HttpEntity<>(objectMapper.writeValueAsString(request), headers);
@@ -280,7 +287,7 @@ class PresentationTest extends MiwTestCase {
         request.put(StringPool.HOLDER_IDENTIFIER, did.toString());
         request.put(StringPool.VERIFIABLE_CREDENTIALS, List.of(map));
 
-        HttpHeaders headers = getValidUserHttpHeaders(bpn);
+        HttpHeaders headers = authV1Util.getValidUserHttpHeaders(bpn);
         headers.put(HttpHeaders.CONTENT_TYPE, List.of(MediaType.APPLICATION_JSON_VALUE));
 
         HttpEntity<String> entity = new HttpEntity<>(objectMapper.writeValueAsString(request), headers);
@@ -312,7 +319,7 @@ class PresentationTest extends MiwTestCase {
                         .build();
 
         Map<String, Objects> map = objectMapper.readValue(credentialWithoutProof.toJson(), Map.class);
-        HttpEntity<Map> entity = new HttpEntity<>(map, getValidUserHttpHeaders(miwSettings.getAuthorityWalletBpn()));
+        HttpEntity<Map> entity = new HttpEntity<>(map, authV1Util.getValidUserHttpHeaders(miwSettings.getAuthorityWalletBpn()));
         return restTemplate.exchange(RestURI.ISSUERS_CREDENTIALS + "?holderDid={did}", HttpMethod.POST, entity, String.class, holderDid);
     }
 }
