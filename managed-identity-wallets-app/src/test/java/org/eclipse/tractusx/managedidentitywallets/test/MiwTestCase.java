@@ -38,7 +38,7 @@ import org.testcontainers.vault.VaultContainer;
 public abstract class MiwTestCase {
 
 
-    public static final KeycloakContainer KEYCLOAK_CONTAINER = new KeycloakContainer().withRealmImportFile("miw-test-realm.json");
+    public static final KeycloakContainer KEYCLOAK_CONTAINER = new KeycloakContainer().withAdminUsername("admin").withAdminPassword("admin");
     private static final String VAULT_TOKEN = "00000000-0000-0000-0000-000000000foo";
     private static final VaultContainer<?> VAULT_CONTAINER = new VaultContainer<>("hashicorp/vault:1.13")
             .withVaultToken(VAULT_TOKEN)

@@ -21,14 +21,19 @@
 
 package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
 
+import org.eclipse.tractusx.managedidentitywallets.api.v2.ApiRolesV2;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.WalletRepository;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestAuthV2Util;
 import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
+import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 
 public class DeleteWalletAdminApiHandlerTest extends RestAssuredTestCase {
@@ -39,6 +44,9 @@ public class DeleteWalletAdminApiHandlerTest extends RestAssuredTestCase {
     @Autowired
     private TestPersistenceUtil persistenceUtil;
 
+    @Autowired
+    public TestAuthV2Util testAuthV2Util;
+
     @Test
     public void testDeleteWalletByIdAdminApiSuccess() {
         final Wallet wallet = persistenceUtil.newWalletPersisted();
@@ -47,8 +55,17 @@ public class DeleteWalletAdminApiHandlerTest extends RestAssuredTestCase {
         when()
                 .delete("/api/v2/admin/wallets/" + wallet.getWalletId().getText())
                 .then()
+                .statusCode(401);
+
+        given().
+                header(testAuthV2Util.getAuthHeader( List.of(ApiRolesV2.ADMIN)));
+        when()
+                .delete("/api/v2/admin/wallets/" + wallet.getWalletId().getText())
+                .then()
                 .statusCode(204);
 
+        given().
+                header(testAuthV2Util.getAuthHeader( List.of(ApiRolesV2.ADMIN)));
         when()
                 .delete("/api/v2/admin/wallets/foo")
                 .then()
