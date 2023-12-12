@@ -21,16 +21,22 @@
 
 package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
 
+import io.restassured.http.Header;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.ApiRolesV2;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.VerifiableCredentialRepository;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestAuthV2Util;
 import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
 import static io.restassured.RestAssured.given;
+import static io.restassured.RestAssured.when;
 
 public class PostVerifiableCredentialAdminApiHandlerTest extends RestAssuredTestCase {
 
@@ -40,12 +46,65 @@ public class PostVerifiableCredentialAdminApiHandlerTest extends RestAssuredTest
     @Autowired
     private TestPersistenceUtil persistenceUtil;
 
+    @Autowired
+    public TestAuthV2Util testAuthV2Util;
+
+    @Test
+    public void testUnauthorizedAccess() {
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
+        final VerifiableCredential verifiableCredential = persistenceUtil.newVerifiableCredential(wallet);
+
+        given()
+                .contentType("application/json")
+                .body(verifiableCredential)
+                .when()
+                .then()
+                .statusCode(401);
+    }
+
+    @Test
+    public void testSuccessfulAccess() {
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
+        final VerifiableCredential verifiableCredential = persistenceUtil.newVerifiableCredential(wallet);
+
+        final Header auth_admin = testAuthV2Util.getAuthHeader(List.of(ApiRolesV2.ADMIN));
+
+        given()
+                .header(auth_admin)
+                .contentType("application/json")
+                .body(verifiableCredential)
+                .when()
+                .post("/api/v2/admin/verifiable-credentials")
+                .then()
+                .statusCode(201);
+    }
+
+    @Test
+    public void testForbiddenAccess() {
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
+        final VerifiableCredential verifiableCredential = persistenceUtil.newVerifiableCredential(wallet);
+
+        final Header auth_foo = testAuthV2Util.getAuthHeader(List.of("FOO"));
+
+        given()
+                .header(auth_foo)
+                .contentType("application/json")
+                .body(verifiableCredential)
+                .when()
+                .post("/api/v2/admin/verifiable-credentials")
+                .then()
+                .statusCode(403);
+    }
+
     @Test
     public void testPostWalletAdminApiSuccess() {
         final Wallet wallet = persistenceUtil.newWalletPersisted();
         final VerifiableCredential verifiableCredential = persistenceUtil.newVerifiableCredential(wallet);
 
+        final Header auth_admin = testAuthV2Util.getAuthHeader(List.of(ApiRolesV2.ADMIN));
+
         given()
+                .header(auth_admin)
                 .contentType("application/json")
                 .body(verifiableCredential)
                 .when()
@@ -54,6 +113,7 @@ public class PostVerifiableCredentialAdminApiHandlerTest extends RestAssuredTest
                 .statusCode(201);
 
         given()
+                .header(auth_admin)
                 .contentType("application/json")
                 .body(verifiableCredential)
                 .when()
@@ -61,7 +121,7 @@ public class PostVerifiableCredentialAdminApiHandlerTest extends RestAssuredTest
                 .then()
                 .statusCode(409);
 
-        // expect automatically issued BPN+Summary VC + New VC
-        Assertions.assertEquals(3, verifiableCredentialRepository.count(), "Verifiable Credential should have been created");
+        // expect 2x(BPN+SummaryVC)+NewVC=2x2+1=5
+        Assertions.assertEquals(5, verifiableCredentialRepository.count(), "Verifiable Credential should have been created");
     }
 }

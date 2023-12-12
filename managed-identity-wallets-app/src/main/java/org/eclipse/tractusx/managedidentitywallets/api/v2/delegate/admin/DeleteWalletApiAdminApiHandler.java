@@ -32,7 +32,6 @@ import org.springframework.stereotype.Component;
 
 @RequiredArgsConstructor
 @Component
-@Secured("ROLE_MIW_ADMIN")
 class DeleteWalletApiAdminApiHandler extends AbstractApiHandler {
 
     private final WalletService walletService;

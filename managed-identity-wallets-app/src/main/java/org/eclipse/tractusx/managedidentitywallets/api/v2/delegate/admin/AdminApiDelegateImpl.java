@@ -25,9 +25,11 @@ package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.ApiRolesV2;
 import org.eclipse.tractusx.managedidentitywallets.spring.controllers.v2.AdministratorApiDelegate;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -48,46 +50,55 @@ public class AdminApiDelegateImpl implements AdministratorApiDelegate {
     private final GetVerifiableCredentialsAdminApiHandler getVerifiableCredentialsAdminApiHandler;
 
     @Override
+    @Secured({ApiRolesV2.ADMIN_ROLE})
     public ResponseEntity<CreateWalletResponsePayloadV2> adminCreateWallet(@NonNull CreateWalletRequestPayloadV2 createWalletRequestPayloadV2) {
         return postWalletApiCommand.execute(createWalletRequestPayloadV2);
     }
 
     @Override
+    @Secured({ApiRolesV2.ADMIN_ROLE})
     public ResponseEntity<Void> adminDeleteWalletById(@NonNull String walletId) {
         return deleteWalletApiAdminApiHandler.execute(walletId);
     }
 
     @Override
+    @Secured({ApiRolesV2.ADMIN_ROLE})
     public ResponseEntity<WalletResponsePayloadV2> adminGetWalletById(@NonNull String walletId) {
         return getWalletByIdAdminApiHandler.execute(walletId);
     }
 
     @Override
+    @Secured({ApiRolesV2.ADMIN_ROLE})
     public ResponseEntity<ListWalletsResponsePayloadV2> adminGetWallets(Integer page, Integer perPage) {
         return getWalletsAdminApiHandler.execute(page, perPage);
     }
 
     @Override
+    @Secured({ApiRolesV2.ADMIN_ROLE})
     public ResponseEntity<UpdateWalletResponsePayloadV2> adminUpdateWallet(@NonNull UpdateWalletRequestPayloadV2 updateWalletRequestPayloadV2) {
         return putWalletAdminApiHandler.execute(updateWalletRequestPayloadV2);
     }
 
     @Override
+    @Secured({ApiRolesV2.ADMIN_ROLE})
     public ResponseEntity<Map<String, Object>> adminCreateVerifiableCredential(Map<String, Object> requestBody) {
         return postVerifiableCredentialAdminApiHandler.execute(requestBody);
     }
 
     @Override
+    @Secured({ApiRolesV2.ADMIN_ROLE})
     public ResponseEntity<Map<String, Object>> adminGetVerifiableCredentialById(String verifiableCredentialId) {
         return getVerifiableCredentialByIdAdminApiHandler.execute(verifiableCredentialId);
     }
 
     @Override
+    @Secured({ApiRolesV2.ADMIN_ROLE})
     public ResponseEntity<Void> adminDeleteVerifiableCredentialById(String verifiableCredentialId) {
         return deleteVerifiableCredentialByIdAdminApiHandler.execute(verifiableCredentialId);
     }
 
     @Override
+    @Secured({ApiRolesV2.ADMIN_ROLE})
     public ResponseEntity<VerifiableCredentialListResponsePayloadV2> adminGetVerifiableCredentials
             (Integer page, Integer perPage, String id, String type, String issuer, String holder) {
         return getVerifiableCredentialsAdminApiHandler.execute(page, perPage, id, type, issuer, holder);

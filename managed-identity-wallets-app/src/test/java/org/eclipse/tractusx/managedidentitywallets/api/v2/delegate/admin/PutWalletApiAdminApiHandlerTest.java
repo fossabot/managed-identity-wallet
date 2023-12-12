@@ -21,15 +21,22 @@
 
 package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
 
+import io.restassured.http.Header;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.ApiRolesV2;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.query.WalletQuery;
+import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.CreateWalletRequestPayloadV2;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.UpdateWalletRequestPayloadV2;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestAuthV2Util;
 import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
+import java.util.UUID;
 
 import static io.restassured.RestAssured.given;
 
@@ -41,9 +48,11 @@ public class PutWalletApiAdminApiHandlerTest extends RestAssuredTestCase {
     @Autowired
     private TestPersistenceUtil persistenceUtil;
 
-    @Test
-    public void testPutWalletAdminApiSuccess() {
+    @Autowired
+    public TestAuthV2Util testAuthV2Util;
 
+    @Test
+    public void testUnauthorizedAccess() {
         final Wallet wallet = persistenceUtil.newWalletPersisted();
         final UpdateWalletRequestPayloadV2 payload = new UpdateWalletRequestPayloadV2();
         payload.id(wallet.getWalletId().getText());
@@ -55,11 +64,69 @@ public class PutWalletApiAdminApiHandlerTest extends RestAssuredTestCase {
                 .when()
                 .put("/api/v2/admin/wallets")
                 .then()
+                .statusCode(401);
+    }
+
+    @Test
+    public void testSuccessfulAccess() {
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
+        final UpdateWalletRequestPayloadV2 payload = new UpdateWalletRequestPayloadV2();
+        payload.id(wallet.getWalletId().getText());
+        payload.name("foo");
+
+        final Header auth_admin = testAuthV2Util.getAuthHeader(List.of(ApiRolesV2.ADMIN));
+
+        given()
+                .header(auth_admin)
+                .contentType("application/json")
+                .body(payload)
+                .when()
+                .put("/api/v2/admin/wallets")
+                .then()
+                .statusCode(201);
+    }
+
+    @Test
+    public void testForbiddenAccess() {
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
+        final UpdateWalletRequestPayloadV2 payload = new UpdateWalletRequestPayloadV2();
+        payload.id(wallet.getWalletId().getText());
+        payload.name("foo");
+
+        final Header auth_foo = testAuthV2Util.getAuthHeader(List.of("FOO"));
+
+        given()
+                .header(auth_foo)
+                .contentType("application/json")
+                .body(payload)
+                .when()
+                .put("/api/v2/admin/wallets")
+                .then()
+                .statusCode(403);
+    }
+
+    @Test
+    public void testPutWalletAdminApiSuccess() {
+
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
+        final UpdateWalletRequestPayloadV2 payload = new UpdateWalletRequestPayloadV2();
+        payload.id(wallet.getWalletId().getText());
+        payload.name("foo");
+
+        final Header auth_admin = testAuthV2Util.getAuthHeader(List.of(ApiRolesV2.ADMIN));
+        given()
+                .header(auth_admin)
+                .contentType("application/json")
+                .body(payload)
+                .when()
+                .put("/api/v2/admin/wallets")
+                .then()
                 .log().all()
                 .statusCode(202);
 
         payload.id("foo"); // non-existing wallet
         given()
+                .header(auth_admin)
                 .contentType("application/json")
                 .body(payload)
                 .when()

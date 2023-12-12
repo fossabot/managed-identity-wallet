@@ -40,7 +40,6 @@ import java.util.Optional;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-@Secured("ROLE_MIW_ADMIN")
 class PostVerifiableCredentialAdminApiHandler extends AbstractApiHandler {
 
     private final VerifiableCredentialsMapper verifiableCredentialsMapper;

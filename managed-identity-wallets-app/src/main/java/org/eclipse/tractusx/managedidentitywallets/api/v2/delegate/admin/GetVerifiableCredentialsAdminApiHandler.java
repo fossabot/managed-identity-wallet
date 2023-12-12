@@ -45,7 +45,6 @@ import java.util.Optional;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-@Secured("ROLE_MIW_ADMIN")
 class GetVerifiableCredentialsAdminApiHandler extends AbstractApiHandler {
 
     private final VerifiableCredentialService verifiableCredentialService;

@@ -21,11 +21,17 @@
 
 package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.admin;
 
+import io.restassured.http.Header;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.ApiRolesV2;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestAuthV2Util;
 import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
+import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.equalTo;
 
@@ -34,12 +40,53 @@ public class GetWalletsAdminApiHandlerTest extends RestAssuredTestCase {
     @Autowired
     private TestPersistenceUtil persistenceUtil;
 
+    @Autowired
+    public TestAuthV2Util testAuthV2Util;
+
     @Test
-    public void testGetWalletByIdAdminApiSuccess() {
+    public void testUnauthorizedAccess() {
+        when()
+                .get("/api/v2/admin/wallets")
+                .then()
+                .statusCode(401);
+    }
+
+    @Test
+    public void testSuccessfulAccess() {
+        final Header auth_admin = testAuthV2Util.getAuthHeader(List.of(ApiRolesV2.ADMIN));
+
+        given()
+                .header(auth_admin)
+                .when()
+                .get("/api/v2/admin/wallets")
+                .then()
+                .statusCode(200);
+    }
+
+    @Test
+    public void testForbiddenAccess() {
+        final Header auth_foo = testAuthV2Util.getAuthHeader(List.of("FOO"));
+
+        given()
+                .header(auth_foo)
+                .when()
+                .get("/api/v2/admin/wallets")
+                .then()
+                .statusCode(403);
+    }
+
+
+    @Test
+    public void testGetWalletsAdminPaging() {
         persistenceUtil.newWalletPersisted();
         persistenceUtil.newWalletPersisted();
 
-        when()
+
+        final Header auth_admin = testAuthV2Util.getAuthHeader(List.of(ApiRolesV2.ADMIN));
+
+        given()
+                .header(auth_admin)
+                .when()
                 .get("/api/v2/admin/wallets?page=0&per_page=1")
                 .then()
                 .statusCode(200)

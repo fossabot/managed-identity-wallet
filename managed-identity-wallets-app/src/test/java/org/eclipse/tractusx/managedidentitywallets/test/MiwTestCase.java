@@ -64,6 +64,7 @@ public abstract class MiwTestCase {
     @DynamicPropertySource
     static void keycloakProperties(DynamicPropertyRegistry registry) {
         registry.add("miw.security.auth-server-url", KEYCLOAK_CONTAINER::getAuthServerUrl);
+        registry.add("miw.security.realm", () -> "miw_test");
         registry.add("miw.security.clientId", () -> "miw_private_client");
         registry.add("miw.security.auth-url", () -> "${miw.security.auth-server-url}realms/${miw.security.realm}/protocol/openid-connect/auth");
         registry.add("miw.security.token-url", () -> "${miw.security.auth-server-url}realms/${miw.security.realm}/protocol/openid-connect/token");

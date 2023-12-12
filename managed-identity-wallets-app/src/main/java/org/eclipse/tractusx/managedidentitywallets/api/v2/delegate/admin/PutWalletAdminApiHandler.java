@@ -42,7 +42,6 @@ import java.util.Optional;
 @Component
 @Slf4j
 @RequiredArgsConstructor
-@Secured("ROLE_MIW_ADMIN")
 class PutWalletAdminApiHandler extends AbstractApiHandler {
 
     private final ApiV2Mapper apiMapper;
