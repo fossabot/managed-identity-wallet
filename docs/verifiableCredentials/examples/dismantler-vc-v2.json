@@ -1,0 +1,34 @@
+{
+  "issuanceDate": "2023-11-07T11:39:08Z",
+  "credentialSubject": [
+    {
+      "holderIdentifier": "BPNL000000000000",
+      "allowedVehicleBrands": [
+        "Alpina",
+        "Alfa Romeo"
+      ],
+      "id": "did:web:managed-identity-wallets-alpha.dev.demo.catena-x.net:BPNL000000000000",
+      "type": "DismantlerCredential",
+      "activityType": "vehicleDismantle"
+    }
+  ],
+  "id": "did:web:managed-identity-wallets-alpha.dev.demo.catena-x.net:BPNL000000000000#bbf15159-6809-4167-8c3f-704829b4b4f9",
+  "proof": {
+    "proofPurpose": "assertionMethod",
+    "verificationMethod": "did:web:managed-identity-wallets-alpha.dev.demo.catena-x.net:BPNL000000000000#b143b76d-0d42-44d0-9d1a-65ab0ca1dda6",
+    "type": "JsonWebSignature2020",
+    "created": "2023-11-07T11:39:08Z",
+    "jws": "eyJhbGciOiJFZERTQSJ9..gvxDwWrFHkeqJ7hRIzI2Tj0LdbsZE2wG9TyiRWEvI_wUpiD1O89-L3qBB5l8zdfHexsSU7dxGVRkI6UOxVi3DQ"
+  },
+  "type": [
+    "VerifiableCredential",
+    "DismantlerCredential"
+  ],
+  "@context": [
+    "https://www.w3.org/2018/credentials/v1",
+    "https://catenax-ng.github.io/product-core-schemas/businessPartnerData.json",
+    "https://w3id.org/security/suites/jws-2020/v1"
+  ],
+  "issuer": "did:web:managed-identity-wallets-alpha.dev.demo.catena-x.net:BPNL000000000000",
+  "expirationDate": "2023-12-31T00:00:00Z"
+}

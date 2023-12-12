@@ -28,6 +28,7 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 
 @Data
@@ -35,13 +36,14 @@ import lombok.NoArgsConstructor;
 @EqualsAndHashCode(of = "type", callSuper = false)
 @Entity(name= VerifiableCredentialTypeEntity.TABLE_NAME)
 @Table(name = VerifiableCredentialTypeEntity.TABLE_NAME)
+@ToString
 public class VerifiableCredentialTypeEntity extends AbstractEntity {
 
     public static final String TABLE_NAME = "verifiable_credential_type";
-
     public static final String COLUMN_TYPE = "type";
 
     @Id
+    @ToString.Include
     @Column(name = COLUMN_TYPE, nullable = false)
     private String type;
 }

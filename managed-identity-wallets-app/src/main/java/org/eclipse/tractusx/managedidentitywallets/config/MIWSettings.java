@@ -21,6 +21,7 @@
 
 package org.eclipse.tractusx.managedidentitywallets.config;
 
+import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -32,13 +33,32 @@ import java.util.Set;
 /**
  * The type Miw settings.
  */
-@ConfigurationProperties(prefix = "miw")
-public record MIWSettings(String host, String encryptionKey, String authorityWalletBpn, String authorityWalletDid,
-                          String authorityWalletName,
-                          List<URI> vcContexts, List<URI> summaryVcContexts,
-                          @DateTimeFormat(pattern = "dd-MM-yyyy") Date vcExpiryDate,
-                          Set<String> supportedFrameworkVCTypes,
-                          boolean enforceHttps, String contractTemplatesUrl,
-                          List<URI> didDocumentContextUrls,
-                          int apiDefaultPageSize) {
+@Data
+@ConfigurationProperties("miw")
+public class MIWSettings {
+
+    private String host;
+
+    private String encryptionKey;
+
+    private String authorityWalletBpn;
+
+    private String authorityWalletDid;
+
+    private String authorityWalletName;
+
+    private List<URI> vcContexts;
+
+    @DateTimeFormat(pattern = "dd-MM-yyyy")
+    private Date vcExpiryDate;
+
+    private Set<String> supportedFrameworkVCTypes;
+
+    private boolean enforceHttps;
+
+    private String contractTemplatesUrl;
+
+    private List<URI> didDocumentContextUrls;
+
+    private int apiDefaultPageSize;
 }

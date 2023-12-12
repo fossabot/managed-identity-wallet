@@ -31,7 +31,6 @@ import io.swagger.v3.oas.models.security.SecurityRequirement;
 import io.swagger.v3.oas.models.security.SecurityScheme;
 import lombok.AllArgsConstructor;
 import org.eclipse.tractusx.managedidentitywallets.config.security.SecurityConfigProperties;
-import org.springdoc.core.models.GroupedOpenApi;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
@@ -76,20 +75,6 @@ public class OpenApiConfig {
             openAPI = enableSecurity(openAPI);
         }
         return openAPI.info(info);
-    }
-
-    /**
-     * Open api definition grouped open api.
-     *
-     * @return the grouped open api
-     */
-    @Bean
-    public GroupedOpenApi openApiDefinition() {
-        return GroupedOpenApi.builder()
-                .group("docs")
-                .pathsToMatch("/**")
-                .displayName("Docs")
-                .build();
     }
 
     private OpenAPI enableSecurity(OpenAPI openAPI) {

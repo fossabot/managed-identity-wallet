@@ -7,5 +7,7 @@ include ':managed-identity-wallets-client-rest-assured-v1'
 include ':managed-identity-wallets-client-rest-assured-v2'
 include ':managed-identity-wallets-client-resttemplate-v1'
 include ':managed-identity-wallets-client-resttemplate-v2'
+include ':managed-identity-wallets-markdown-v1'
+include ':managed-identity-wallets-markdown-v2'
 
 rootProject.name = 'managedidentitywallets'

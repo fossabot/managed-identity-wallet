@@ -28,10 +28,18 @@ spring:
           #Issuer-uri indicates the iss claims from jwt token
           issuer-uri: ${miw.security.auth-server-url}/realms/${miw.security.realm}
           jwk-set-uri: ${miw.security.auth-server-url}/realms/${miw.security.realm}/protocol/openid-connect/certs
+  cloud:
+    vault:
+      enabled: false
 
 ## only needed if you want to enable API doc
 springdoc:
   swagger-ui:
+    urls:
+      - name: v1
+        url: openapi_v1.yaml
+      - name: v2
+        url: openapi_v2.yaml
     oauth:
       clientId: ${KEYCLOAK_MIW_PUBLIC_CLIENT} #It should be public client created in keycloak
     disable-swagger-default-url: true
@@ -77,14 +85,27 @@ miw:
   authorityWalletBpn: ${AUTHORITY_WALLET_BPN:BPNL000000000000}
   authorityWalletName: ${AUTHORITY_WALLET_NAME:Catena-X}
   authorityWalletDid: ${AUTHORITY_WALLET_DID:did:web:localhost:BPNL000000000000}
-  vcContexts: ${VC_SCHEMA_LINK:https://www.w3.org/2018/credentials/v1, https://catenax-ng.github.io/product-core-schemas/businessPartnerData.json}
-  summaryVcContexts: ${SUMMARY_VC_SCHEMA_LINK:https://www.w3.org/2018/credentials/v1, https://catenax-ng.github.io/product-core-schemas/SummaryVC.json}
-  vcExpiryDate: ${VC_EXPIRY_DATE:01-10-2023} #dd-MM-yyyy ie.  01-01-2025 expiry date will be 2024-12-31T18:30:00Z in VC
+  vcContexts: ${VC_SCHEMA_LINK:https://www.w3.org/2018/credentials/v1}
+  vcExpiryDate: ${VC_EXPIRY_DATE:01-01-2024} #dd-MM-yyyy ie.  01-01-2025 expiry date will be 2024-12-31T18:30:00Z in VC
   supportedFrameworkVCTypes: ${SUPPORTED_FRAMEWORK_VC_TYPES:PcfCredential, SustainabilityCredential, QualityCredential, TraceabilityCredential, BehaviorTwinCredential, ResiliencyCredential}
   enforceHttps: ${ENFORCE_HTTPS_IN_DID_RESOLUTION:true}
   contractTemplatesUrl: ${CONTRACT_TEMPLATES_URL:https://public.catena-x.org/contracts/}
   didDocumentContextUrls: ${DID_DOCUMENT_CONTEXT_URL:https://www.w3.org/ns/did/v1,https://w3c.github.io/vc-jws-2020/contexts/v1}
   apiDefaultPageSize: 10
+  health:
+    checkAuthorityKeyReachable: true
+    checkSpecialCredentialIssuable: true
+  cron:
+    updateSummaryVerifiableCredentials: ${CRON_UPDATE_SUMMARY_VC:0 0 * * * *}
+  verifiable:
+    credential:
+      contexts:
+        useEmbeddedContexts: ${USE_EMBEDDED_CONTEXTS:true}
+        summaryCredential: ${SUMMARY_VC_SCHEMA_LINK:https://catenax-ng.github.io/product-core-schemas/SummaryVC.json}
+        membershipCredential: ${SUPPORTED_FRAMEWORK_VC_TYPES:https://catenax-ng.github.io/product-core-schemas/businessPartnerData.json}
+        businessPartnerNumberCredential: ${SUPPORTED_FRAMEWORK_VC_TYPES:https://raw.githubusercontent.com/catenax-ng/product-core-schemas/main/bpn-credential-v2.json}
+        frameworkCredential: ${SUPPORTED_FRAMEWORK_VC_TYPES:https://raw.githubusercontent.com/catenax-ng/product-core-schemas/main/framework-credential-v2.json}
+        dismantlerCredential: ${SUPPORTED_FRAMEWORK_VC_TYPES:https://raw.githubusercontent.com/catenax-ng/product-core-schemas/main/dismantler-credential-v2.json}
   security:
     enabled: true
     realm: ${KEYCLOAK_REALM:miw_test}

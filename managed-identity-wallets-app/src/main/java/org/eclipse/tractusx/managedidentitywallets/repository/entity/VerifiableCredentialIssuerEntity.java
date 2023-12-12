@@ -28,19 +28,21 @@ import jakarta.persistence.Table;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(of = "issuer", callSuper = false)
 @Entity(name= VerifiableCredentialIssuerEntity.TABLE_NAME)
 @Table(name = VerifiableCredentialIssuerEntity.TABLE_NAME)
+@ToString
 public class VerifiableCredentialIssuerEntity extends AbstractEntity {
 
     public static final String TABLE_NAME = "verifiable_credential_issuer";
-
     public static final String COLUMN_ISSUER = "issuer";
 
     @Id
+    @ToString.Include
     @Column(name = COLUMN_ISSUER, nullable = false)
     private String issuer;
 }

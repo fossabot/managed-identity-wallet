@@ -60,7 +60,7 @@ openApiGenerate {
     /* for more libraries see https://github.com/OpenAPITools/openapi-generator/blob/master/docs/generators/java.md */
     library.set("resttemplate")
 
-    inputSpec.set("$rootDir/docs/openapi/v2/openapi_v2.yaml")
+    inputSpec.set("$rootDir/managed-identity-wallets-app/src/main/resources/static/openapi_v2.yaml")
     outputDir.set("$buildDir/generated/openapi")
 
     invokerPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.v2.client")

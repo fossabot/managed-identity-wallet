@@ -22,7 +22,7 @@
 package org.eclipse.tractusx.managedidentitywallets.repository.map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.eclipse.tractusx.managedidentitywallets.exceptions.MappingException;
+import org.eclipse.tractusx.managedidentitywallets.exception.MappingException;
 
 public abstract class AbstractMap<TIn, TOut> {
 

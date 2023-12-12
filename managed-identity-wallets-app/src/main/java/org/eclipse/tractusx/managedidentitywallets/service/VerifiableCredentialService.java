@@ -24,21 +24,25 @@ package org.eclipse.tractusx.managedidentitywallets.service;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.annotations.IsJsonLdValid;
+import org.eclipse.tractusx.managedidentitywallets.annotations.IsSignatureValid;
 import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialCreatedEvent;
 import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialCreatingEvent;
 import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialDeletedEvent;
 import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialDeletingEvent;
-import org.eclipse.tractusx.managedidentitywallets.exceptions.VerifiableCredentialAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
-import org.eclipse.tractusx.managedidentitywallets.repository.VerifiableCredentialRepository;
-import org.eclipse.tractusx.managedidentitywallets.repository.query.VerifiableCredentialQuery;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.VerifiableCredentialRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationUtils;
+import org.springframework.validation.annotation.Validated;
 
 import java.util.List;
 import java.util.Optional;
@@ -46,16 +50,36 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 @Slf4j
+@Validated
 public class VerifiableCredentialService {
 
     private final VerifiableCredentialRepository verifiableCredentialRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
 
-    public Optional<VerifiableCredential> findById(@NonNull VerifiableCredentialId id) {
+    public Optional<VerifiableCredential> findById(@NonNull final VerifiableCredentialId id) {
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
                 .verifiableCredentialId(id)
                 .build();
         return verifiableCredentialRepository.findOne(query);
+    }
+
+    public Optional<VerifiableCredential> findOne(@NonNull final VerifiableCredentialQuery query) {
+        return verifiableCredentialRepository.findOne(query);
+    }
+
+    public boolean existsById(@NonNull final VerifiableCredentialId id) {
+        final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
+                .verifiableCredentialId(id)
+                .build();
+        return findOne(query).isPresent();
+    }
+
+    public boolean exists(@NonNull final VerifiableCredentialQuery query) {
+        return findOne(query).isPresent();
+    }
+
+    public Page<VerifiableCredential> findAll(VerifiableCredentialQuery query) {
+        return findAll(query, 0, Integer.MAX_VALUE);
     }
 
     public Page<VerifiableCredential> findAll(int page, int size) {
@@ -63,21 +87,29 @@ public class VerifiableCredentialService {
         return findAll(query, page, size);
     }
 
+    public Page<VerifiableCredential> findAll(int page, int size, Sort sort) {
+        final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder().build();
+        return findAll(query, page, size, sort);
+    }
+
     public Page<VerifiableCredential> findAll(@NonNull VerifiableCredentialQuery query, int page, int size) {
-        final Pageable pageable = Pageable.ofSize(size).withPage(page);
+        return findAll(query, page, size, Sort.unsorted());
+    }
+
+    public Page<VerifiableCredential> findAll(@NonNull VerifiableCredentialQuery query, int page, int size, Sort sort) {
+        final Pageable pageable = PageRequest.of(page, size, sort);
         return verifiableCredentialRepository.findAll(query, pageable);
     }
 
-    public void create(@NonNull VerifiableCredential verifiableCredential)
-            throws VerifiableCredentialAlreadyExistsException {
-        applicationEventPublisher.publishEvent(new VerifiableCredentialCreatingEvent(verifiableCredential));
+    public void create(@IsSignatureValid @IsJsonLdValid @NonNull VerifiableCredential verifiableCredential) {
         verifiableCredentialRepository.create(verifiableCredential);
+        applicationEventPublisher.publishEvent(new VerifiableCredentialCreatingEvent(verifiableCredential));
         afterCommit(() -> applicationEventPublisher.publishEvent(new VerifiableCredentialCreatedEvent(verifiableCredential)));
     }
 
     public void delete(@NonNull VerifiableCredential verifiableCredential) {
-        applicationEventPublisher.publishEvent(new VerifiableCredentialDeletingEvent(verifiableCredential));
         verifiableCredentialRepository.delete(verifiableCredential);
+        applicationEventPublisher.publishEvent(new VerifiableCredentialDeletingEvent(verifiableCredential));
         afterCommit(() -> applicationEventPublisher.publishEvent(new VerifiableCredentialDeletedEvent(verifiableCredential)));
     }
 

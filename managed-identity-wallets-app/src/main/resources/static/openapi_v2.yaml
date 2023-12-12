@@ -1,0 +1,805 @@
+openapi: 3.0.0
+info:
+  title: Verifiable Credentials API
+  version: 2.0.0
+  description: An API for managing Verifiable Credentials and DID Documents.
+
+servers:
+  - url: /api/v2
+
+paths:
+
+  /wallet:
+    get:
+      operationId: userGetWallet
+      tags:
+        - User
+      summary: Get Wallet
+      description: Retrieves wallet information.
+      responses:
+        '200':
+          description: Successful response with wallet information.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletResponsePayload'
+
+  /verifiable-credentials:
+    get:
+      operationId: userGetVerifiableCredentials
+      tags:
+        - User
+      summary: Get Verifiable Credentials
+      description: Retrieves a list of Verifiable Credentials from the wallet.
+      parameters:
+        - $ref: '#/components/parameters/Query_Page'
+        - $ref: '#/components/parameters/Query_Per_Page'
+        - $ref: '#/components/parameters/Query_Verifiable_Credential_Type'
+        - $ref: '#/components/parameters/Query_Verifiable_Credential_Issuer'
+      responses:
+        '200':
+          description: Successful response with Verifiable Credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifiableCredentialListResponsePayload'
+    post:
+      operationId: userCreateVerifiableCredential
+      tags:
+        - User
+      summary: Create Verifiable Credential
+      description: Stores the Verifiable Credential in the wallet.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVerifiableCredentialRequestPayload'
+      responses:
+        '201':
+          description: Verifiable Credential stored successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateVerifiableCredentialResponsePayload'
+        '400':
+          description: Bad request.
+
+  /verifiable-credentials/{verifiableCredentialId}:
+    get:
+      operationId: userGetVerifiableCredentialById
+      tags:
+        - User
+      summary: Get Verifiable Credential by ID
+      description: Retrieves a verifiable credential from the wallet by ID.
+      parameters:
+        - $ref: '#/components/parameters/Path_Verifiable_Credential_Id'
+      responses:
+        '200':
+          description: Successful response with the requested verifiable credential.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifiableCredentialResponsePayload'
+        '404':
+          description: Verifiable credential not found.
+    delete:
+      operationId: userDeleteVerifiableCredentialById
+      tags:
+        - User
+      summary: Delete Verifiable Credential
+      description: Removes Verifiable Credential from the wallet by ID.
+      parameters:
+        - $ref: '#/components/parameters/Path_Verifiable_Credential_Id'
+      responses:
+        '204':
+          description: Verifiable Credential deleted successfully.
+        '404':
+          description: Verifiable Credential not found.
+
+  /signed-verifiable-presentations:
+    post:
+      operationId: userIssuedVerifiablePresentation
+      tags:
+        - User
+      summary: Issue Verifiable Presentation
+      description: Issues a new Verifiable Presentation.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssueVerifiablePresentationRequestPayload'
+      responses:
+        '200':
+          description: Verifiable Presentation issued successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssueVerifiablePresentationResponsePayload'
+        '400':
+          description: Bad request.
+
+  /signed-verifiable-presentations/jwt:
+    post:
+      operationId: userIssuedVerifiablePresentationJwt
+      tags:
+        - User
+      summary: Issue Verifiable Presentation as JWT
+      description: Issues a new Verifiable Presentation as JWT.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssueVerifiablePresentationJwtRequestPayload'
+      responses:
+        '200':
+          description: Verifiable Presentation issued successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssueVerifiablePresentationJwtResponsePayload'
+        '400':
+          description: Bad request.
+
+  /signed-verifiable-credentials:
+    get:
+      operationId: userGetIssuedVerifiableCredentials
+      tags:
+        - User
+      summary: Get Issued Verifiable Credentials
+      description: Retrieves a list of issued Verifiable Credentials. These Verifiable Credentials may or may not be stored in the wallet.
+      parameters:
+        - $ref: '#/components/parameters/Query_Page'
+        - $ref: '#/components/parameters/Query_Per_Page'
+        - $ref: '#/components/parameters/Query_Verifiable_Credential_Type'
+      responses:
+        '200':
+          description: Successful response with Verifiable Credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifiableCredentialListResponsePayload'
+    post:
+      operationId: userIssuedVerifiableCredential
+      tags:
+        - User
+      summary: Issue Verifiable Credential
+      description: Issues a new Verifiable Credential.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/IssueVerifiableCredentialRequestPayload'
+      responses:
+        '200':
+          description: Verifiable Credential issued successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/IssueVerifiableCredentialResponsePayload'
+        '400':
+          description: Bad request.
+
+  /verifiable-credentials-validation:
+    post:
+      tags:
+        - User
+      summary: Validate Verifiable Credential
+      description: Validates a Verifiable Credential
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidateVerifiableCredentialRequestPayload'
+      responses:
+        '200':
+          description: Verifiable Credential Validation Result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidateVerifiableCredentialResponsePayload'
+        '400':
+          description: Bad Request.
+
+  /verifiable-presentation-validation:
+    post:
+      tags:
+        - User
+      summary: Validate Verifiable Presentation
+      description: Validates a Verifiable Presentation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidateVerifiablePresentationRequestPayload'
+      responses:
+        '200':
+          description: Verifiable Presentation Validation Result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidateVerifiablePresentationResponsePayload'
+        '400':
+          description: Bad Request.
+
+  /verifiable-presentation-jwt-validation:
+    post:
+      tags:
+        - User
+      summary: Validate Verifiable JWT Presentation
+      description: Validates a Verifiable JWT Presentation
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ValidateVerifiablePresentationJwtRequestPayload'
+      responses:
+        '200':
+          description: Verifiable Presentation Validation Result
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ValidateVerifiablePresentationJwtResponsePayload'
+        '400':
+          description: Bad Request.
+
+  /admin/wallets:
+    get:
+      operationId: adminGetWallets
+      tags:
+        - Administrator
+      summary: Get All Wallets
+      parameters:
+        - $ref: '#/components/parameters/Query_Page'
+        - $ref: '#/components/parameters/Query_Per_Page'
+      description: Retrieves a list of wallets.
+      responses:
+        '200':
+          description: Successful response with a list of wallets.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ListWalletsResponsePayload'
+    post:
+      operationId: adminCreateWallet
+      tags:
+        - Administrator
+      summary: Create Wallet for User
+      description: Creates a wallet for a user.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateWalletRequestPayload'
+      responses:
+        '201':
+          description: Wallet created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateWalletResponsePayload'
+        '409':
+          description: Wallet already exists.
+        '400':
+          description: Bad request.
+    put:
+      operationId: adminUpdateWallet
+      tags:
+        - Administrator
+      summary: Update Wallet for User
+      description: Updates a wallet for a user by user ID.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateWalletRequestPayload'
+      responses:
+        '202':
+          description: Wallet updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UpdateWalletResponsePayload'
+        '400':
+          description: Bad request.
+
+  /admin/wallets/{walletId}:
+    get:
+      operationId: adminGetWalletById
+      tags:
+        - Administrator
+      summary: Get Wallet for User
+      description: Retrieves a wallet for a user by user ID.
+      parameters:
+        - $ref: '#/components/parameters/Path_Wallet_Id'
+      responses:
+        '200':
+          description: Successful response with the requested wallet.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/WalletResponsePayload'
+        '404':
+          description: Wallet not found.
+    delete:
+      operationId: adminDeleteWalletById
+      tags:
+        - Administrator
+      summary: Delete Wallet for User
+      description: Deletes a wallet for by wallet ID.
+      parameters:
+        - $ref: '#/components/parameters/Path_Wallet_Id'
+      responses:
+        '204':
+          description: Wallet deleted.
+
+  /admin/verifiable-credentials:
+    get:
+      operationId: adminGetVerifiableCredentials
+      tags:
+        - Administrator
+      summary: Get Verifiable Credentials
+      description: Retrieves a list of verifiable credentials
+      parameters:
+        - $ref: '#/components/parameters/Query_Page'
+        - $ref: '#/components/parameters/Query_Per_Page'
+        - $ref: '#/components/parameters/Query_Verifiable_Credential_Id'
+        - $ref: '#/components/parameters/Query_Verifiable_Credential_Type'
+        - $ref: '#/components/parameters/Query_Verifiable_Credential_Issuer'
+        - $ref: '#/components/parameters/Query_Verifiable_Credential_Holder'
+      responses:
+        '200':
+          description: Successful response with a list of verifiable credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifiableCredentialListResponsePayload'
+    post:
+      operationId: adminCreateVerifiableCredential
+      tags:
+        - Administrator
+      summary: Create Verifiable Credential
+      description: Creates a verifiable credential
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CreateVerifiableCredentialRequestPayload'
+      responses:
+        '201':
+          description: Verifiable credential created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateVerifiableCredentialResponsePayload'
+        '400':
+          description: Bad request.
+
+  /admin/verifiable-credentials/{verifiableCredentialId}:
+    get:
+      operationId: adminGetVerifiableCredentialById
+      tags:
+        - Administrator
+      summary: Get Verifiable Credentials by Id
+      description: Retrieves a list of verifiable credentials for a user by user ID.
+      parameters:
+        - $ref: '#/components/parameters/Path_Verifiable_Credential_Id'
+      responses:
+        '200':
+          description: Successful response with a verifiable credentials.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/VerifiableCredentialResponsePayload'
+        '404':
+          description: Verifiable credential not found.
+    delete:
+      operationId: adminDeleteVerifiableCredentialById
+      tags:
+        - Administrator
+      summary: Delete Verifiable Credential
+      description: Deletes a verifiable credential
+      parameters:
+        - $ref: '#/components/parameters/Path_Verifiable_Credential_Id'
+      responses:
+        '204':
+          description: Verifiable credential deleted successfully.
+        '404':
+          description: Verifiable credential not found.
+
+components:
+  parameters:
+    Path_Wallet_Id:
+      name: walletId
+      in: path
+      required: true
+      description: The ID of the wallet.
+      schema:
+        type: string
+    Path_Verifiable_Credential_Id:
+      name: verifiableCredentialId
+      in: path
+      required: true
+      description: The ID of the verifiable credential.
+      schema:
+        type: string
+    Query_Page:
+      name: page
+      in: query
+      required: false
+      description: The page to return
+      schema:
+        type: integer
+        minimum: 0
+    Query_Per_Page:
+      name: per_page
+      in: query
+      required: false
+      description: The maximum number of items to return per page
+      schema:
+        type: integer
+        minimum: 1
+    Query_Verifiable_Credential_Id:
+      name: id
+      in: query
+      required: false
+      description: Verifiable Credential ID
+      schema:
+        type: string
+    Query_Verifiable_Credential_Type:
+      name: type
+      in: query
+      required: false
+      description: Verifiable Credential Type
+      schema:
+        type: string
+    Query_Verifiable_Credential_Issuer:
+      name: issuer
+      in: query
+      required: false
+      description: Verifiable Credential Issuer
+      schema:
+        type: string
+    Query_Verifiable_Credential_Holder:
+      name: holder
+      in: query
+      required: false
+      description: Verifiable Credential ID
+      schema:
+        type: string
+
+  schemas:
+    Page:
+      type: object
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          description: The current page number.
+        size:
+          type: integer
+          minimum: 0
+          description: The number of items in the current page.
+        totalElements:
+          type: integer
+          format: int64
+          minimum: 0
+          description: The total number of items.
+    VerifiableCredentialIdList:
+      description: List of Verifiable Credential IDs
+      type: array
+      items:
+        description: Verifiable Credential ID
+        type: string
+    ListWalletsResponsePayload:
+      allOf:
+        - $ref: '#/components/schemas/Page'
+        - type: object
+          properties:
+            items:
+              type: array
+              items:
+                $ref: '#/components/schemas/Wallet'
+    WalletResponsePayload:
+      allOf:
+        - $ref: '#/components/schemas/Wallet'
+    CreateWalletResponsePayload:
+      allOf:
+        - $ref: '#/components/schemas/Wallet'
+    CreateWalletRequestPayload:
+      properties:
+        id:
+          type: string
+          description: The ID of the wallet.
+        name:
+          type: string
+          description: The name of the wallet.
+    UpdateWalletRequestPayload:
+      properties:
+        id:
+          type: string
+          description: The ID of the wallet.
+        name:
+          type: string
+          description: The name of the wallet.
+    UpdateWalletResponsePayload:
+      allOf:
+        - $ref: '#/components/schemas/Wallet'
+    ListVerifiableCredentialResponsePayload:
+      type: array
+      items:
+        description: key value map
+        type: object
+        additionalProperties: true
+    CreateVerifiableCredentialResponsePayload:
+      description: key value map
+      type: object
+      additionalProperties: true
+    CreateVerifiableCredentialRequestPayload:
+      description: key value map
+      type: object
+      additionalProperties: true
+    VerifiableCredentialListResponsePayload:
+      description: key value map
+      type: object
+      properties:
+        page:
+          type: integer
+          minimum: 1
+          description: The current page number.
+        size:
+          type: integer
+          minimum: 0
+          description: The number of items in the current page.
+        totalElements:
+          type: integer
+          format: int64
+          minimum: 0
+          description: The total number of items.
+        items:
+          type: array
+          items:
+            description: key value map
+            type: object
+            additionalProperties: true
+    VerifiableCredentialValidationResponsePayload:
+      description: key value map
+      type: object
+      properties:
+        isValid:
+          type: boolean
+          description: Whether the Verifiable Credential is valid.
+        verifiable-credential:
+          description: Verifiable Credential
+          type: object
+          additionalProperties: true
+    VerifiablePresentationValidationResponsePayload:
+      description: key value map
+      type: object
+      properties:
+        isValid:
+          type: boolean
+          description: Whether the Verifiable Presentation is valid.
+        verifiable-credential:
+          description: Verifiable Presentation
+          type: object
+          additionalProperties: true
+    VerifiableCredentialResponsePayload:
+      description: key value map
+      type: object
+      additionalProperties: true
+    WalletKey:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the key.
+        didFragment:
+          type: string
+          description: The DID fragment of the key.
+        created:
+          type: string
+          format: date-time
+          description: The date and time the key was created.
+    Wallet:
+      type: object
+      properties:
+        id:
+          type: string
+          description: The ID of the wallet.
+        name:
+          type: string
+          description: The name of the wallet.
+        keys:
+          type: array
+          items:
+            $ref: '#/components/schemas/WalletKey'
+        created:
+          type: string
+          format: date-time
+          description: The date and time the wallet was created.
+    VerifiableCredential:
+      description: key value map
+      type: object
+      additionalProperties: true
+    VerifiablePresentation:
+      description: key value map
+      type: object
+      additionalProperties: true
+    IssueVerifiableCredentialRequestPayload:
+      description: Verifiable Credential Request Payload
+      type: object
+      required: [ subject ]
+      properties:
+        verifiableCredentialSubject:
+          description: Verifiable Credential Subject
+          type: object
+          additionalProperties: true
+        additionalVerifiableCredentialTypes:
+          description: Verifiable Credential types to include
+          type: array
+          items:
+            type: string
+        additionalVerifiableCredentialContexts:
+          description: Json-LD contexts to include
+          type: array
+          items:
+            type: string
+        expirationDate:
+          description: Verifiable Credential Expiration Date
+          type: string
+          format: date-time
+    IssueVerifiableCredentialResponsePayload:
+      description: key value map
+      type: object
+      additionalProperties: true
+    IssueVerifiablePresentationRequestPayload:
+      description: Verifiable Credential Request Payload
+      type: object
+      required: [ verifiableCredentials ]
+      properties:
+        verifiableCredentials:
+          description: Verifiable Credentials
+          type: array
+          items:
+            description: key value map
+            type: object
+            additionalProperties: true
+    IssueVerifiablePresentationResponsePayload:
+      description: key value map
+      type: object
+      additionalProperties: true
+    IssueVerifiablePresentationJwtRequestPayload:
+      description: Verifiable Credential Request Payload
+      type: object
+      required: [ audience, verifiableCredentials ]
+      properties:
+        audience:
+          description: The audience for the JWT
+          type: string
+        verifiableCredentials:
+          description: Verifiable Credentials
+          type: array
+          items:
+            description: key value map
+            type: string
+            additionalProperties: true
+    IssueVerifiablePresentationJwtResponsePayload:
+      description: Verifiable Presentation as JWT
+      type: object
+      properties:
+        verifiable-presentation:
+          description: Verifiable Presentation as JWT
+          type: string
+    ValidateVerifiableCredentialRequestPayload:
+      description: Verifiable Credential Validation Payload
+      type: object
+      required: [ verifiableCredentials ]
+      properties:
+        verifiableCredentials:
+          description: Verifiable Credentials
+          type: array
+          items:
+            description: key value map
+            type: object
+            additionalProperties: true
+    VerifiableCredentialValidationResult:
+      type: object
+      properties:
+        isValid:
+          description: Whether all Verifiable Credential are valid.
+          type: boolean
+        violations:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: string
+                description: The ID of the Verifiable Credential.
+              type:
+                type: array
+                items:
+                  type: string
+                  enum:
+                    - incorrect_json_ld_format
+                    - incorrect_signature
+                    - no_embedded_signature
+                    - expired
+    VerifiablePresentationValidationResult:
+      type: object
+      properties:
+        isValid:
+          description: Whether all Verifiable Presentations are valid.
+          type: boolean
+        verifiableCredentialResult:
+          $ref: '#/components/schemas/VerifiableCredentialValidationResult'
+        verifiablePresentationViolations:
+          type: array
+          items:
+            type: string
+            enum:
+              - incorrect_json_ld_format
+              - incorrect_signature
+              - no_embedded_signature
+              - expired
+    VerifiablePresentationJwtValidationResult:
+      type: object
+      properties:
+        isValid:
+          description: Whether all Verifiable Presentations are valid.
+          type: boolean
+        verifiableCredentialResult:
+          $ref: '#/components/schemas/VerifiableCredential'
+        verifiablePresentationViolations:
+          type: array
+          items:
+            type: string
+            enum:
+              - incorrect_json_ld_format
+              - incorrect_signature
+              - expired
+    ValidateVerifiableCredentialResponsePayload:
+      description: Verifiable Credential Validation Response
+      allOf:
+        - $ref: '#/components/schemas/VerifiableCredentialValidationResult'
+    ValidateVerifiablePresentationRequestPayload:
+      description: Verifiable Presentation Validation Payload
+      type: object
+      required: [ verifiablePresentation ]
+      properties:
+        verifiablePresentation:
+          description: Verifiable Presentation
+          type: object
+          additionalProperties: true
+    ValidateVerifiablePresentationResponsePayload:
+      description: Verifiable Presentation Validation Response
+      allOf:
+        - $ref: '#/components/schemas/VerifiablePresentationValidationResult'
+    ValidateVerifiablePresentationJwtRequestPayload:
+      description: JWT Verifiable Presentation Validation Payload
+      type: object
+      required: [ jwt ]
+      properties:
+        jwt:
+          description: JWT Verifiable Presentation
+          type: string
+    ValidateVerifiablePresentationJwtResponsePayload:
+      description: JWT Verifiable Presentation Validation Response
+      allOf:
+        - $ref: '#/components/schemas/VerifiablePresentationValidationResult'
+
+  securitySchemes:
+    OAuth2:
+      type: oauth2
+      flows:
+        authorizationCode:
+          authorizationUrl: https://example.com/oauth/authorize
+          tokenUrl: https://example.com/oauth/token
+          scopes:
+            read: Grants read access
+            write: Grants write access
+            admin: Grants access to admin operations

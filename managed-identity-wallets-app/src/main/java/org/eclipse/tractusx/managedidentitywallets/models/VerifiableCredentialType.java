@@ -21,13 +21,20 @@
 
 package org.eclipse.tractusx.managedidentitywallets.models;
 
-import lombok.EqualsAndHashCode;
-import lombok.ToString;
-import lombok.Value;
+import lombok.*;
 
-@Value
+@Getter
 @EqualsAndHashCode
-@ToString
+@RequiredArgsConstructor
 public class VerifiableCredentialType {
-    String text;
+
+    public static final VerifiableCredentialType VERIFIABLE_CREDENTIAL = new VerifiableCredentialType("VerifiableCredential");
+
+    @NonNull
+    private final String text;
+
+    @Override
+    public String toString() {
+        return text;
+    }
 }

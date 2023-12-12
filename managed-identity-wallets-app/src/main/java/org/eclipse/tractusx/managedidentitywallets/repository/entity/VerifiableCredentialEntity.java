@@ -25,7 +25,10 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.OffsetDateTime;
 import java.util.Set;
 
 @Data
@@ -33,25 +36,36 @@ import java.util.Set;
 @EqualsAndHashCode(of = {"id"}, callSuper = false)
 @Entity(name = VerifiableCredentialEntity.TABLE_NAME)
 @Table(name = VerifiableCredentialEntity.TABLE_NAME)
+@ToString
 public class VerifiableCredentialEntity extends AbstractEntity {
 
     public static final String TABLE_NAME = "verifiable_credential";
-
     public static final String COLUMN_JSON = "raw";
+    public static final String COLUMN_ID = "id";
+    public static final String EXPIRATION_DATE = "expiration_date";
 
     @Id
+    @ToString.Include
+    @Column(name = COLUMN_ID, nullable = false)
     private String id;
 
     @Column(name = COLUMN_JSON, nullable = false)
     private String json;
 
+    @Temporal(value = TemporalType.TIMESTAMP)
+    @Column(name = EXPIRATION_DATE, nullable = true, updatable = false)
+    private OffsetDateTime expirationDate;
+
     @OneToMany(mappedBy = "id.verifiableCredential", cascade = CascadeType.REMOVE)
+    @ToString.Exclude
     private Set<VerifiableCredentialWalletIntersectionEntity> walletIntersections;
 
     @OneToMany(mappedBy = "id.verifiableCredential", cascade = CascadeType.REMOVE)
+    @ToString.Exclude
     private Set<VerifiableCredentialTypeIntersectionEntity> credentialTypeIntersections;
 
     @OneToMany(mappedBy = "id.verifiableCredential", cascade = CascadeType.REMOVE)
+    @ToString.Exclude
     private Set<VerifiableCredentialIssuerIntersectionEntity> credentialIssuerIntersections;
 
 }

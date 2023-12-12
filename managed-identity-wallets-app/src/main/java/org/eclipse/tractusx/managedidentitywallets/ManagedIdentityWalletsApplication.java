@@ -24,6 +24,8 @@ package org.eclipse.tractusx.managedidentitywallets;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.properties.ConfigurationPropertiesScan;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 /**
@@ -32,6 +34,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 @SpringBootApplication
 @ConfigurationPropertiesScan
 @EnableTransactionManagement
+@ComponentScan(excludeFilters = @ComponentScan.Filter(type = FilterType.REGEX, pattern = "org.eclipse.tractusx.managedidentitywallets.spring.controllers.v1.*"))
 public class ManagedIdentityWalletsApplication {
 
     /**
@@ -42,5 +45,4 @@ public class ManagedIdentityWalletsApplication {
     public static void main(String[] args) {
         SpringApplication.run(ManagedIdentityWalletsApplication.class, args);
     }
-
 }

@@ -24,16 +24,18 @@ package org.eclipse.tractusx.managedidentitywallets.service;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.annotations.IsKeysExist;
 import org.eclipse.tractusx.managedidentitywallets.event.*;
-import org.eclipse.tractusx.managedidentitywallets.exceptions.WalletAlreadyExistsException;
-import org.eclipse.tractusx.managedidentitywallets.exceptions.WalletDoesNotExistException;
-import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
-import org.eclipse.tractusx.managedidentitywallets.repository.WalletRepository;
-import org.eclipse.tractusx.managedidentitywallets.repository.query.WalletQuery;
+import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.WalletRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.query.WalletQuery;
+import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.support.TransactionSynchronization;
 import org.springframework.transaction.support.TransactionSynchronizationUtils;
@@ -48,6 +50,22 @@ public class WalletService {
 
     private final WalletRepository walletRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
+
+    public void storeVerifiableCredential(@NonNull Wallet wallet, @NonNull VerifiableCredential verifiableCredential) {
+        walletRepository.storeVerifiableCredentialInWallet(wallet, verifiableCredential);
+        applicationEventPublisher.publishEvent(new VerifiableCredentialStoringInWalletEvent(verifiableCredential, wallet));
+        afterCommit(() -> applicationEventPublisher.publishEvent(new VerifiableCredentialStoredInWalletEvent(verifiableCredential, wallet)));
+    }
+
+    public void removeVerifiableCredential(@NonNull Wallet wallet, @NonNull VerifiableCredential verifiableCredential) {
+        walletRepository.removeVerifiableCredentialFromWallet(wallet, verifiableCredential);
+        applicationEventPublisher.publishEvent(new VerifiableCredentialRemovingFromWalletEvent(verifiableCredential, wallet));
+        afterCommit(() -> applicationEventPublisher.publishEvent(new VerifiableCredentialRemovedFromWalletEvent(verifiableCredential, wallet)));
+    }
+
+    public boolean existsById(@NonNull WalletId walletId) {
+        return walletRepository.existsById(walletId);
+    }
 
     public Optional<Wallet> findById(@NonNull WalletId id) {
         final WalletQuery query = WalletQuery.builder()
@@ -66,21 +84,26 @@ public class WalletService {
         return walletRepository.findAll(query, pageable);
     }
 
-    public void create(@NonNull Wallet wallet) throws WalletAlreadyExistsException {
-        applicationEventPublisher.publishEvent(new WalletCreatingEvent(wallet));
+    public Page<Wallet> findAll(@NonNull WalletQuery query, int page, int size, Sort sort) {
+        final Pageable pageable = PageRequest.of(page, size, sort);
+        return walletRepository.findAll(query, pageable);
+    }
+
+    public void create(@NonNull @IsKeysExist Wallet wallet) {
         walletRepository.create(wallet);
+        applicationEventPublisher.publishEvent(new WalletCreatingEvent(wallet));
         afterCommit(() -> applicationEventPublisher.publishEvent(new WalletCreatedEvent(wallet)));
     }
 
-    public void update(@NonNull Wallet wallet) throws WalletDoesNotExistException {
-        applicationEventPublisher.publishEvent(new WalletUpdatingEvent(wallet));
+    public void update(@NonNull @IsKeysExist Wallet wallet) {
         walletRepository.update(wallet);
+        applicationEventPublisher.publishEvent(new WalletUpdatingEvent(wallet));
         afterCommit(() -> applicationEventPublisher.publishEvent(new WalletUpdatedEvent(wallet)));
     }
 
     public void delete(@NonNull Wallet wallet) {
-        applicationEventPublisher.publishEvent(new WalletDeletingEvent(wallet));
         walletRepository.delete(wallet.getWalletId());
+        applicationEventPublisher.publishEvent(new WalletDeletingEvent(wallet));
         afterCommit(() -> applicationEventPublisher.publishEvent(new WalletDeletedEvent(wallet)));
     }
 

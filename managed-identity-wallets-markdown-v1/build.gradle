@@ -1,0 +1,31 @@
+plugins {
+    id 'java'
+    id "org.openapi.generator" version "6.6.0"
+}
+
+group = "${groupName}"
+version = "${applicationVersion}"
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+}
+
+ext {
+
+}
+
+
+dependencies {
+    implementation "org.springdoc:springdoc-openapi-starter-common:${openApiVersion}"
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${openApiVersion}"
+}
+
+openApiGenerate {
+    generatorName.set("markdown")
+
+    inputSpec.set("$rootDir/managed-identity-wallets-app/src/main/resources/static/openapi_v1.yaml")
+    outputDir.set("$rootDir/documentation/api/v1")
+
+}
+

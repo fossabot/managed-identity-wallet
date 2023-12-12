@@ -23,12 +23,13 @@ package org.eclipse.tractusx.managedidentitywallets.repository.map;
 
 import lombok.NoArgsConstructor;
 import lombok.NonNull;
-import org.eclipse.tractusx.managedidentitywallets.exceptions.MappingException;
+import org.eclipse.tractusx.managedidentitywallets.exception.MappingException;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 @NoArgsConstructor
@@ -38,23 +39,23 @@ public class WalletMap extends AbstractMap<Wallet, WalletEntity> {
 
         final WalletId walletId = new WalletId(entity.getId());
         final WalletName walletName = new WalletName(entity.getName());
-        final WalletDescription walletDescription = new WalletDescription(entity.getDescription());
 
-        final List<Ed25519Key> keys = entity.getEd25519Keys()
+        final List<StoredEd25519Key> keys = entity.getEd25519Keys()
                 .stream().map(
-                        key -> Ed25519Key.builder()
-                                .didIdentifier(key.getDidIdentifier())
-                                .vaultSecret(key.getVaultSecret())
-                                .createdAt(key.getCreatedAt().toInstant())
-                                .description(key.getDescription())
+                        key -> StoredEd25519Key.builder()
+                                .id(new Ed25519KeyId(key.getId()))
+                                .didFragment(new DidFragment(key.getDidFragment()))
+                                .publicKey(new CypherText(key.getPublicKeyCypherTextBase64()))
+                                .privateKey(new CypherText(key.getPrivateKeyCypherTextBase64()))
+                                .createdAt(key.getCreatedAt())
                                 .build()
-                ).toList();
+                ).collect(Collectors.toList());
 
         return Wallet.builder()
                 .walletId(walletId)
                 .walletName(walletName)
-                .walletDescription(walletDescription)
-                .ed25519Keys(keys)
+                .storedEd25519Keys(keys)
+                .createdAt(entity.getCreatedAt())
                 .build();
     }
 }

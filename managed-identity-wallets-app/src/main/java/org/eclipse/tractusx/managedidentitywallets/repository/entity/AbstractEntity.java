@@ -36,11 +36,9 @@ public abstract class AbstractEntity {
     public static final String COLUMN_MODIFIED_AT = "modified_at";
     public static final String COLUMN_VERSION = "version";
 
-    // TODO define column names
-
     @CreationTimestamp
     @Temporal(value = TemporalType.TIMESTAMP)
-    @Column(name = COLUMN_CREATED_AT, nullable = false)
+    @Column(name = COLUMN_CREATED_AT, nullable = false, updatable = false)
     private OffsetDateTime createdAt;
 
     @UpdateTimestamp
