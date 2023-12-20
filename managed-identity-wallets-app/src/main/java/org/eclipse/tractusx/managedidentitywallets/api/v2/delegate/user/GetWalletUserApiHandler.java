@@ -26,6 +26,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiHandler;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.map.ApiV2Mapper;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.WalletResponsePayloadV2;
 import org.springframework.http.ResponseEntity;
@@ -40,11 +41,12 @@ class GetWalletUserApiHandler extends AbstractApiHandler {
     private final ApiV2Mapper apiMapper;
 
     public ResponseEntity<WalletResponsePayloadV2> execute() {
-        if (log.isDebugEnabled()) {
-            log.debug("userGetWallet(walletId={})", TMP_WALLET_ID);
-        }
+        final String bpn = readBpnFromAuthenticationToken();
+        final WalletId walletId = new WalletId(bpn);
 
-        final Wallet wallet = walletService.findById(TMP_WALLET_ID)
+        logIfDebug("userGetWallet(walletId={})", walletId);
+
+        final Wallet wallet = walletService.findById(walletId)
                 .orElseThrow();
 
         final WalletResponsePayloadV2 payloadV2 = apiMapper.mapWalletResponsePayloadV2(wallet);

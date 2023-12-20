@@ -28,6 +28,7 @@ import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.G
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialContext;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.IssueVerifiableCredentialRequestPayloadV2;
@@ -51,12 +52,15 @@ class PostSignedVerifiableCredentialUserApiHandler extends AbstractApiHandler {
     private final GenericVerifiableCredentialFactory genericVerifiableCredentialFactory;
 
     public ResponseEntity<Map<String, Object>> execute(IssueVerifiableCredentialRequestPayloadV2 issueVerifiableCredentialRequestPayloadV2) {
+        final String bpn = readBpnFromAuthenticationToken();
+        final WalletId walletId = new WalletId(bpn);
+
         logIfDebug("userIssuedVerifiableCredential(issueVerifiableCredentialRequestPayloadV2={})", issueVerifiableCredentialRequestPayloadV2);
 
         final GenericVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs.GenericVerifiableCredentialFactoryArgsBuilder credentialFactoryArgsBuilder =
                 GenericVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs.builder();
 
-        final Wallet wallet = walletService.findById(TMP_WALLET_ID).orElseThrow();
+        final Wallet wallet = walletService.findById(walletId).orElseThrow();
 
         /* Subject */
         final Optional<VerifiableCredentialSubject> subject = readVerifiableCredentialSubjectArgs(issueVerifiableCredentialRequestPayloadV2.getVerifiableCredentialSubject());

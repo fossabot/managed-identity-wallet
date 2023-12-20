@@ -29,6 +29,7 @@ import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.VerifiableCredentialListResponsePayloadV2;
@@ -47,13 +48,15 @@ import java.util.Optional;
 class GetIssuedVerifiableCredentialsUserApiHandler extends AbstractApiHandler {
 
     private final VerifiableCredentialService verifiableCredentialService;
-
     private final MIWSettings miwSettings;
     private final DidFactory didFactory;
     private final ApiV2Mapper apiMapper;
 
     public ResponseEntity<VerifiableCredentialListResponsePayloadV2> execute(Integer page, Integer perPage, String type) {
-        logIfDebug("userGetIssuedVerifiableCredentials(walletId={}, page={}, perPage={}, type={})", TMP_WALLET_ID, page, perPage, type);
+        final String bpn = readBpnFromAuthenticationToken();
+        final WalletId walletId = new WalletId(bpn);
+
+        logIfDebug("userGetIssuedVerifiableCredentials(walletId={}, page={}, perPage={}, type={})", walletId, page, perPage, type);
 
         page = Optional.ofNullable(page).orElse(0);
         perPage = Optional.ofNullable(perPage).orElse(miwSettings.getApiDefaultPageSize());
@@ -62,7 +65,7 @@ class GetIssuedVerifiableCredentialsUserApiHandler extends AbstractApiHandler {
                 .map(VerifiableCredentialType::new)
                 .stream().toList();
 
-        final Did issuerDid = didFactory.generateDid(TMP_WALLET_ID);
+        final Did issuerDid = didFactory.generateDid(walletId);
         final VerifiableCredentialIssuer verifiableCredentialIssuer = new VerifiableCredentialIssuer(issuerDid.toString());
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
                 .verifiableCredentialTypes(verifiableCredentialType)

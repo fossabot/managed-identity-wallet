@@ -26,9 +26,12 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.annotations.IsKeysExist;
 import org.eclipse.tractusx.managedidentitywallets.event.*;
+import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.WalletRepository;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.query.WalletWithVerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.query.WalletQuery;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.context.ApplicationEventPublisher;
@@ -50,6 +53,15 @@ public class WalletService {
 
     private final WalletRepository walletRepository;
     private final ApplicationEventPublisher applicationEventPublisher;
+
+    public boolean containsVerifiableCredential(@NonNull WalletId walletId, @NonNull VerifiableCredentialId verifiableCredentialid) {
+        final WalletWithVerifiableCredentialQuery credentialQuery = WalletWithVerifiableCredentialQuery.builder()
+                .walletId(walletId)
+                .verifiableCredentialId(verifiableCredentialid)
+                .build();
+
+        return walletRepository.exists(credentialQuery);
+    }
 
     public void storeVerifiableCredential(@NonNull Wallet wallet, @NonNull VerifiableCredential verifiableCredential) {
         walletRepository.storeVerifiableCredentialInWallet(wallet, verifiableCredential);

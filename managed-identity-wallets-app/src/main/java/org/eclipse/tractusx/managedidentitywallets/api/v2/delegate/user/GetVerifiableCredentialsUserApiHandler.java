@@ -28,6 +28,7 @@ import org.eclipse.tractusx.managedidentitywallets.api.v2.map.ApiV2Mapper;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.query.VerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.VerifiableCredentialListResponsePayloadV2;
@@ -49,7 +50,10 @@ class GetVerifiableCredentialsUserApiHandler extends AbstractApiHandler {
     private final ApiV2Mapper apiMapper;
 
     public ResponseEntity<VerifiableCredentialListResponsePayloadV2> execute(Integer page, Integer perPage, String type, String issuer) {
-        logIfDebug("userGetVerifiableCredentials(walletId={}, page={}, perPage={}, type={}, issuer={})", TMP_WALLET_ID, page, perPage, type, issuer);
+        final String bpn = readBpnFromAuthenticationToken();
+        final WalletId walletId = new WalletId(bpn);
+
+        logIfDebug("userGetVerifiableCredentials(walletId={}, page={}, perPage={}, type={}, issuer={})", walletId, page, perPage, type, issuer);
 
         page = Optional.ofNullable(page).orElse(0);
         perPage = Optional.ofNullable(perPage).orElse(miwSettings.getApiDefaultPageSize());
@@ -61,7 +65,7 @@ class GetVerifiableCredentialsUserApiHandler extends AbstractApiHandler {
                 .map(VerifiableCredentialIssuer::new)
                 .orElse(null);
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
-                .holderWalletId(TMP_WALLET_ID)
+                .holderWalletId(walletId)
                 .verifiableCredentialTypes(verifiableCredentialType)
                 .verifiableCredentialIssuer(verifiableCredentialIssuer)
                 .build();

@@ -27,6 +27,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiHandler;
 import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.VerifiablePresentationFactory;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.IssueVerifiablePresentationRequestPayloadV2;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
@@ -47,9 +48,12 @@ class PostSignedVerifiablePresentationUserApiHandler extends AbstractApiHandler 
     private final VerifiablePresentationFactory verifiablePresentationFactory;
 
     public ResponseEntity<Map<String, Object>> execute(@NonNull IssueVerifiablePresentationRequestPayloadV2 issueVerifiablePresentationRequestPayloadV2) {
+        final String bpn = readBpnFromAuthenticationToken();
+        final WalletId walletId = new WalletId(bpn);
+
         logIfDebug("userIssuedVerifiablePresentation(issueVerifiablePresentationRequestPayloadV2={})", issueVerifiablePresentationRequestPayloadV2);
 
-        final Wallet wallet = walletService.findById(TMP_WALLET_ID).orElseThrow();
+        final Wallet wallet = walletService.findById(walletId).orElseThrow();
 
         final Optional<List<VerifiableCredential>> verifiableCredentials =
                 readVerifiableCredentialArgs(issueVerifiablePresentationRequestPayloadV2.getVerifiableCredentials());

@@ -33,6 +33,8 @@ import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.predicate.WalletWithVerifiableCredentialPredicate;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.query.WalletWithVerifiableCredentialQuery;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.Ed25519KeyEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialWalletIntersectionEntity;
@@ -280,4 +282,11 @@ public class WalletRepository {
         return entity;
     }
 
+    public boolean exists(@NonNull WalletWithVerifiableCredentialQuery credentialQuery) {
+        final Predicate predicate = WalletWithVerifiableCredentialPredicate.fromQuery(credentialQuery);
+        if (log.isTraceEnabled()) {
+            log.trace("exists: predicate={}", predicate);
+        }
+        return verifiableCredentialWalletIntersectionJpaRepository.exists(predicate);
+    }
 }

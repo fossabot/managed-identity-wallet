@@ -24,9 +24,12 @@ package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.user;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.ApiRolesV2;
 import org.eclipse.tractusx.managedidentitywallets.spring.controllers.v2.UserApiDelegate;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.*;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.annotation.Secured;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;
@@ -50,61 +53,73 @@ public class UserApiDelegateImpl implements UserApiDelegate {
     private final PostVerifiablePresentationsJwtValidationUserApiHandler postVerifiablePresentationsJwtValidationUserApiHandler;
 
     @Override
+    @Secured({ApiRolesV2.WALLET_OWNER_ROLE})
     public ResponseEntity<Map<String, Object>> userCreateVerifiableCredential(Map<String, Object> payload) {
         return postVerifiableCredentialUserApiHandler.execute(payload);
     }
 
     @Override
-    public ResponseEntity<Void> userDeleteVerifiableCredentialById(String verifiableCredentialId) {
+    @Secured({ApiRolesV2.WALLET_OWNER_ROLE})
+    public ResponseEntity<Void> userDeleteVerifiableCredentialById(@NonNull String verifiableCredentialId) {
         return deleteVerifiableCredentialByIdUserApiHandler.execute(verifiableCredentialId);
     }
 
     @Override
+    @Secured({ApiRolesV2.WALLET_OWNER_ROLE})
     public ResponseEntity<Map<String, Object>> userGetVerifiableCredentialById(String verifiableCredentialId) {
         return getVerifiableCredentialByIdUserApiHandler.execute(verifiableCredentialId);
     }
 
     @Override
+    @Secured({ApiRolesV2.WALLET_OWNER_ROLE})
     public ResponseEntity<VerifiableCredentialListResponsePayloadV2> userGetIssuedVerifiableCredentials(Integer page, Integer perPage, String type) {
         return getIssuedVerifiableCredentialsUserApiHandler.execute(page, perPage, type);
     }
 
     @Override
+    @Secured({ApiRolesV2.WALLET_OWNER_ROLE})
     public ResponseEntity<VerifiableCredentialListResponsePayloadV2> userGetVerifiableCredentials(Integer page, Integer perPage, String type, String issuer) {
         return getVerifiableCredentialsUserApiHandler.execute(page, perPage, type, issuer);
     }
 
     @Override
+    @Secured({ApiRolesV2.WALLET_OWNER_ROLE})
     public ResponseEntity<WalletResponsePayloadV2> userGetWallet() {
         return getWalletUserApiHandler.execute();
     }
 
     @Override
+    @Secured({ApiRolesV2.WALLET_OWNER_ROLE})
     public ResponseEntity<Map<String, Object>> userIssuedVerifiableCredential(IssueVerifiableCredentialRequestPayloadV2 issueVerifiableCredentialRequestPayloadV2) {
         return postSignedVerifiableCredentialUserApiHandler.execute(issueVerifiableCredentialRequestPayloadV2);
     }
 
     @Override
+    @Secured({ApiRolesV2.WALLET_OWNER_ROLE})
     public ResponseEntity<Map<String, Object>> userIssuedVerifiablePresentation(@NonNull IssueVerifiablePresentationRequestPayloadV2 issueVerifiablePresentationRequestPayloadV2) {
         return postSignedVerifiablePresentationUserApiHandler.execute(issueVerifiablePresentationRequestPayloadV2);
     }
 
     @Override
+    @Secured({ApiRolesV2.WALLET_OWNER_ROLE})
     public ResponseEntity<IssueVerifiablePresentationJwtResponsePayloadV2> userIssuedVerifiablePresentationJwt(@NonNull IssueVerifiablePresentationJwtRequestPayloadV2 issueVerifiablePresentationJwtRequestPayloadV2) {
         return postSignedVerifiablePresentationJwtUserApiHandler.execute(issueVerifiablePresentationJwtRequestPayloadV2);
     }
 
     @Override
+    @Secured({ApiRolesV2.WALLET_OWNER_ROLE})
     public ResponseEntity<ValidateVerifiableCredentialResponsePayloadV2> verifiableCredentialsValidationPost(@NonNull ValidateVerifiableCredentialRequestPayloadV2 validateVerifiableCredentialRequestPayloadV2) {
         return postVerifiableCredentialsValidationUserApiHandler.execute(validateVerifiableCredentialRequestPayloadV2);
     }
 
     @Override
+    @Secured({ApiRolesV2.WALLET_OWNER_ROLE})
     public ResponseEntity<ValidateVerifiablePresentationJwtResponsePayloadV2> verifiablePresentationJwtValidationPost(ValidateVerifiablePresentationJwtRequestPayloadV2 validateVerifiablePresentationJwtRequestPayloadV2) {
         return postVerifiablePresentationsJwtValidationUserApiHandler.execute(validateVerifiablePresentationJwtRequestPayloadV2);
     }
 
     @Override
+    @Secured({ApiRolesV2.WALLET_OWNER_ROLE})
     public ResponseEntity<ValidateVerifiablePresentationResponsePayloadV2> verifiablePresentationValidationPost(ValidateVerifiablePresentationRequestPayloadV2 validateVerifiablePresentationRequestPayloadV2) {
         return postVerifiablePresentationsValidationUserApiHandler.execute(validateVerifiablePresentationRequestPayloadV2);
     }

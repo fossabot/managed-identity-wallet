@@ -21,41 +21,88 @@
 
 package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.user;
 
+import io.restassured.http.Header;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.ApiRolesV2;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.query.WalletQuery;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestAuthV2Util;
 import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.util.List;
+
+import static io.restassured.RestAssured.given;
 import static io.restassured.RestAssured.when;
 import static org.hamcrest.Matchers.equalTo;
 
 public class GetIssuedVerifiableCredentialsUserApiHandlerTest extends RestAssuredTestCase {
 
     @Autowired
-    private WalletRepository walletRepository;
+    private TestPersistenceUtil persistenceUtil;
 
     @Autowired
-    private TestPersistenceUtil persistenceUtil;
+    public TestAuthV2Util testAuthV2Util;
+
+    @Test
+    public void testUnauthorizedAccess() {
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
+        persistenceUtil.newWalletPersisted();
+
+        when()
+                .get("/api/v2/signed-verifiable-credentials")
+                .then()
+                .statusCode(401);
+    }
+
+    @Test
+    public void testSuccessfulAccess() {
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
+        persistenceUtil.newWalletPersisted();
+
+        final Header auth = testAuthV2Util.getAuthHeader(List.of(ApiRolesV2.WALLET_OWNER), wallet);
+
+        given()
+                .header(auth)
+                .when()
+                .get("/api/v2/signed-verifiable-credentials")
+                .then()
+                .statusCode(204);
+    }
+
+    @Test
+    public void testForbiddenAccess() {
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
+        persistenceUtil.newWalletPersisted();
+
+        final Header auth = testAuthV2Util.getAuthHeader(List.of("FOO"), wallet);
+
+        given()
+                .header(auth)
+                .when()
+                .get("/api/v2/signed-verifiable-credentials")
+                .then()
+                .statusCode(403);
+    }
 
     @Test
     public void testGetSignedVerifiableCredentialsUserApiSuccess() {
 
-        // TODO currently the logged-in user always is BPNL000000000000
-        final WalletQuery walletQuery = WalletQuery.builder()
-                .walletId(new WalletId("BPNL000000000000"))
-                .build();
-        final Wallet issuerWallet = walletRepository.findOne(walletQuery).orElseThrow();
+        final Wallet issuerWallet = persistenceUtil.newWalletPersisted();
 
         final int MAX_CREDENTIALS = 10;
         for (var i = 0; i < MAX_CREDENTIALS; i++) {
             persistenceUtil.newWalletPlusVerifiableCredentialPersisted(issuerWallet);
         }
 
-        when()
+        final Header auth = testAuthV2Util.getAuthHeader(List.of(ApiRolesV2.WALLET_OWNER), issuerWallet);
+        given()
+                .header(auth)
+                .when()
+
                 .get("/api/v2/signed-verifiable-credentials?page=0&per_page=" + MAX_CREDENTIALS)
                 .then()
                 .statusCode(200)

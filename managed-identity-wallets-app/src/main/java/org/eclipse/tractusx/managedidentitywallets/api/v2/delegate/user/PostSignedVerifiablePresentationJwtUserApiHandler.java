@@ -29,6 +29,7 @@ import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.V
 import org.eclipse.tractusx.managedidentitywallets.models.JsonWebToken;
 import org.eclipse.tractusx.managedidentitywallets.models.JsonWebTokenAudience;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.IssueVerifiablePresentationJwtRequestPayloadV2;
 import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.IssueVerifiablePresentationJwtResponsePayloadV2;
@@ -48,13 +49,16 @@ class PostSignedVerifiablePresentationJwtUserApiHandler extends AbstractApiHandl
     private final VerifiablePresentationFactory verifiablePresentationFactory;
 
     public ResponseEntity<IssueVerifiablePresentationJwtResponsePayloadV2> execute(@NonNull IssueVerifiablePresentationJwtRequestPayloadV2 issueVerifiablePresentationJwtRequestPayloadV2) {
+        final String bpn = readBpnFromAuthenticationToken();
+        final WalletId walletId = new WalletId(bpn);
+
         logIfDebug("userIssuedVerifiablePresentationJwt(issueVerifiablePresentationJwtRequestPayloadV2={})", issueVerifiablePresentationJwtRequestPayloadV2);
 
         if (issueVerifiablePresentationJwtRequestPayloadV2.getAudience() == null) {
             return ResponseEntity.badRequest().build();
         }
 
-        final Wallet wallet = walletService.findById(TMP_WALLET_ID).orElseThrow();
+        final Wallet wallet = walletService.findById(walletId).orElseThrow();
 
         final JsonWebTokenAudience audience = new JsonWebTokenAudience(issueVerifiablePresentationJwtRequestPayloadV2.getAudience());
         final Optional<List<VerifiableCredential>> verifiableCredentials = readVerifiableCredentialArgs(issueVerifiablePresentationJwtRequestPayloadV2.getVerifiableCredentials());

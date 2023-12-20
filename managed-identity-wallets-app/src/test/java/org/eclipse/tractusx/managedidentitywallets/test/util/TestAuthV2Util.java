@@ -79,8 +79,6 @@ public class TestAuthV2Util {
 
         /* Assign roles */
         roles.stream().map(r -> createClientRole(client, r)).forEach(role -> assignClientRoleToUser(user, role, client));
-//        roles.stream().map(r -> createRole(r)).forEach(role -> assignRole(user, role, client));
-
 
         if (wallet != null) {
             final Keycloak keycloak = getAdminKeycloak();
@@ -142,20 +140,6 @@ public class TestAuthV2Util {
                 "jsonType.label", "String"
         ));
 
-        /* map client role to access token */
-//        ProtocolMapperRepresentation protocolMapperRepresentation2 = new ProtocolMapperRepresentation();
-//        protocolMapperRepresentation2.setProtocol("openid-connect");
-//        protocolMapperRepresentation2.setProtocolMapper("oidc-usermodel-client-role-mapper");
-//        protocolMapperRepresentation2.setName("MIW Private Client Mapper");
-//        protocolMapperRepresentation2.setConfig(Map.of(
-//                "userinfo.token.claim", "true",
-//                "usermodel.clientRoleMapping.clientId", KEYCLOAK_DEFAULT_CLIENT_NAME,
-//                "id.token.claim", "true",
-//                "access.token.claim", "true",
-//                "claim.name", KEYCLOAK_DEFAULT_CLIENT_NAME,
-//                "jsonType.label", "String"
-//        ));
-
         final ClientRepresentation client = new ClientRepresentation();
         client.setEnabled(true);
         client.setName(KEYCLOAK_DEFAULT_CLIENT_NAME);
@@ -202,39 +186,12 @@ public class TestAuthV2Util {
 
         // Create user (requires manage-users role)
         final Response response = usersResource.create(user);
-//        if (response.getStatus() == 409 /* exists */) {
-//            final UserRepresentation existingUserRep = keycloak.realm(KEYCLOAK_DEFAULT_REALM).users().search(name).get(0);
-//            return new User(existingUserRep.getId(), name, password);
-//        }
         if (response.getStatus() < 200 || response.getStatus() > 299) {
             throw new RuntimeException(String.format("Error creating user. Status: %s. Data: %s", response.getStatus(), response.getEntity()));
         }
 
         final String userId = CreatedResponseUtil.getCreatedId(response);
         return new User(userId, name, password);
-    }
-
-    private Role createRole(@NonNull String roleName) {
-        final String roleId = UUID.randomUUID().toString();
-        final Keycloak keycloak = getAdminKeycloak();
-
-        final RealmResource realmResource = keycloak.realm(KEYCLOAK_DEFAULT_REALM);
-        final RolesResource rolesResource = realmResource.roles();
-        final boolean exists = rolesResource.list().stream().anyMatch(role -> role.getName().equals(roleName));
-        if (!exists) {
-            final RoleRepresentation role = new RoleRepresentation();
-            role.setId(roleId);
-            role.setName(roleName);
-            role.setDescription("Description of role " + roleName);
-            role.setClientRole(true);
-
-//            client.get(0).set()
-
-            // Create role
-            rolesResource.create(role);
-        }
-
-        return new Role(roleId, roleName);
     }
 
     public Role createClientRole(@NonNull Client client, @NonNull String roleName) {
@@ -266,47 +223,14 @@ public class TestAuthV2Util {
     }
 
     public void assignClientRoleToUser(@NonNull User user, @NonNull Role role, @NonNull Client client) {
-        // Get Keycloak instance
-        Keycloak keycloak = getAdminKeycloak();
+        final Keycloak keycloak = getAdminKeycloak();
 
-        // Get realm resource
-        RealmResource realmResource = keycloak.realm(KEYCLOAK_DEFAULT_REALM);
+        final RealmResource realmResource = keycloak.realm(KEYCLOAK_DEFAULT_REALM);
+        final UserResource userResource = realmResource.users().get(user.getId());
+        final ClientResource clientResource = realmResource.clients().get(client.getId());
 
-        // Get user resource
-        UserResource userResource = realmResource.users().get(user.getId());
-
-        // Get client resource
-        ClientResource clientResource = realmResource.clients().get(client.getId());
-
-        // Get role from client
-        RoleRepresentation roleRepresentation = clientResource.roles().get(role.getName()).toRepresentation();
-
-        // Assign role to user
+        final RoleRepresentation roleRepresentation = clientResource.roles().get(role.getName()).toRepresentation();
         userResource.roles().clientLevel(client.getId()).add(Collections.singletonList(roleRepresentation));
-    }
-
-    private void assignRole(@NonNull User user, @NonNull Role role, @NonNull Client client) {
-
-//        final Keycloak keycloak = getAdminKeycloak();
-//
-//        final RealmResource realmResource = keycloak.realm(KEYCLOAK_DEFAULT_REALM);
-//        final UsersResource usersResource = realmResource.users();
-//        final RolesResource rolesResource = realmResource.roles();
-//
-////        final ClientResource clientResource = realmResource.clients().get(client.getId());
-////        final RolesResource rolesResource = clientResource.roles();
-//
-//        final RoleRepresentation roleRep = rolesResource.list().stream().filter(r -> r.getName().equals(role.getName())).findFirst().orElseThrow();
-//
-//        // Assign role to user
-//        final UserResource userResource = usersResource.get(user.getId());
-//
-//        final RoleMappingResource userRoleMappingResource = userResource.roles();
-//        userRoleMappingResource.clientLevel(client.getId()).add(Collections.singletonList(roleRep));
-//
-////        var roles = rolesResource.list();
-////
-////        final RoleRepresentation roleRepresentation = rolesResource.get(role.getId()).toRepresentation();
     }
 
     public String getBearerToken(User user) {

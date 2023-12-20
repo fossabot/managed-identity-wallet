@@ -22,13 +22,16 @@
 package org.eclipse.tractusx.managedidentitywallets.repository.database;
 
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialWalletIntersectionEntity;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.querydsl.QuerydslPredicateExecutor;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
 interface VerifiableCredentialWalletIntersectionJpaRepository
         extends CrudRepository<VerifiableCredentialWalletIntersectionEntity, VerifiableCredentialWalletIntersectionEntity.VerifiableCredentialIntersectionEntityId>,
-        JpaRepository<VerifiableCredentialWalletIntersectionEntity, VerifiableCredentialWalletIntersectionEntity.VerifiableCredentialIntersectionEntityId> {
+        JpaRepository<VerifiableCredentialWalletIntersectionEntity, VerifiableCredentialWalletIntersectionEntity.VerifiableCredentialIntersectionEntityId>,
+        QuerydslPredicateExecutor<VerifiableCredentialWalletIntersectionEntity> {
 
 }

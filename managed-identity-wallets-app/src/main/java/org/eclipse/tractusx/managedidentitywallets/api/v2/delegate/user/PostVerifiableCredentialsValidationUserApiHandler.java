@@ -46,6 +46,8 @@ class PostVerifiableCredentialsValidationUserApiHandler extends AbstractApiHandl
     private final ApiV2Mapper apiMapper;
 
     public ResponseEntity<ValidateVerifiableCredentialResponsePayloadV2> execute(@NonNull ValidateVerifiableCredentialRequestPayloadV2 validateVerifiableCredentialRequestPayloadV2) {
+        logIfDebug("userValidateVerifiableCredential(validateVerifiableCredentialRequestPayloadV2={})", validateVerifiableCredentialRequestPayloadV2);
+
         final Optional<List<VerifiableCredential>> verifiableCredentials = readVerifiableCredentialArgs(validateVerifiableCredentialRequestPayloadV2.getVerifiableCredentials());
         if (verifiableCredentials.isEmpty()) {
             return ResponseEntity.badRequest().build();

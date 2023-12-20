@@ -21,18 +21,17 @@
 
 package org.eclipse.tractusx.managedidentitywallets.config.security;
 
+import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
+import org.eclipse.tractusx.managedidentitywallets.security.ApplicationAuthenticationToken;
+import org.eclipse.tractusx.managedidentitywallets.security.ApplicationPrincipal;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 
-import java.util.Collection;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -52,14 +51,21 @@ public class CustomAuthenticationConverter implements Converter<Jwt, AbstractAut
         this.resourceId = resourceId;
         grantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
     }
+
     @Override
     public AbstractAuthenticationToken convert(Jwt source) {
-        Collection<GrantedAuthority> authorities = (grantedAuthoritiesConverter.convert(source))
-                .stream()
-                .collect(Collectors.toSet());
-        authorities.addAll(extractResourceRoles(source, resourceId));
-        extractResourceRoles(source, resourceId);
-        return new JwtAuthenticationToken(source, authorities);
+        final Collection<? extends GrantedAuthority> roles = extractResourceRoles(source, resourceId);
+        final Collection<GrantedAuthority> authorities = new HashSet<>((grantedAuthoritiesConverter.convert(source)));
+        authorities.addAll(roles);
+
+        final ApplicationPrincipal applicationPrincipal =
+                new ApplicationPrincipal(source.getSubject(), extractBpn(source));
+        return new ApplicationAuthenticationToken(applicationPrincipal, authorities);
+    }
+
+    private String extractBpn(Jwt jwt) {
+        Map<String, Object> claims = jwt.getClaims();
+        return claims.get(StringPool.BPN).toString();
     }
 
     private Collection<? extends GrantedAuthority> extractResourceRoles(Jwt jwt, String resourceId) {
@@ -76,4 +82,5 @@ public class CustomAuthenticationConverter implements Converter<Jwt, AbstractAut
                 .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
                 .collect(Collectors.toSet());
     }
+
 }

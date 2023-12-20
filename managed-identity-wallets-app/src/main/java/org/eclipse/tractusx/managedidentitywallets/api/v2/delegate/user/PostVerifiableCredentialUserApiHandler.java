@@ -27,6 +27,7 @@ import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiHa
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
@@ -47,6 +48,9 @@ class PostVerifiableCredentialUserApiHandler extends AbstractApiHandler {
     private final VerifiableCredentialService verifiableCredentialService;
 
     public ResponseEntity<Map<String, Object>> execute(Map<String, Object> payload) {
+        final String bpn = readBpnFromAuthenticationToken();
+        final WalletId walletId = new WalletId(bpn);
+
         logIfDebug("userCreateVerifiableCredential(payload={})", payload);
 
         final Optional<VerifiableCredential> verifiableCredentialOptional = readVerifiableCredentialArg(payload);
@@ -55,8 +59,8 @@ class PostVerifiableCredentialUserApiHandler extends AbstractApiHandler {
         }
         final VerifiableCredential verifiableCredential = verifiableCredentialOptional.get();
 
-        final Wallet wallet = walletService.findById(TMP_WALLET_ID)
-                .orElseThrow(() -> new WalletNotFoundException(TMP_WALLET_ID));
+        final Wallet wallet = walletService.findById(walletId)
+                .orElseThrow(() -> new WalletNotFoundException(walletId));
 
         final VerifiableCredentialId verifiableCredentialId = new VerifiableCredentialId(verifiableCredential.getId().toString());
         if (!verifiableCredentialService.existsById(verifiableCredentialId)) {

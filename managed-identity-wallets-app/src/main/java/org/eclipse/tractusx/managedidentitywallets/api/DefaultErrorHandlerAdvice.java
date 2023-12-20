@@ -21,7 +21,6 @@
 
 package org.eclipse.tractusx.managedidentitywallets.api;
 
-import jakarta.validation.ConstraintViolation;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.exception.*;
@@ -50,7 +49,7 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
             log.debug("WalletNotFoundException: {}", ex.getMessage(), ex);
         }
 
-        return ResponseEntity.status(404).body(createMessage(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(createMessage(ex.getMessage()));
     }
 
     @ExceptionHandler(value = {VerifiableCredentialNotFoundException.class})
@@ -61,7 +60,7 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
             log.debug("VerifiableCredentialNotFoundException: {}", ex.getMessage(), ex);
         }
 
-        return ResponseEntity.status(404).body(createMessage(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(createMessage(ex.getMessage()));
     }
 
     @ExceptionHandler(value = {VerifiableCredentialAlreadyExistsException.class})
@@ -72,7 +71,7 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
             log.debug("VerifiableCredentialAlreadyExistsException: {}", ex.getMessage(), ex);
         }
 
-        return ResponseEntity.status(409).body(createMessage(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(createMessage(ex.getMessage()));
     }
 
     @ExceptionHandler(value = {WalletAlreadyExistsException.class})
@@ -83,7 +82,7 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
             log.debug("WalletAlreadyExistsException: {}", ex.getMessage(), ex);
         }
 
-        return ResponseEntity.status(409).body(createMessage(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(createMessage(ex.getMessage()));
     }
 
     @ExceptionHandler(value = {VerifiableCredentialAlreadyStoredInWalletException.class})
@@ -94,7 +93,7 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
             log.debug("VerifiableCredentialAlreadyStoredInWallet: {}", ex.getMessage(), ex);
         }
 
-        return ResponseEntity.status(409).body(createMessage(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(createMessage(ex.getMessage()));
     }
 
     @ExceptionHandler(value = {ConstraintViolationException.class})
@@ -113,7 +112,17 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
     public ResponseEntity<Object> handleUnexpectedRollbackException(UnexpectedRollbackException ex) {
         log.error("UnexpectedRollbackException: {}", ex.getMessage(), ex);
 
-        return ResponseEntity.status(409).body(createMessage(ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(createMessage(ex.getMessage()));
+    }
+
+    @ExceptionHandler(value = {BpnAttributeMissingException.class})
+    @ResponseStatus(value = HttpStatus.FORBIDDEN)
+    @ResponseBody
+    public ResponseEntity<Object> handleBpnAttributeRequiredException(BpnAttributeMissingException ex) {
+        log.error("BpnAttributeRequiredException: {}", ex.getMessage(), ex);
+
+        return ResponseEntity.status(HttpStatus.FORBIDDEN)
+                .body(createMessage("Identity Token is missing BPN attribute. Please contact your identity provider."));
     }
 
     private static Object createMessage(String message) {

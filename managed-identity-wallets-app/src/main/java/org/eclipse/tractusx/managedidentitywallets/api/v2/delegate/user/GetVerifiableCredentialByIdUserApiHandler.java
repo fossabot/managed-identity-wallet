@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiHandler;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.http.ResponseEntity;
@@ -41,7 +42,10 @@ class GetVerifiableCredentialByIdUserApiHandler extends AbstractApiHandler {
     private final VerifiableCredentialService verifiableCredentialService;
 
     public ResponseEntity<Map<String, Object>> execute(String verifiableCredentialId) {
-        logIfDebug("userGetVerifiableCredentialById(walletId={}, verifiableCredentialId={})", TMP_WALLET_ID, verifiableCredentialId);
+        final String bpn = readBpnFromAuthenticationToken();
+        final WalletId walletId = new WalletId(bpn);
+
+        logIfDebug("userGetVerifiableCredentialById(walletId={}, verifiableCredentialId={})", walletId, verifiableCredentialId);
 
         final VerifiableCredentialId id = new VerifiableCredentialId(verifiableCredentialId);
         final Optional<VerifiableCredential> verifiableCredential = verifiableCredentialService.findById(id);

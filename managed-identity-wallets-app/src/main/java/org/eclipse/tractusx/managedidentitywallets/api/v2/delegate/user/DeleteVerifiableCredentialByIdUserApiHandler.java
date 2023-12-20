@@ -21,12 +21,14 @@
 
 package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.user;
 
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiHandler;
 import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
@@ -41,14 +43,17 @@ class DeleteVerifiableCredentialByIdUserApiHandler extends AbstractApiHandler {
     private final WalletService walletService;
     private final VerifiableCredentialService verifiableCredentialService;
 
-    public ResponseEntity<Void> execute(String verifiableCredentialId) {
-        logIfDebug("userDeleteVerifiableCredentialById(walletId={}, verifiableCredentialId={})", TMP_WALLET_ID, verifiableCredentialId);
+    public ResponseEntity<Void> execute(@NonNull String verifiableCredentialId) {
+        final String bpn = readBpnFromAuthenticationToken();
+        final WalletId walletId = new WalletId(bpn);
+
+        logIfDebug("userDeleteVerifiableCredentialById(walletId={}, verifiableCredentialId={})", walletId, verifiableCredentialId);
 
         final VerifiableCredentialId id = new VerifiableCredentialId(verifiableCredentialId);
         final VerifiableCredential verifiableCredential = verifiableCredentialService.findById(id)
                 .orElseThrow(() -> new VerifiableCredentialNotFoundException(id));
         verifiableCredentialService.delete(verifiableCredential);
-        final Wallet wallet = walletService.findById(TMP_WALLET_ID).orElseThrow();
+        final Wallet wallet = walletService.findById(walletId).orElseThrow();
         walletService.removeVerifiableCredential(wallet, verifiableCredential);
         return ResponseEntity.status(204).build();
     }

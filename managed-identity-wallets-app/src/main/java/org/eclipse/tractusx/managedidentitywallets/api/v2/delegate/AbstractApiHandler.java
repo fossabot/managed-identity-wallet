@@ -22,9 +22,11 @@
 package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate;
 
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.exception.BpnAttributeMissingException;
+import org.eclipse.tractusx.managedidentitywallets.security.SecurityService;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialSubject;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.util.List;
 import java.util.Map;
@@ -34,8 +36,13 @@ import java.util.stream.Collectors;
 @Slf4j
 public class AbstractApiHandler {
 
-    /* Used as long as there is no authentication */
-    protected static final WalletId TMP_WALLET_ID = new WalletId("BPNL000000000000");
+    @Autowired
+    private SecurityService securityService;
+
+    protected String readBpnFromAuthenticationToken() {
+        return securityService.getBpn()
+                .orElseThrow(BpnAttributeMissingException::new);
+    }
 
     protected void logIfDebug(String string, Object arg) {
         if (log.isDebugEnabled()) {
