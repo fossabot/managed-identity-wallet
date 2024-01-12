@@ -31,15 +31,16 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.RestURI;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.entity.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.ForbiddenException;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.service.WalletServiceV1;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.dto.CreateWalletRequest;
+import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.Map;
 
 /**
@@ -49,6 +50,8 @@ import java.util.Map;
 @RequiredArgsConstructor
 @Tag(name = "Wallets")
 public class WalletController extends BaseController {
+
+    private final MIWSettings miwSettings;
 
     private final WalletServiceV1 service;
 
@@ -157,8 +160,8 @@ public class WalletController extends BaseController {
     })
     @Operation(summary = "Create Wallet", description = "Permission: **add_wallets** (The BPN of the base wallet must equal BPN of caller)\n\n Create a wallet and store it")
     @PostMapping(path = RestURI.WALLETS, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<Wallet> createWallet(@Valid @RequestBody CreateWalletRequest request, Principal principal) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.createWallet(request,getBPNFromToken(principal)));
+    public ResponseEntity<Wallet> createWallet(@Valid @RequestBody CreateWalletRequest request) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.createWallet(request, getBpn()));
     }
 
     /**
@@ -274,9 +277,8 @@ public class WalletController extends BaseController {
                     """)
     })})
     public ResponseEntity<Map<String, String>> storeCredential(@RequestBody Map<String, Object> data,
-                                                               @Parameter(description = "Did or BPN", examples = {@ExampleObject(name = "bpn", value = "BPNL000000000001", description = "bpn"), @ExampleObject(description = "did", name = "did", value = "did:web:localhost:BPNL000000000001")}) @PathVariable(name = "identifier") String identifier, Principal principal) {
-
-        return ResponseEntity.status(HttpStatus.CREATED).body(service.storeCredential(data, identifier, getBPNFromToken(principal)));
+                                                               @Parameter(description = "Did or BPN", examples = {@ExampleObject(name = "bpn", value = "BPNL000000000001", description = "bpn"), @ExampleObject(description = "did", name = "did", value = "did:web:localhost:BPNL000000000001")}) @PathVariable(name = "identifier") String identifier) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(service.storeCredential(data, identifier, getBpn()));
     }
 
     /**
@@ -438,9 +440,8 @@ public class WalletController extends BaseController {
     @Operation(summary = "Retrieve wallet by identifier", description = "Permission: **view_wallets** OR **view_wallet** (The BPN of Wallet to retrieve must equal the BPN of caller or Base wallet, authority wallet can see all wallets) \n\n Retrieve single wallet by identifier, with or without its credentials")
     @GetMapping(path = RestURI.API_WALLETS_IDENTIFIER, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Wallet> getWalletByIdentifier(@Parameter(description = "Did or BPN", examples = {@ExampleObject(name = "bpn", value = "BPNL000000000001", description = "bpn"), @ExampleObject(description = "did", name = "did", value = "did:web:localhost:BPNL000000000001")}) @PathVariable(name = "identifier") String identifier,
-                                                        @RequestParam(name = "withCredentials", defaultValue = "false") boolean withCredentials,
-                                                        Principal principal) {
-        return ResponseEntity.status(HttpStatus.OK).body(service.getWalletByIdentifier(identifier, withCredentials, getBPNFromToken(principal)));
+                                                        @RequestParam(name = "withCredentials", defaultValue = "false") boolean withCredentials) {
+        return ResponseEntity.status(HttpStatus.OK).body(service.getWalletByIdentifier(identifier, withCredentials, getBpn()));
     }
 
     /**
@@ -547,8 +548,8 @@ public class WalletController extends BaseController {
     @Operation(summary = "List of wallets", description = "Permission: **view_wallets** \n\n Retrieve list of registered wallets")
     @GetMapping(path = RestURI.WALLETS, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<Wallet>> getWallets(@Parameter(name = "pageNumber", description = "Page number, Page number start with zero") @RequestParam(required = false, defaultValue = "0") int pageNumber,
-                                                         @Parameter(name = "size", description = "Number of records per page") @RequestParam(required = false, defaultValue = Integer.MAX_VALUE + "") int size,
-                                                         @Parameter(name = "sortColumn", description = "Sort column name", examples = {
+                                                   @Parameter(name = "size", description = "Number of records per page") @RequestParam(required = false, defaultValue = Integer.MAX_VALUE + "") int size,
+                                                   @Parameter(name = "sortColumn", description = "Sort column name", examples = {
                                                            @ExampleObject(value = "createdAt", name = "Creation date"),
                                                            @ExampleObject(value = "name", name = "Wallet name"),
                                                            @ExampleObject(value = "did", name = "Wallet did"),
@@ -556,7 +557,11 @@ public class WalletController extends BaseController {
                                                    }
                                                    )
                                                    @RequestParam(required = false, defaultValue = "createdAt") String sortColumn,
-                                                         @Parameter(name = "sortTpe", description = "Sort order", examples = {@ExampleObject(value = "desc", name = "Descending order"), @ExampleObject(value = "asc", name = "Ascending order")}) @RequestParam(required = false, defaultValue = "desc") String sortTpe) {
+                                                   @Parameter(name = "sortTpe", description = "Sort order", examples = {@ExampleObject(value = "desc", name = "Descending order"), @ExampleObject(value = "asc", name = "Ascending order")}) @RequestParam(required = false, defaultValue = "desc") String sortTpe) {
+        if (!miwSettings.getAuthorityWalletBpn().equals(getBpn())) {
+            throw new ForbiddenException();
+        }
+
         return ResponseEntity.status(HttpStatus.OK).body(service.getWallets(pageNumber, size, sortColumn, sortTpe));
     }
 }

@@ -21,18 +21,23 @@
 
 package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.user;
 
+import io.restassured.http.Header;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.ApiRolesV2;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.WalletRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.query.WalletQuery;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestAuthV2Util;
 import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
-import static io.restassured.RestAssured.when;
+import java.util.List;
+
+import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
 public class GetVerifiableCredentialsUserApiHandlerTest extends RestAssuredTestCase {
@@ -45,6 +50,9 @@ public class GetVerifiableCredentialsUserApiHandlerTest extends RestAssuredTestC
 
     @Autowired
     private TestPersistenceUtil persistenceUtil;
+
+    @Autowired
+    private TestAuthV2Util testAuthV2Util;
 
     @Test
     public void testGetVerifiableCredentialsUserApiSuccess() {
@@ -63,7 +71,11 @@ public class GetVerifiableCredentialsUserApiHandlerTest extends RestAssuredTestC
             walletService.storeVerifiableCredential(holderWallet, verifiableCredential);
         }
 
-        when()
+        final Header auth = testAuthV2Util.getAuthHeader(List.of(ApiRolesV2.WALLET_OWNER), holderWallet);
+
+        given()
+                .header(auth)
+                .when()
                 .get("/api/v2/verifiable-credentials?page=0&per_page=" + MAX_CREDENTIALS)
                 .then()
                 .statusCode(200)

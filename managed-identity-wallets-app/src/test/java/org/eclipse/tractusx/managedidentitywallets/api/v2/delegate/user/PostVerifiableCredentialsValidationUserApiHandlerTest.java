@@ -21,12 +21,17 @@
 
 package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.user;
 
+import io.restassured.http.Header;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.ApiRolesV2;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
+import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestAuthV2Util;
 import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 
+import java.time.Year;
 import java.util.List;
 import java.util.Map;
 
@@ -37,19 +42,51 @@ public class PostVerifiableCredentialsValidationUserApiHandlerTest extends RestA
     @Autowired
     private TestPersistenceUtil persistenceUtil;
 
+    @Autowired
+    private TestAuthV2Util testAuthV2Util;
+
     @Test
-    public void testPostSignedVerifiableCredentialUserApiHandler() {
+    public void testValidationOfVerifiableCredentialsSuccess() {
         final VerifiableCredential verifiableCredential = persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
-        final Map<String,Object> payload= Map.of(
+        final Map<String, Object> payload = Map.of(
                 "verifiableCredentials", List.of(verifiableCredential)
         );
 
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
+        final Header auth = testAuthV2Util.getAuthHeader(List.of(ApiRolesV2.WALLET_OWNER), wallet);
+
         given()
                 .header("Content-Type", "application/json")
+                .header(auth)
                 .body(payload)
                 .when()
                 .post("/api/v2/verifiable-credentials-validation")
                 .then()
-                .statusCode(200);
+                .statusCode(200)
+                .log().all()
+                .body("isValid", org.hamcrest.Matchers.equalTo(true));
+    }
+
+    @Test
+    public void testValidationOfVerifiableCredentialsFailure() {
+        final VerifiableCredential verifiableCredential = persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
+        // set different expiration date
+        verifiableCredential.put(VerifiableCredential.EXPIRATION_DATE, Year.now().getValue() + 1 + "-01-01T00:00:00Z");
+        final Map<String, Object> payload = Map.of(
+                "verifiableCredentials", List.of(verifiableCredential)
+        );
+
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
+        final Header auth = testAuthV2Util.getAuthHeader(List.of(ApiRolesV2.WALLET_OWNER), wallet);
+
+        given()
+                .header("Content-Type", "application/json")
+                .header(auth)
+                .body(payload)
+                .when()
+                .post("/api/v2/verifiable-credentials-validation")
+                .then()
+                .statusCode(200)
+                .body("isValid", org.hamcrest.Matchers.equalTo(false));
     }
 }

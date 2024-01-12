@@ -83,13 +83,13 @@ class MembershipHoldersCredentialTest extends MiwTestCase {
 
         String did = DidWebFactory.fromHostnameAndPath(miwSettings.getHost(), bpn).toString();
 
-        HttpHeaders headers = authV1Util.getInvalidUserHttpHeaders();
+        HttpHeaders headers = authV1Util.getNonExistingUserHttpHeaders();
 
         IssueMembershipCredentialRequest request = IssueMembershipCredentialRequest.builder().bpn(bpn).build();
 
         HttpEntity<IssueMembershipCredentialRequest> entity = new HttpEntity<>(request, headers);
 
-        ResponseEntity<VerifiableCredential> response = restTemplate.exchange(RestURI.CREDENTIALS_ISSUER_MEMBERSHIP, HttpMethod.POST, entity, VerifiableCredential.class);
+        ResponseEntity<Object> response = restTemplate.exchange(RestURI.CREDENTIALS_ISSUER_MEMBERSHIP, HttpMethod.POST, entity, Object.class);
         Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatusCode().value());
     }
 

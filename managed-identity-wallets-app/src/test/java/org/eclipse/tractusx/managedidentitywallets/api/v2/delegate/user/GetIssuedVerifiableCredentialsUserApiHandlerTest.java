@@ -25,9 +25,6 @@ import io.restassured.http.Header;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.ApiRolesV2;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
-import org.eclipse.tractusx.managedidentitywallets.repository.database.WalletRepository;
-import org.eclipse.tractusx.managedidentitywallets.repository.database.query.WalletQuery;
 import org.eclipse.tractusx.managedidentitywallets.test.util.TestAuthV2Util;
 import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.junit.jupiter.api.Test;
@@ -70,7 +67,7 @@ public class GetIssuedVerifiableCredentialsUserApiHandlerTest extends RestAssure
                 .when()
                 .get("/api/v2/signed-verifiable-credentials")
                 .then()
-                .statusCode(204);
+                .statusCode(200);
     }
 
     @Test

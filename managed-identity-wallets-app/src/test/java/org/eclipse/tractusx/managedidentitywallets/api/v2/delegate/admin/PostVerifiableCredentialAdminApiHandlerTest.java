@@ -121,7 +121,7 @@ public class PostVerifiableCredentialAdminApiHandlerTest extends RestAssuredTest
                 .then()
                 .statusCode(409);
 
-        // expect 2x(BPN+SummaryVC)+NewVC=2x2+1=5
-        Assertions.assertEquals(5, verifiableCredentialRepository.count(), "Verifiable Credential should have been created");
+        final int expected = 3 /* Summary + BPN + NewVC */;
+        Assertions.assertEquals(3, verifiableCredentialRepository.count(), "Verifiable Credential should have been created");
     }
 }

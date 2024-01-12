@@ -22,9 +22,10 @@
 package org.eclipse.tractusx.managedidentitywallets.test;
 
 import dasniko.testcontainers.keycloak.KeycloakContainer;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.runner.RunWith;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
@@ -32,33 +33,46 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.testcontainers.vault.VaultContainer;
 
+import java.time.Year;
+
 @RunWith(SpringRunner.class)
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT)
 @ActiveProfiles("dev")
 public abstract class MiwTestCase {
 
-
-    public static final KeycloakContainer KEYCLOAK_CONTAINER = new KeycloakContainer().withAdminUsername("admin").withAdminPassword("admin");
+    private static final String KEYCLOAK_ADMIN_USER_NAME = "admin";
+    private static final String KEYCLOAK_ADMIN_PASSWORD = "admin";
     private static final String VAULT_TOKEN = "00000000-0000-0000-0000-000000000foo";
+    private static final String VAULT_INIT_COMMAND = "secrets enable transit";
+
+    public static final KeycloakContainer KEYCLOAK_CONTAINER = new KeycloakContainer()
+            .withAdminUsername(KEYCLOAK_ADMIN_USER_NAME)
+            .withAdminPassword(KEYCLOAK_ADMIN_PASSWORD)
+            .withReuse(true);
     private static final VaultContainer<?> VAULT_CONTAINER = new VaultContainer<>("hashicorp/vault:1.13")
             .withVaultToken(VAULT_TOKEN)
-            .withInitCommand(
-                    "secrets enable transit",
-                    "write -f transit/keys/my-key",
-                    "kv put secret/testing1 top_secret=password123",
-                    "kv put secret/testing2 secret_one=password1 secret_two=password2 secret_three=password3 secret_three=password3 secret_four=password4"
-            );
+            .withInitCommand(VAULT_INIT_COMMAND)
+            .withReuse(true);
 
-    @BeforeAll
-    public static void beforeAll() {
+    static {
         KEYCLOAK_CONTAINER.start();
         VAULT_CONTAINER.start();
     }
 
-    @AfterAll
-    public static void afterAll() {
-        KEYCLOAK_CONTAINER.stop();
-        VAULT_CONTAINER.stop();
+    @Autowired
+    private TestPersistenceUtil testPersistenceUtil;
+
+    @Autowired
+    private WalletEventTracker walletEventTracker;
+
+    @Autowired
+    private VerifiableCredentialEventTracker verifiableCredentialEventTracker;
+
+    @BeforeEach
+    public void beforeEach() {
+        testPersistenceUtil.cleanUp();
+        walletEventTracker.clear();
+        verifiableCredentialEventTracker.clear();
     }
 
     @DynamicPropertySource
@@ -76,5 +90,6 @@ public abstract class MiwTestCase {
         registry.add("spring.cloud.vault.host", VAULT_CONTAINER::getHost);
         registry.add("spring.cloud.vault.port", VAULT_CONTAINER::getFirstMappedPort);
         registry.add("spring.cloud.vault.scheme", () -> "http");
+        registry.add("miw.vcExpiryDate", () -> "01-01-" + Year.now().getValue() + 1);
     }
 }

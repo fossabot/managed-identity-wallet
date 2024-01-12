@@ -88,12 +88,11 @@ class WalletTest extends MiwTestCase {
         Assertions.assertTrue(exists, "Authority wallet does not exist");
     }
 
-
     @Test
     void createWalletTest403() {
         String bpn = UUID.randomUUID().toString();
         String name = "Sample Wallet";
-        HttpHeaders headers = authV1Util.getInvalidUserHttpHeaders();
+        HttpHeaders headers = authV1Util.getNonExistingUserHttpHeaders();
 
         CreateWalletRequest request = CreateWalletRequest.builder().bpn(bpn).name(name).build();
 
@@ -107,6 +106,7 @@ class WalletTest extends MiwTestCase {
     void createWalletTestWithUserToken403() {
         String bpn = UUID.randomUUID().toString();
         String name = "Sample Wallet";
+        final org.eclipse.tractusx.managedidentitywallets.models.Wallet wallet = persistenceUtil.newWalletPersisted(bpn, name);
         HttpHeaders headers = authV1Util.getValidUserHttpHeaders(bpn);
 
         CreateWalletRequest request = CreateWalletRequest.builder().bpn(bpn).name(name).build();
@@ -190,7 +190,7 @@ class WalletTest extends MiwTestCase {
         authorityWalletExistTest();
         String did = "did:web:localhost:" + miwSettings.getAuthorityWalletBpn();
 
-        HttpHeaders headers = authV1Util.getValidUserHttpHeaders("Invalid BPN");
+        HttpHeaders headers = authV1Util.getNonExistingUserHttpHeaders();
 
         final var wallet = persistenceUtil.newWalletPersisted();
         final GenericVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs args = GenericVerifiableCredentialFactory.GenericVerifiableCredentialFactoryArgs.builder()
@@ -211,7 +211,7 @@ class WalletTest extends MiwTestCase {
         String bpn = UUID.randomUUID().toString();
         String did = DidWebFactory.fromHostnameAndPath(miwSettings.getHost(), bpn).toString();
         String baseBpn = miwSettings.getAuthorityWalletBpn();
-        HttpHeaders headers = authV1Util.getValidUserHttpHeaders("Some random pbn");
+        HttpHeaders headers = authV1Util.getNonExistingUserHttpHeaders();
 
         TestUtils.createWallet(bpn, "name", restTemplate, headers);
 
@@ -243,7 +243,7 @@ class WalletTest extends MiwTestCase {
     @Test
     void getWalletByIdentifierTest403() {
         String bpn = UUID.randomUUID().toString();
-        HttpHeaders headers = authV1Util.getInvalidUserHttpHeaders();
+        HttpHeaders headers = authV1Util.getNonExistingUserHttpHeaders();
 
         HttpEntity<CreateWalletRequest> entity = new HttpEntity<>(headers);
 
@@ -261,10 +261,10 @@ class WalletTest extends MiwTestCase {
         TestUtils.createWallet(bpn, "sample name", restTemplate, headers);
 
         //create token with different BPN
-        headers = authV1Util.getValidUserHttpHeaders("invalid BPN");
+        headers = authV1Util.getNonExistingUserHttpHeaders();
         HttpEntity<CreateWalletRequest> entity = new HttpEntity<>(headers);
 
-        ResponseEntity<WalletEntity> response = restTemplate.exchange(RestURI.API_WALLETS_IDENTIFIER, HttpMethod.GET, entity, WalletEntity.class, bpn);
+        ResponseEntity<Object> response = restTemplate.exchange(RestURI.API_WALLETS_IDENTIFIER, HttpMethod.GET, entity, Object.class, bpn);
 
         Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatusCode().value());
     }
@@ -357,34 +357,32 @@ class WalletTest extends MiwTestCase {
 
     @Test
     void getWallets403() {
-        HttpHeaders headers = authV1Util.getInvalidUserHttpHeaders();
+        HttpHeaders headers = authV1Util.getNonExistingUserHttpHeaders();
 
         HttpEntity<CreateWalletRequest> entity = new HttpEntity<>(headers);
-        ResponseEntity<List<WalletEntity>> response = restTemplate.exchange(RestURI.WALLETS, HttpMethod.GET, entity,
+        ResponseEntity<Object> response = restTemplate.exchange(RestURI.WALLETS, HttpMethod.GET, entity,
                 new ParameterizedTypeReference<>() {
                 });
         Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatusCode().value());
     }
 
-
     @Test
     void getWallets200() throws JsonProcessingException {
 
-        String bpn = UUID.randomUUID().toString();
-        String name = "Sample Name";
-        String baseBpn = miwSettings.getAuthorityWalletBpn();
-        HttpHeaders headers = authV1Util.getValidUserHttpHeaders(baseBpn);
+        final String authorityWalletBpn = miwSettings.getAuthorityWalletBpn();
+        final HttpHeaders headers = authV1Util.getValidUserHttpHeaders(authorityWalletBpn);
+
         //Create entry
+        final String bpn = UUID.randomUUID().toString();
+        final String name = "Sample Name";
         TestUtils.createWallet(bpn, name, restTemplate, headers);
 
-        headers = authV1Util.getValidUserHttpHeaders();
         HttpEntity<CreateWalletRequest> entity = new HttpEntity<>(headers);
         ResponseEntity<String> response = restTemplate.exchange(RestURI.WALLETS, HttpMethod.GET, entity, String.class);
         List<Wallet> body = getWalletsFromString(response.getBody());
         Assertions.assertEquals(HttpStatus.OK.value(), response.getStatusCode().value());
         Assertions.assertTrue(Objects.requireNonNull(body).size() > 0);
     }
-
 
     private ResponseEntity<Map> storeCredential(String bpn, HttpHeaders headers) throws JsonProcessingException {
 

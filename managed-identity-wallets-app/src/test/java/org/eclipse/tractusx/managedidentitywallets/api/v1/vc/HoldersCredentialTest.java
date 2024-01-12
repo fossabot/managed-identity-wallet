@@ -89,7 +89,7 @@ class HoldersCredentialTest extends MiwTestCase {
     void issueCredentialTestWithInvalidBPNAccess403() throws JsonProcessingException {
         String bpn = UUID.randomUUID().toString();
         Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
-        HttpHeaders headers = authV1Util.getValidUserHttpHeaders("not valid BPN");
+        HttpHeaders headers = authV1Util.getNonExistingUserHttpHeaders();
 
         ResponseEntity<String> response = issueVC(wallet, headers);
 
@@ -116,7 +116,7 @@ class HoldersCredentialTest extends MiwTestCase {
 
     @Test
     void getCredentialsTest403() {
-        HttpHeaders headers = authV1Util.getInvalidUserHttpHeaders();
+        HttpHeaders headers = authV1Util.getNonExistingUserHttpHeaders();
         HttpEntity<CreateWalletRequest> entity = new HttpEntity<>(headers);
         ResponseEntity<Map> response = restTemplate.exchange(RestURI.CREDENTIALS, HttpMethod.GET, entity, Map.class);
 
@@ -125,11 +125,11 @@ class HoldersCredentialTest extends MiwTestCase {
 
     @Test
     void getCredentials200() throws com.fasterxml.jackson.core.JsonProcessingException {
-        String baseDID = miwSettings.getAuthorityWalletDid();
-        String bpn = UUID.randomUUID().toString();
-        HttpHeaders headers = authV1Util.getValidUserHttpHeaders(bpn);
-        //save wallet
+        final String baseDID = miwSettings.getAuthorityWalletDid();
+        final String bpn = UUID.randomUUID().toString();
         final Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
+        final HttpHeaders headers = authV1Util.getValidUserHttpHeaders(bpn);
+        //save wallet
         persistenceUtil.newVerifiableCredential(wallet);
         String vcList = """
                 [

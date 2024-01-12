@@ -243,18 +243,18 @@ class PresentationTest extends MiwTestCase {
 
     @Test
     void createPresentationWithInvalidBPNAccess403() throws JsonProcessingException {
-        String bpn = UUID.randomUUID().toString();
-        Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
+        final String bpn = UUID.randomUUID().toString();
+        final Wallet wallet = persistenceUtil.newWalletPersisted(bpn);
 
-        Map<String, Object> request = getIssueVPRequest(wallet);
+        final Map<String, Object> request = getIssueVPRequest(wallet);
 
-        HttpHeaders headers = authV1Util.getValidUserHttpHeaders("invalid bpn");
+        final HttpHeaders headers = authV1Util.getNonExistingUserHttpHeaders();
         headers.put(HttpHeaders.CONTENT_TYPE, List.of(MediaType.APPLICATION_JSON_VALUE));
 
-        HttpEntity<String> entity = new HttpEntity<>(objectMapper.writeValueAsString(request), headers);
+        final HttpEntity<String> entity = new HttpEntity<>(objectMapper.writeValueAsString(request), headers);
 
-        ResponseEntity<Map> vpResponse = restTemplate.exchange(RestURI.API_PRESENTATIONS + "?asJwt={asJwt}&audience={audience}", HttpMethod.POST, entity, Map.class, true, "companyA");
-        Assertions.assertEquals(vpResponse.getStatusCode().value(), HttpStatus.NOT_FOUND.value());
+        final ResponseEntity<Map> vpResponse = restTemplate.exchange(RestURI.API_PRESENTATIONS + "?asJwt={asJwt}&audience={audience}", HttpMethod.POST, entity, Map.class, true, "companyA");
+        Assertions.assertEquals(vpResponse.getStatusCode().value(), HttpStatus.FORBIDDEN.value());
     }
 
     @NotNull

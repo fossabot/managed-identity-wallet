@@ -26,6 +26,7 @@ import org.eclipse.tractusx.managedidentitywallets.api.v2.ApiRolesV2;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.WalletRepository;
+import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
 import org.eclipse.tractusx.managedidentitywallets.test.util.TestAuthV2Util;
 import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.junit.jupiter.api.Assertions;
@@ -91,7 +92,21 @@ public class DeleteWalletByIdAdminApiHandlerTest extends RestAssuredTestCase {
 
     @Test
     public void testSuccessForNonExistingWallet() {
+
+        System.out.println("XXXXXXXXXXXX");
+        System.out.println("XXXXXXXXXXXX");
+        System.out.println("XXXXXXXXXXXX");
+        System.out.println("XXXXXXXXXXXX");
+        System.out.println("XXXXXXXXXXXX");
+        System.out.println(MiwTestCase.KEYCLOAK_CONTAINER.getAuthServerUrl());
+        System.out.println("XXXXXXXXXXXX");
+        System.out.println("XXXXXXXXXXXX");
+        System.out.println("XXXXXXXXXXXX");
+        System.out.println("XXXXXXXXXXXX");
+        System.out.println("XXXXXXXXXXXX");
+
         final Header auth_admin = testAuthV2Util.getAuthHeader(List.of(ApiRolesV2.ADMIN));
+
 
         given()
                 .header(auth_admin)

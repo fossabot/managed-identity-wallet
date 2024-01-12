@@ -21,36 +21,39 @@
 
 package org.eclipse.tractusx.managedidentitywallets.api.v1.controller;
 
-import org.eclipse.tractusx.managedidentitywallets.api.v1.utils.Validate;
-import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
+import lombok.RequiredArgsConstructor;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.ForbiddenException;
-import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
-
-import java.security.Principal;
-import java.util.Map;
-import java.util.TreeMap;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.security.SecurityService;
+import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Controller;
 
 /**
  * The type Base controller.
  */
+@Controller
 public class BaseController {
+
+    @Autowired
+    private SecurityService securityService;
+
+    @Autowired
+    private WalletService walletService;
 
     /**
      * Gets bpn from token.
      *
-     * @param principal the principal
      * @return the bpn from token
      */
-    public String getBPNFromToken(Principal principal) {
-        Object principal1 = ((JwtAuthenticationToken) principal).getPrincipal();
-        Jwt jwt = (Jwt) principal1;
+    public String getBpn() {
+        final String bpn = securityService.getBpn()
+                .orElseThrow(() -> new ForbiddenException("Invalid token, BPN not found"));
 
-        //this will misbehave if we have more then one claims with different case
-        // ie. BPN=123456 and bpn=789456
-        Map<String, Object> claims = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
-        claims.putAll(jwt.getClaims());
-        Validate.isFalse(claims.containsKey(StringPool.BPN)).launch(new ForbiddenException("Invalid token, BPN not found"));
-        return claims.get(StringPool.BPN).toString();
+        if (walletService.existsById(new WalletId(bpn))) {
+            return bpn;
+        } else {
+            throw new ForbiddenException();
+        }
     }
 }

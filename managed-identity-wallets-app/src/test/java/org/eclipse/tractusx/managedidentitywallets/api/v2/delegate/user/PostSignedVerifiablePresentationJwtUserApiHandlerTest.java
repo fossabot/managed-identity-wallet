@@ -21,7 +21,11 @@
 
 package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.user;
 
+import io.restassured.http.Header;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.ApiRolesV2;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
+import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestAuthV2Util;
 import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.junit.jupiter.api.Test;
@@ -37,21 +41,30 @@ public class PostSignedVerifiablePresentationJwtUserApiHandlerTest extends RestA
     @Autowired
     private TestPersistenceUtil persistenceUtil;
 
+    @Autowired
+    private TestAuthV2Util testAuthV2Util;
+
     @Test
-    public void testPostSignedVerifiableCredentialUserApiHandler() {
+    public void testVerifiablePresentationJwtIssuingSuccess() {
 
         final VerifiableCredential verifiableCredential = persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
-        final Map<String,Object> payload= Map.of(
+        final Map<String, Object> payload = Map.of(
                 "audience", "foo",
                 "verifiableCredentials", List.of(verifiableCredential)
         );
 
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
+        final Header auth = testAuthV2Util.getAuthHeader(List.of(ApiRolesV2.WALLET_OWNER), wallet);
+
         given()
                 .header("Content-Type", "application/json")
+                .header(auth)
                 .body(payload)
                 .when()
                 .post("/api/v2/signed-verifiable-presentations/jwt")
                 .then()
-                .statusCode(200);
+                .statusCode(200)
+                .log().all()
+                .body("verifiable-presentation", org.hamcrest.Matchers.notNullValue());
     }
 }

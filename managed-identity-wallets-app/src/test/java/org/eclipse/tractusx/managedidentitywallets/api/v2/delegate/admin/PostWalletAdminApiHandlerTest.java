@@ -127,7 +127,7 @@ public class PostWalletAdminApiHandlerTest extends RestAssuredTestCase {
                 .log().all()
                 .statusCode(409);
 
-        Assertions.assertEquals(3, walletRepository.count(), "2 Wallet should have been created (plus Authority Wallet =3)");
+        Assertions.assertEquals(2, walletRepository.count(), "One Wallet should have been created (plus Authority Wallet = 2)");
     }
 
 }

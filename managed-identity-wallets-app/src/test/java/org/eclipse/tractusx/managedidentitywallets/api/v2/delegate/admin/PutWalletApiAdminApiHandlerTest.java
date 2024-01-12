@@ -83,7 +83,7 @@ public class PutWalletApiAdminApiHandlerTest extends RestAssuredTestCase {
                 .when()
                 .put("/api/v2/admin/wallets")
                 .then()
-                .statusCode(201);
+                .statusCode(202);
     }
 
     @Test

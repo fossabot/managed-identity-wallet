@@ -21,96 +21,52 @@
 
 package org.eclipse.tractusx.managedidentitywallets.test.util;
 
+import io.restassured.http.Header;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
-import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
+import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.ApplicationRole;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
-import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.KeycloakBuilder;
-import org.keycloak.admin.client.resource.RealmResource;
-import org.keycloak.admin.client.resource.UserResource;
-import org.keycloak.representations.idm.UserRepresentation;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
-import java.util.Map;
-import java.util.Random;
-
-import static org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase.KEYCLOAK_CONTAINER;
+import java.util.UUID;
 
 @Getter
 @Component
 @RequiredArgsConstructor
 public class TestAuthV1Util {
 
+    private static final List<String> ALL_ROLES = List.of(ApplicationRole.ROLE_VIEW_WALLETS, ApplicationRole.ROLE_VIEW_WALLET, ApplicationRole.ROLE_ADD_WALLETS, ApplicationRole.ROLE_UPDATE_WALLETS, ApplicationRole.ROLE_UPDATE_WALLET, ApplicationRole.ROLE_MANAGE_APP);
+
+    private final TestAuthV2Util testAuthV2Util;
     private final TestPersistenceUtil testPersistenceUtil;
 
     public HttpHeaders getValidUserHttpHeaders() {
-        Wallet wallet = testPersistenceUtil.newWalletPersisted();
-        String token = getApiV1JwtToken(StringPool.VALID_USER_NAME, wallet.getWalletId().toString());
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, token);
+        final Wallet wallet = testPersistenceUtil.newWalletPersisted();
+        final Header header = testAuthV2Util.getAuthHeader(ALL_ROLES, wallet);
+
+        final HttpHeaders headers = new HttpHeaders();
+        headers.set(header.getName(), header.getValue());
         return headers;
     }
 
     public HttpHeaders getValidUserHttpHeaders(String bpn) {
-        String token = getApiV1JwtToken(StringPool.VALID_USER_NAME, bpn);
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, token);
+        final Wallet wallet = testPersistenceUtil.getWalletRepository().findById(new WalletId(bpn)).orElseThrow();
+        final Header header = testAuthV2Util.getAuthHeader(ALL_ROLES, wallet);
+
+        final HttpHeaders headers = new HttpHeaders();
+        headers.set(header.getName(), header.getValue());
         return headers;
     }
 
-    public HttpHeaders getInvalidUserHttpHeaders() {
-        String token = getInvalidUserToken();
-        HttpHeaders headers = new HttpHeaders();
-        headers.set(HttpHeaders.AUTHORIZATION, token);
+    public HttpHeaders getNonExistingUserHttpHeaders() {
+        final Wallet nonPersistetWallet = testPersistenceUtil.newWallet(UUID.randomUUID().toString(), "foo");
+        final Header header = testAuthV2Util.getAuthHeader(ALL_ROLES, nonPersistetWallet);
+
+        final HttpHeaders headers = new HttpHeaders();
+        headers.set(header.getName(), header.getValue());
         return headers;
-    }
-
-    public String getInvalidUserToken() {
-        return getApiV1JwtToken(StringPool.INVALID_USER_NAME);
-    }
-
-    public String getApiV1JwtToken(String username, String bpn) {
-
-        List<String> list = List.of("BPN", "bpn", "bPn"); //Do not add more field here, if you do make sure you change in keycloak realm file
-        Random randomizer = new Random();
-        String attributeName = list.get(randomizer.nextInt(list.size()));
-
-        Keycloak keycloak = KeycloakBuilder.builder()
-                .serverUrl(KEYCLOAK_CONTAINER.getAuthServerUrl())
-                .realm(StringPool.REALM)
-                .clientId(StringPool.CLIENT_ID)
-                .clientSecret(StringPool.CLIENT_SECRET)
-                .grantType(StringPool.CLIENT_CREDENTIALS)
-                .scope(StringPool.OPENID)
-                .build();
-
-        RealmResource realmResource = keycloak.realm(StringPool.REALM);
-
-        List<UserRepresentation> userRepresentations = realmResource.users().search(username, true);
-        UserRepresentation userRepresentation = userRepresentations.get(0);
-        UserResource userResource = realmResource.users().get(userRepresentations.get(0).getId());
-        userRepresentation.setEmailVerified(true);
-        userRepresentation.setEnabled(true);
-        userRepresentation.setAttributes(Map.of(attributeName, List.of(bpn)));
-        userResource.update(userRepresentation);
-        return getApiV1JwtToken(username);
-    }
-
-    public String getApiV1JwtToken(String username) {
-
-        Keycloak keycloakAdminClient = KeycloakBuilder.builder()
-                .serverUrl(KEYCLOAK_CONTAINER.getAuthServerUrl())
-                .realm(StringPool.REALM)
-                .clientId(StringPool.CLIENT_ID)
-                .clientSecret(StringPool.CLIENT_SECRET)
-                .username(username)
-                .password(StringPool.USER_PASSWORD)
-                .build();
-        String access_token = keycloakAdminClient.tokenManager().getAccessToken().getToken();
-
-        return StringPool.BEARER_SPACE + access_token;
     }
 }

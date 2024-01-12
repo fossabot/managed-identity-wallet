@@ -23,6 +23,7 @@ package org.eclipse.tractusx.managedidentitywallets.api.v1.vc;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.MIWVerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.RestURI;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
@@ -142,13 +143,20 @@ class IssuersCredentialTest extends MiwTestCase {
     }
 
     @Test
+    @SneakyThrows
     void issueCredentialsTestWithInvalidRole403() {
 
-        HttpHeaders headers = authV1Util.getInvalidUserHttpHeaders();
+        HttpHeaders headers = authV1Util.getNonExistingUserHttpHeaders();
+        headers.add("Content-Type", MediaType.APPLICATION_JSON_VALUE);
 
-        HttpEntity<CreateWalletRequest> entity = new HttpEntity<>(headers);
+        final Wallet issuerWallet = persistenceUtil.newWalletPersisted(UUID.randomUUID().toString());
+        VerifiableCredential verifiableCredential = persistenceUtil.newVerifiableCredential(issuerWallet);
+        Map<String, Objects> map = objectMapper.readValue(verifiableCredential.toJson(), Map.class);
+        HttpEntity<Map> entity = new HttpEntity<>(map, headers);
 
-        ResponseEntity<Map> response = restTemplate.exchange(RestURI.ISSUERS_CREDENTIALS, HttpMethod.POST, entity, Map.class);
+        final Wallet holderWallet = persistenceUtil.newWalletPersisted();
+
+        ResponseEntity<Map> response = restTemplate.exchange(RestURI.ISSUERS_CREDENTIALS + "?holderDid={did}", HttpMethod.POST, entity, Map.class, holderWallet.getWalletId().toString());
 
         Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatusCode().value());
     }

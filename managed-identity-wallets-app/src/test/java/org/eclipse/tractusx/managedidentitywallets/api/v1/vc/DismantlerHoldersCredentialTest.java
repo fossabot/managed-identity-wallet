@@ -65,16 +65,29 @@ class DismantlerHoldersCredentialTest extends MiwTestCase {
     private VerifiableCredentialService verifiableCredentialService;
 
     @Test
+    void issueDismantlerCredentialTest403NotAuthority() {
+        final Wallet nonAuhorityWallet = testPersistenceUtil.newWalletPersisted();
+        final HttpHeaders nonAuthorityHeaders = testAuthV1Util.getValidUserHttpHeaders(nonAuhorityWallet.getWalletId().toString());
+
+        final IssueDismantlerCredentialRequest request = IssueDismantlerCredentialRequest.builder().bpn(nonAuhorityWallet.getWalletId().toString()).activityType("yes").build();
+
+        final HttpEntity<IssueDismantlerCredentialRequest> entity = new HttpEntity<>(request, nonAuthorityHeaders);
+
+        final ResponseEntity<Object> response = restTemplate.exchange(RestURI.CREDENTIALS_ISSUER_DISMANTLER, HttpMethod.POST, entity, Object.class);
+        Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatusCode().value());
+    }
+
+    @Test
     void issueDismantlerCredentialTest403() {
         final String bpn = UUID.randomUUID().toString();
 
-        final HttpHeaders headers = testAuthV1Util.getInvalidUserHttpHeaders();
+        final HttpHeaders headers = testAuthV1Util.getNonExistingUserHttpHeaders();
 
         final IssueDismantlerCredentialRequest request = IssueDismantlerCredentialRequest.builder().bpn(bpn).activityType("yes").build();
 
         final HttpEntity<IssueDismantlerCredentialRequest> entity = new HttpEntity<>(request, headers);
 
-        final ResponseEntity<VerifiableCredential> response = restTemplate.exchange(RestURI.CREDENTIALS_ISSUER_DISMANTLER, HttpMethod.POST, entity, VerifiableCredential.class);
+        final ResponseEntity<Object> response = restTemplate.exchange(RestURI.CREDENTIALS_ISSUER_DISMANTLER, HttpMethod.POST, entity, Object.class);
         Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatusCode().value());
     }
 

@@ -77,13 +77,13 @@ class FrameworkHoldersCredentialTest extends MiwTestCase {
     void issueFrameworkCredentialTest403() {
         String bpn = UUID.randomUUID().toString();
         String did = DidWebFactory.fromHostnameAndPath(miwSettings.getHost(), bpn).toString();
-        HttpHeaders headers = authV1Util.getInvalidUserHttpHeaders();
+        HttpHeaders headers = authV1Util.getNonExistingUserHttpHeaders();
 
-        IssueMembershipCredentialRequest request = IssueMembershipCredentialRequest.builder().bpn(bpn).build();
+        IssueFrameworkCredentialRequest request = IssueFrameworkCredentialRequest.builder().holderIdentifier(bpn).type("type").contractTemplate("http://localhost/template").contractVersion("0.0.1").build();
 
-        HttpEntity<IssueMembershipCredentialRequest> entity = new HttpEntity<>(request, headers);
+        HttpEntity<IssueFrameworkCredentialRequest> entity = new HttpEntity<>(request, headers);
 
-        ResponseEntity<VerifiableCredential> response = restTemplate.exchange(RestURI.API_CREDENTIALS_ISSUER_FRAMEWORK, HttpMethod.POST, entity, VerifiableCredential.class);
+        ResponseEntity<Object> response = restTemplate.exchange(RestURI.API_CREDENTIALS_ISSUER_FRAMEWORK, HttpMethod.POST, entity, Object.class);
         Assertions.assertEquals(HttpStatus.FORBIDDEN.value(), response.getStatusCode().value());
     }
 

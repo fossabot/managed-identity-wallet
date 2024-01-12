@@ -283,6 +283,7 @@ paths:
           description: Wallet already exists.
         '400':
           description: Bad request.
+    # TODO Should this be behind /admin/wallets/{walletId}?
     put:
       operationId: adminUpdateWallet
       tags:

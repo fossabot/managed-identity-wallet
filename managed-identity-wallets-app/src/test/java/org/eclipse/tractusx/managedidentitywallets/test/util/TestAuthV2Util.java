@@ -65,9 +65,6 @@ public class TestAuthV2Util {
 
     public Header getAuthHeader(@NonNull List<String> roles, Wallet wallet) {
 
-        var adminUser = KEYCLOAK_CONTAINER.getAdminUsername();
-        var adminPassword = KEYCLOAK_CONTAINER.getAdminPassword();
-
         /* Create Realm */
         createRealm(KEYCLOAK_DEFAULT_REALM);
 
@@ -114,7 +111,6 @@ public class TestAuthV2Util {
         realmsResource.create(newRealm);
     }
 
-
     public Client createClient(@NonNull String clientId, @NonNull String clientSecret) {
         final Keycloak keycloak = getAdminKeycloak();
 
@@ -133,10 +129,10 @@ public class TestAuthV2Util {
         protocolMapperRepresentation.setName("BPN Mapper");
         protocolMapperRepresentation.setConfig(Map.of(
                 "userinfo.token.claim", "true",
-                "user.attribute", "BPN",
+                "user.attribute", ATTRIBUTE_BPN,
                 "id.token.claim", "true",
                 "access.token.claim", "true",
-                "claim.name", "BPN",
+                "claim.name", "bpn",
                 "jsonType.label", "String"
         ));
 
@@ -182,7 +178,7 @@ public class TestAuthV2Util {
         user.setFirstName("foo");
         user.setLastName("bar");
         user.setEmail(name + "@localhost.bar");
-        user.setAttributes(Map.of("BPN", Collections.singletonList("BPNL0000000FOO")));
+        user.setAttributes(Map.of(ATTRIBUTE_BPN, Collections.singletonList("BPNL0000000FOO")));
 
         // Create user (requires manage-users role)
         final Response response = usersResource.create(user);

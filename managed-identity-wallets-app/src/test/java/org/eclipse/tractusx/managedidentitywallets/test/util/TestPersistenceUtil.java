@@ -65,7 +65,6 @@ public class TestPersistenceUtil {
 
     private final VerifiableCredentialService verifiableCredentialService;
 
-    @BeforeEach
     public void cleanUp() {
 
         verifiableCredentialRepository.deleteAll();

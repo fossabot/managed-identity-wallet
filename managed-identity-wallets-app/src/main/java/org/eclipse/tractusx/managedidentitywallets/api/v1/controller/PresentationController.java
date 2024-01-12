@@ -38,7 +38,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.security.Principal;
 import java.util.Map;
 
 /**
@@ -58,7 +57,6 @@ public class PresentationController extends BaseController {
      * @param data      the data
      * @param audience  the audience
      * @param asJwt     the as jwt
-     * @param principal the principal
      * @return the response entity
      */
     @Tag(name = API_TAG_VERIFIABLE_PRESENTATIONS_GENERATION)
@@ -188,9 +186,9 @@ public class PresentationController extends BaseController {
     })
     public ResponseEntity<Map<String, Object>> createPresentation(@RequestBody Map<String, Object> data,
                                                                   @RequestParam(name = "audience", required = false) String audience,
-                                                                  @RequestParam(name = "asJwt", required = false, defaultValue = "false") boolean asJwt, Principal principal
+                                                                  @RequestParam(name = "asJwt", required = false, defaultValue = "false") boolean asJwt
     ) {
-        return ResponseEntity.status(HttpStatus.CREATED).body(presentationService.createPresentation(data, asJwt, audience, getBPNFromToken(principal)));
+        return ResponseEntity.status(HttpStatus.CREATED).body(presentationService.createPresentation(data, asJwt, audience, getBpn()));
     }
 
     /**

@@ -21,17 +21,32 @@
 
 package org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.user;
 
+import io.restassured.http.Header;
+import org.eclipse.tractusx.managedidentitywallets.api.v2.ApiRolesV2;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.RestAssuredTestCase;
+import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestAuthV2Util;
+import org.eclipse.tractusx.managedidentitywallets.test.util.TestPersistenceUtil;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+
+import java.util.List;
 
 import static io.restassured.RestAssured.given;
 
 public class PostSignedVerifiableCredentialUserApiHandlerTest extends RestAssuredTestCase {
 
-    @Test
-    public void testPostSignedVerifiableCredentialUserApiHandler() {
+    @Autowired
+    private TestPersistenceUtil persistenceUtil;
 
-        final String payload = "{" +
+
+    @Autowired
+    private TestAuthV2Util testAuthV2Util;
+
+    @Test
+    public void testIssuingOfNewVerifiableCredentialSuccess() {
+
+        final String vcWithoutProof = "{" +
                 "    \"verifiableCredentialSubject\": {" +
                 "        \"holderIdentifier\": \"FOO\"," +
                 "        \"id\": \"BAR\"," +
@@ -50,12 +65,18 @@ public class PostSignedVerifiableCredentialUserApiHandlerTest extends RestAssure
                 "    ]" +
                 "}";
 
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
+        final Header auth = testAuthV2Util.getAuthHeader(List.of(ApiRolesV2.WALLET_OWNER), wallet);
+
         given()
                 .header("Content-Type", "application/json")
-                .body(payload)
+                .header(auth)
+                .body(vcWithoutProof)
                 .when()
                 .post("/api/v2/signed-verifiable-credentials")
                 .then()
-                .statusCode(200);
+                .statusCode(200)
+                .log().all()
+                .body("proof", org.hamcrest.Matchers.notNullValue());
     }
 }
