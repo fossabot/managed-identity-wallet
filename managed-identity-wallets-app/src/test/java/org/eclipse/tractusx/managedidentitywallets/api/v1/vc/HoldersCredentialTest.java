@@ -192,7 +192,7 @@ class HoldersCredentialTest extends MiwTestCase {
             utils.when(() -> {
                 LinkedDataProofValidation.newInstance(Mockito.any(DidResolver.class));
             }).thenReturn(mock);
-            Mockito.when(mock.verifiy(Mockito.any(VerifiableCredential.class))).thenReturn(false);
+            Mockito.when(mock.verify(Mockito.any(VerifiableCredential.class))).thenReturn(false);
 
             Map<String, Object> stringObjectMap = credentialController.credentialsValidation(map, false).getBody();
             Assertions.assertFalse(Boolean.parseBoolean(stringObjectMap.get(StringPool.VALID).toString()));
@@ -214,7 +214,7 @@ class HoldersCredentialTest extends MiwTestCase {
             utils.when(() -> {
                 LinkedDataProofValidation.newInstance(Mockito.any(DidResolver.class));
             }).thenReturn(mock);
-            Mockito.when(mock.verifiy(Mockito.any(VerifiableCredential.class))).thenReturn(true);
+            Mockito.when(mock.verify(Mockito.any(VerifiableCredential.class))).thenReturn(true);
 
             Map<String, Object> stringObjectMap = credentialController.credentialsValidation(map, true).getBody();
             Assertions.assertTrue(Boolean.parseBoolean(stringObjectMap.get(StringPool.VALID).toString()));
@@ -241,7 +241,7 @@ class HoldersCredentialTest extends MiwTestCase {
             utils.when(() -> {
                 LinkedDataProofValidation.newInstance(Mockito.any(DidResolver.class));
             }).thenReturn(mock);
-            Mockito.when(mock.verifiy(Mockito.any(VerifiableCredential.class))).thenReturn(true);
+            Mockito.when(mock.verify(Mockito.any(VerifiableCredential.class))).thenReturn(true);
 
             Map<String, Object> stringObjectMap = credentialController.credentialsValidation(map, false).getBody();
             Assertions.assertTrue(Boolean.parseBoolean(stringObjectMap.get(StringPool.VALID).toString()));
@@ -267,7 +267,7 @@ class HoldersCredentialTest extends MiwTestCase {
             utils.when(() -> {
                 LinkedDataProofValidation.newInstance(Mockito.any(DidResolver.class));
             }).thenReturn(mock);
-            Mockito.when(mock.verifiy(Mockito.any(VerifiableCredential.class))).thenReturn(true);
+            Mockito.when(mock.verify(Mockito.any(VerifiableCredential.class))).thenReturn(true);
 
             Map<String, Object> stringObjectMap = credentialController.credentialsValidation(map, true).getBody();
             Assertions.assertFalse(Boolean.parseBoolean(stringObjectMap.get(StringPool.VALID).toString()));

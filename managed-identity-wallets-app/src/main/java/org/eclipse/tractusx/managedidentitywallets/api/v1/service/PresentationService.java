@@ -30,7 +30,12 @@ import org.eclipse.tractusx.managedidentitywallets.api.v1.entity.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.BadDataException;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.utils.Validate;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
-import org.eclipse.tractusx.managedidentitywallets.models.*;
+import org.eclipse.tractusx.managedidentitywallets.models.JsonWebToken;
+import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
+import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialValidationResultViolation;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiablePresentationJwtValidationResult;
+import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.ValidationService;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
@@ -53,7 +58,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 
 import java.net.URI;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
 /**
  * The type Presentation service.
@@ -64,7 +74,6 @@ import java.util.*;
 public class PresentationService {
 
     private final CommonService commonService;
-
     private final VaultService vaultService;
     private final WalletService walletService;
     private final ValidationService validationService;
@@ -129,8 +138,6 @@ public class PresentationService {
                             .build();
             response.put(StringPool.VP, verifiablePresentation);
         }
-
-
         return response;
     }
 
@@ -153,27 +160,27 @@ public class PresentationService {
             //verify as jwt
             Validate.isNull(vp.get(StringPool.VP)).launch(new BadDataException("Can not find JWT"));
             String jwt = vp.get(StringPool.VP).toString();
+            response.put(StringPool.VP, jwt);
 
             VerifiablePresentationJwtValidationResult result = validationService.validate(new JsonWebToken(jwt));
 
             // is valid
             response.put(StringPool.VALID, result.isValid());
 
-            //validate audience
-            SignedJWT signedJWT = SignedJWT.parse(jwt);
-            boolean validateAudience = validateAudience(audience, signedJWT);
 
             //validate jwt date
             boolean isJwtExpired = result.getVerifiablePresentationViolations().stream().anyMatch(v -> v.equals(VerifiablePresentationJwtValidationResult.Type.EXPIRED));
             response.put(StringPool.VALIDATE_JWT_EXPIRY_DATE, !isJwtExpired);
 
-            boolean isVerifiableCredentialExpired = result.getVerifiableCredentialResult().getVerifiableCredentialViolations().stream().anyMatch(v -> v.getTypes().stream().anyMatch(t -> t.equals(VerifiableCredentialValidationResultViolation.Type.EXPIRED)));
-
             if (withCredentialExpiryDate) {
+                boolean isVerifiableCredentialExpired = result.getVerifiableCredentialResult().getVerifiableCredentialViolations().stream().anyMatch(v -> v.getTypes().stream().anyMatch(t -> t.equals(VerifiableCredentialValidationResultViolation.Type.EXPIRED)));
                 response.put(StringPool.VALIDATE_EXPIRY_DATE, !isVerifiableCredentialExpired);
             }
 
+            //validate audience
             if (StringUtils.hasText(audience)) {
+                SignedJWT signedJWT = SignedJWT.parse(jwt);
+                boolean validateAudience = validateAudience(audience, signedJWT);
                 response.put(StringPool.VALIDATE_AUDIENCE, validateAudience);
             }
 

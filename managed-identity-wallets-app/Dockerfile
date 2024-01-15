@@ -27,7 +27,7 @@ RUN apk add curl
 
 USER miw
 
-COPY /build/libs/miw-*.jar /app/
+COPY  LICENSE NOTICE.md DEPENDENCIES SECURITY.md /build/libs/miw-*.jar /app/
 
 WORKDIR /app
 

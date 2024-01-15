@@ -106,8 +106,9 @@ public class CommonUtils {
 
         // if the credential does not contain the JWS proof-context add it
         URI jwsUri = URI.create("https://w3id.org/security/suites/jws-2020/v1");
-        if (!contexts.contains(jwsUri))
+        if (!contexts.contains(jwsUri)) {
             contexts.add(jwsUri);
+        }
 
         URI id = URI.create(UUID.randomUUID().toString());
         VerifiableCredentialBuilder builder =
@@ -121,7 +122,7 @@ public class CommonUtils {
                         .credentialSubject(verifiableCredentialSubject);
 
 
-        LinkedDataProofGenerator generator = LinkedDataProofGenerator.newInstance(SignatureType.JWS);
+        LinkedDataProofGenerator genDataProofGeneraterator = Linkedor.newInstance(SignatureType.JWS);
         URI verificationMethod = issuerDoc.getVerificationMethods().get(0).getId();
 
         JWSSignature2020 proof =
