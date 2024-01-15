@@ -50,11 +50,15 @@ public class VerifiableCredentialPredicate {
                 .ifPresent(predicate::and);
 
         /* By Verifiable Credential Type */
-        Optional.ofNullable(query.getVerifiableCredentialTypes())
-                .ifPresent(types -> types.stream()
-                        .map(VerifiableCredentialType::getText)
-                        .map(VerifiableCredentialPredicate::hasType)
-                        .forEach(predicate::and));
+        Optional.ofNullable(query.getVerifiableCredentialTypesOr())
+                .ifPresent(types -> {
+                    BooleanBuilder typesPredicate = new BooleanBuilder();
+                    types.stream()
+                            .map(VerifiableCredentialType::getText)
+                            .map(VerifiableCredentialPredicate::hasType)
+                            .forEach(typesPredicate::or);
+                    predicate.and(typesPredicate);
+                });
 
         /* By Holder Wallet Id */
         Optional.ofNullable(query.getHolderWalletId())

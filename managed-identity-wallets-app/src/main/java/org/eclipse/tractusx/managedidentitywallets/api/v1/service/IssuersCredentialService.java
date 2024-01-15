@@ -136,7 +136,7 @@ public class IssuersCredentialService {
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
                 .holderWalletId(Optional.ofNullable(commonService.asBpn(holderIdentifier)).map(WalletId::new).orElse(null))
                 .verifiableCredentialId(Optional.ofNullable(credentialId).map(VerifiableCredentialId::new).orElse(null))
-                .verifiableCredentialTypes(Optional.ofNullable(type).orElse(List.of()).stream().map(org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType::new).toList())
+                .verifiableCredentialTypesOr(Optional.ofNullable(type).orElse(List.of()).stream().map(org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType::new).toList())
                 .verifiableCredentialIssuer(new VerifiableCredentialIssuer(issuerDid.toString()))
                 .build();
 
@@ -200,7 +200,7 @@ public class IssuersCredentialService {
         validateAccess(callerBPN, issuerWallet);
 
         //check duplicate
-        isCredentialExit(holderWallet.getBpn(), MIWVerifiableCredentialType.DISMANTLER_CREDENTIAL);
+        isCredentialExist(holderWallet.getBpn(), MIWVerifiableCredentialType.DISMANTLER_CREDENTIAL);
 
 
         final String activityType = request.getActivityType();
@@ -236,7 +236,7 @@ public class IssuersCredentialService {
         Wallet holderWallet = commonService.getWalletByIdentifier(issueMembershipCredentialRequest.getBpn());
 
         //check duplicate
-        isCredentialExit(holderWallet.getBpn(), VerifiableCredentialType.MEMBERSHIP_CREDENTIAL);
+        isCredentialExist(holderWallet.getBpn(), VerifiableCredentialType.MEMBERSHIP_CREDENTIAL);
 
         // Fetch Issuer Wallet
         Wallet issuerWallet = commonService.getWalletByIdentifier(miwSettings.getAuthorityWalletBpn());
@@ -319,7 +319,7 @@ public class IssuersCredentialService {
         final DidResolver didResolver = new DidWebResolver(HttpClient.newHttpClient(), new DidWebParser(), miwSettings.isEnforceHttps());
         final LinkedDataProofValidation proofValidation = LinkedDataProofValidation.newInstance(didResolver);
 
-        boolean valid = proofValidation.verifiy(verifiableCredential);
+        boolean valid = proofValidation.verify(verifiableCredential);
 
         Map<String, Object> response = new TreeMap<>();
 
@@ -340,10 +340,10 @@ public class IssuersCredentialService {
         Validate.isFalse(issuerWallet.getBpn().equals(miwSettings.getAuthorityWalletBpn())).launch(new ForbiddenException(BASE_WALLET_BPN_IS_NOT_MATCHING_WITH_REQUEST_BPN_FROM_TOKEN));
     }
 
-    private void isCredentialExit(String holderBpn, String credentialType) {
+    private void isCredentialExist(String holderBpn, String credentialType) {
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
                 .holderWalletId(new WalletId(holderBpn))
-                .verifiableCredentialTypes(List.of(new org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType(credentialType)))
+                .verifiableCredentialTypesOr(List.of(new org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType(credentialType)))
                 .build();
         if (verifiableCredentialService.exists(verifiableCredentialQuery)) {
             throw new DuplicateCredentialProblem("Credential of type " + credentialType + " is already exists ");

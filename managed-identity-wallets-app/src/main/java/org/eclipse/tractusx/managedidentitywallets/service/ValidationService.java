@@ -262,7 +262,7 @@ public class ValidationService {
         boolean isSignatureValid = false;
 
         try {
-            isSignatureValid = proofValidation.verifiy(verifiableCredential);
+            isSignatureValid = proofValidation.verify(verifiableCredential);
         } catch (Exception e) {
             // if a verifiable credential is not json-ld valid, the signature verification is not possible and will throw an exception
             // which results in 'isSignatureValid=false', which is somewhat true.

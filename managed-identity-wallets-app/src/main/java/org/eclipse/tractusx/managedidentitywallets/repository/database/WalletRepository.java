@@ -66,7 +66,7 @@ public class WalletRepository {
     private final WalletMap walletMap;
 
     @Transactional
-    public void create(@NonNull Wallet wallet) {
+    public void create(@NonNull final Wallet wallet) {
 
         /* Create New Wallet */
         final String walletId = wallet.getWalletId().getText();
@@ -103,7 +103,7 @@ public class WalletRepository {
     }
 
     @Transactional
-    public void update(@NonNull Wallet wallet) {
+    public void update(@NonNull final Wallet wallet) {
 
         /* Assert Wallet Exists*/
         final WalletQuery walletQuery = WalletQuery.builder()
@@ -158,14 +158,14 @@ public class WalletRepository {
         walletJpaRepository.deleteAll();
     }
 
-    public void delete(@NonNull WalletId walletId) {
+    public void delete(@NonNull final WalletId walletId) {
         if (log.isTraceEnabled()) {
             log.trace("delete: wallet={}", walletId);
         }
         walletJpaRepository.deleteById(walletId.getText());
     }
 
-    public void deleteAll(@NonNull WalletQuery query) {
+    public void deleteAll(@NonNull final WalletQuery query) {
         final Predicate predicate = WalletPredicate.fromQuery(query);
         if (log.isTraceEnabled()) {
             log.trace("deleteAll: predicate={}", predicate);
@@ -178,7 +178,7 @@ public class WalletRepository {
         return count(WalletQuery.builder().build());
     }
 
-    public long count(@NonNull WalletQuery query) {
+    public long count(@NonNull final WalletQuery query) {
         final Predicate predicate = WalletPredicate.fromQuery(query);
         if (log.isTraceEnabled()) {
             log.trace("count: predicate={}", predicate);
@@ -186,7 +186,7 @@ public class WalletRepository {
         return walletJpaRepository.count(predicate);
     }
 
-    public boolean exists(@NonNull WalletQuery query) {
+    public boolean exists(@NonNull final WalletQuery query) {
         final Predicate predicate = WalletPredicate.fromQuery(query);
         if (log.isTraceEnabled()) {
             log.trace("exists: predicate={}", predicate);
@@ -195,19 +195,19 @@ public class WalletRepository {
 
     }
 
-    public boolean existsById(@NonNull WalletId walletId) {
+    public boolean existsById(@NonNull final WalletId walletId) {
         if (log.isTraceEnabled()) {
             log.trace("existsById: walletId={}", walletId);
         }
         return walletJpaRepository.findById(walletId.getText()).isPresent();
     }
 
-    public Optional<Wallet> findById(@NonNull WalletId walletId) {
+    public Optional<Wallet> findById(@NonNull final WalletId walletId) {
         final WalletQuery query = WalletQuery.builder().walletId(walletId).build();
         return findOne(query);
     }
 
-    public Optional<Wallet> findOne(@NonNull WalletQuery query) {
+    public Optional<Wallet> findOne(@NonNull final WalletQuery query) {
         final Predicate predicate = WalletPredicate.fromQuery(query);
         if (log.isTraceEnabled()) {
             log.trace("findOne: predicate={}", predicate);
@@ -221,7 +221,7 @@ public class WalletRepository {
         return findAll(WalletQuery.builder().build(), Pageable.unpaged());
     }
 
-    public Page<Wallet> findAll(@NonNull WalletQuery query, @NonNull Pageable pageable) {
+    public Page<Wallet> findAll(@NonNull final WalletQuery query, @NonNull final Pageable pageable) {
         final Predicate predicate = WalletPredicate.fromQuery(query);
         if (log.isTraceEnabled()) {
             log.trace("findAll: predicate={}", predicate);
@@ -230,7 +230,7 @@ public class WalletRepository {
                 .map(walletMap::map);
     }
 
-    public void storeVerifiableCredentialInWallet(@NonNull Wallet wallet, @NonNull VerifiableCredential verifiableCredential) {
+    public void storeVerifiableCredentialInWallet(@NonNull final Wallet wallet, @NonNull final VerifiableCredential verifiableCredential) {
         final VerifiableCredentialWalletIntersectionEntity verifiableCredentialWalletIntersectionEntity = createVerifiableCredentialWalletIntersectionEntity(wallet, verifiableCredential);
         final VerifiableCredentialWalletIntersectionEntity.VerifiableCredentialIntersectionEntityId verifiableCredentialIntersectionEntityId = verifiableCredentialWalletIntersectionEntity.getId();
 
@@ -253,7 +253,7 @@ public class WalletRepository {
         }
     }
 
-    public void removeVerifiableCredentialFromWallet(@NonNull Wallet wallet, @NonNull VerifiableCredential verifiableCredential) {
+    public void removeVerifiableCredentialFromWallet(@NonNull final Wallet wallet, @NonNull final VerifiableCredential verifiableCredential) {
         final VerifiableCredentialWalletIntersectionEntity verifiableCredentialWalletIntersectionEntity = createVerifiableCredentialWalletIntersectionEntity(wallet, verifiableCredential);
         final VerifiableCredentialWalletIntersectionEntity.VerifiableCredentialIntersectionEntityId verifiableCredentialIntersectionEntityId = verifiableCredentialWalletIntersectionEntity.getId();
 
@@ -266,7 +266,7 @@ public class WalletRepository {
         }
     }
 
-    private VerifiableCredentialWalletIntersectionEntity createVerifiableCredentialWalletIntersectionEntity(@NonNull Wallet wallet, @NonNull VerifiableCredential verifiableCredential) {
+    private VerifiableCredentialWalletIntersectionEntity createVerifiableCredentialWalletIntersectionEntity(@NonNull final Wallet wallet, @NonNull final VerifiableCredential verifiableCredential) {
         final VerifiableCredentialWalletIntersectionEntity.VerifiableCredentialIntersectionEntityId id = new VerifiableCredentialWalletIntersectionEntity.VerifiableCredentialIntersectionEntityId();
         final VerifiableCredentialWalletIntersectionEntity entity = new VerifiableCredentialWalletIntersectionEntity();
 
@@ -282,7 +282,7 @@ public class WalletRepository {
         return entity;
     }
 
-    public boolean exists(@NonNull WalletWithVerifiableCredentialQuery credentialQuery) {
+    public boolean exists(@NonNull final WalletWithVerifiableCredentialQuery credentialQuery) {
         final Predicate predicate = WalletWithVerifiableCredentialPredicate.fromQuery(credentialQuery);
         if (log.isTraceEnabled()) {
             log.trace("exists: predicate={}", predicate);

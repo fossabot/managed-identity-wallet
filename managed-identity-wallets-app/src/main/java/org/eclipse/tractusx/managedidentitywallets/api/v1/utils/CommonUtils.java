@@ -122,11 +122,11 @@ public class CommonUtils {
                         .credentialSubject(verifiableCredentialSubject);
 
 
-        LinkedDataProofGenerator genDataProofGeneraterator = Linkedor.newInstance(SignatureType.JWS);
+        LinkedDataProofGenerator linkedDataProofGenerator = LinkedDataProofGenerator.newInstance(SignatureType.JWS);
         URI verificationMethod = issuerDoc.getVerificationMethods().get(0).getId();
 
         JWSSignature2020 proof =
-                (JWSSignature2020) generator.createProof(builder.build(), verificationMethod, new x21559PrivateKey(privateKey));
+                (JWSSignature2020) linkedDataProofGenerator.createProof(builder.build(), verificationMethod, new x21559PrivateKey(privateKey));
 
 
         //Adding Proof to VC

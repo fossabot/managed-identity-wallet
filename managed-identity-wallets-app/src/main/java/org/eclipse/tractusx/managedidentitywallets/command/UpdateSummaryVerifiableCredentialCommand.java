@@ -52,7 +52,7 @@ public class UpdateSummaryVerifiableCredentialCommand {
         final VerifiableCredentialType summaryVerifiableCredentialType = new VerifiableCredentialType(MIWVerifiableCredentialType.SUMMARY_CREDENTIAL);
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
                 .holderWalletId(wallet.getWalletId())
-                .verifiableCredentialTypes(List.of(summaryVerifiableCredentialType))
+                .verifiableCredentialTypesOr(List.of(summaryVerifiableCredentialType))
                 .build();
 
         final Page<VerifiableCredential> summaryCredentials = verifiableCredentialService.findAll(verifiableCredentialQuery);

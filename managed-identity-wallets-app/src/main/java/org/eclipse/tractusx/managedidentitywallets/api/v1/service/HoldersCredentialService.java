@@ -68,7 +68,7 @@ public class HoldersCredentialService {
      * @param callerBPN        the caller bpn
      * @return the credentials
      */
-    public Page<VerifiableCredential> getCredentials(String credentialId, String issuerIdentifier, String sortColumn, String sortType, List<String> type, int pageNumber, int size, String callerBPN) {
+    public Page<VerifiableCredential> getCredentials(String credentialId, String issuerIdentifier, List<String> type, String sortColumn, String sortType, int pageNumber, int size, String callerBPN) {
         if (credentialId != null) {
 
             final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
@@ -107,7 +107,7 @@ public class HoldersCredentialService {
         final VerifiableCredentialQuery.VerifiableCredentialQueryBuilder builder = VerifiableCredentialQuery.builder()
                 .holderWalletId(new WalletId(callerBPN));
         if (type != null) {
-            builder.verifiableCredentialTypes(type.stream().map(VerifiableCredentialType::new).toList());
+            builder.verifiableCredentialTypesOr(type.stream().map(VerifiableCredentialType::new).toList());
         }
         if (issuerIdentifier != null) {
             if (!issuerIdentifier.startsWith("did")) {

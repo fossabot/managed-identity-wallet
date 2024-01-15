@@ -22,13 +22,10 @@
 package org.eclipse.tractusx.managedidentitywallets.api.v1.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.eclipse.tractusx.managedidentitywallets.api.v1.apidocs.DidDocumentControllerApiDocs;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.RestURI;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.service.DidDocumentService;
 import lombok.extern.slf4j.Slf4j;
-import org.eclipse.tractusx.managedidentitywallets.apidocs.DidDocumentControllerApiDocs.BpnParameterDoc;
-import org.eclipse.tractusx.managedidentitywallets.apidocs.DidDocumentControllerApiDocs.DidOrBpnParameterDoc;
-import org.eclipse.tractusx.managedidentitywallets.apidocs.DidDocumentControllerApiDocs.GetDidDocumentApiDocs;
-import org.eclipse.tractusx.managedidentitywallets.apidocs.DidDocumentControllerApiDocs.GetDidResolveApiDocs;
 import org.eclipse.tractusx.ssi.lib.model.did.DidDocument;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -54,10 +51,10 @@ public class DidDocumentController extends BaseController {
      * @param identifier the identifier
      * @return the did document
      */
-    @GetDidDocumentApiDocs
+    @DidDocumentControllerApiDocs.GetDidDocumentApiDocs
     @GetMapping(path = RestURI.DID_DOCUMENTS, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DidDocument> getDidDocument(
-        @DidOrBpnParameterDoc @PathVariable(name = "identifier") String identifier
+        @DidDocumentControllerApiDocs.DidOrBpnParameterDoc @PathVariable(name = "identifier") String identifier
         ) {
         log.debug("Received request to get DID document for identifier: {}", identifier);
         return ResponseEntity.status(HttpStatus.OK).body(service.getDidDocument(identifier));
@@ -69,10 +66,10 @@ public class DidDocumentController extends BaseController {
      * @param bpn the bpn
      * @return the did resolve
      */
-    @GetDidResolveApiDocs
+    @DidDocumentControllerApiDocs.GetDidResolveApiDocs
     @GetMapping(path = RestURI.DID_RESOLVE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<DidDocument> getDidResolve(
-        @BpnParameterDoc @PathVariable(name = "bpn") String bpn
+        @DidDocumentControllerApiDocs.BpnParameterDoc @PathVariable(name = "bpn") String bpn
         ) {
         log.debug("Received request to get DID document for identifier: {}", bpn);
         return ResponseEntity.status(HttpStatus.OK).body(service.getDidDocument(bpn));

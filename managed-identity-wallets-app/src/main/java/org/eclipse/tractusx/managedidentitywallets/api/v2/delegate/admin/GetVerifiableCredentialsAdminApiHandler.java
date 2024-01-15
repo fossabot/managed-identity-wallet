@@ -36,7 +36,6 @@ import org.eclipse.tractusx.managedidentitywallets.spring.models.v2.VerifiableCr
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.annotation.Secured;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -62,7 +61,7 @@ class GetVerifiableCredentialsAdminApiHandler extends AbstractApiHandler {
         final VerifiableCredentialQuery.VerifiableCredentialQueryBuilder builder = VerifiableCredentialQuery.builder();
         Optional.ofNullable(issuer).map(VerifiableCredentialIssuer::new).ifPresent(builder::verifiableCredentialIssuer);
         Optional.ofNullable(id).map(VerifiableCredentialId::new).ifPresent(builder::verifiableCredentialId);
-        Optional.ofNullable(type).map(VerifiableCredentialType::new).map(List::of).ifPresent(builder::verifiableCredentialTypes);
+        Optional.ofNullable(type).map(VerifiableCredentialType::new).map(List::of).ifPresent(builder::verifiableCredentialTypesOr);
         Optional.ofNullable(holder).map(WalletId::new).ifPresent(builder::holderWalletId);
 
         final Page<VerifiableCredential> verifiableCredentials = verifiableCredentialService.findAll(builder.build(), page, perPage);

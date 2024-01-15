@@ -22,6 +22,10 @@
 package org.eclipse.tractusx.managedidentitywallets.repository.database;
 
 import lombok.SneakyThrows;
+import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.DismantlerVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.FrameworkVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
+import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.managedidentitywallets.test.MiwTestCase;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialIssuer;
@@ -46,6 +50,9 @@ public class VerifiableCredentialRepositoryTest extends MiwTestCase {
 
     @Autowired
     private VerifiableCredentialRepository verifiableCredentialRepository;
+
+    @Autowired
+    private FrameworkVerifiableCredentialFactory frameworkVerifiableCredentialFactory;
 
     @Test
     public void testCreate() {
@@ -114,11 +121,55 @@ public class VerifiableCredentialRepositoryTest extends MiwTestCase {
         persistenceUtil.newWalletPlusVerifiableCredentialPersisted();
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
-                .verifiableCredentialTypes(List.of(new VerifiableCredentialType("VerifiableCredential")))
+                .verifiableCredentialTypesOr(List.of(new VerifiableCredentialType("VerifiableCredential")))
                 .build();
 
         final Page<VerifiableCredential> result = verifiableCredentialRepository.findAll(query, Pageable.unpaged());
 
         Assertions.assertEquals(9, result.getTotalElements()); // 3+3+3 (newly created & bpn & summary credential)
+    }
+
+
+    @Test
+    @SneakyThrows
+    public void testFindByTypesOr() {
+
+        final Wallet wallet = persistenceUtil.newWalletPersisted();
+
+        final VerifiableCredentialType typeFoo = new VerifiableCredentialType("FooVerifiableCredential");
+        final VerifiableCredentialType typeBar = new VerifiableCredentialType("BarVerifiableCredential");
+
+        final VerifiableCredential fooCredential =
+                frameworkVerifiableCredentialFactory.createFrameworkVerifiableCredential(wallet, typeFoo, "foo", "foo");
+        final VerifiableCredential barCredential =
+                frameworkVerifiableCredentialFactory.createFrameworkVerifiableCredential(wallet, typeBar, "bar", "bar");
+
+        verifiableCredentialRepository.create(fooCredential);
+        verifiableCredentialRepository.createWalletIntersection(new VerifiableCredentialId(fooCredential.getId().toString()), wallet.getWalletId());
+        verifiableCredentialRepository.create(barCredential);
+        verifiableCredentialRepository.createWalletIntersection(new VerifiableCredentialId(barCredential.getId().toString()), wallet.getWalletId());
+
+        final VerifiableCredentialQuery fooQuery = VerifiableCredentialQuery.builder()
+                .holderWalletId(wallet.getWalletId())
+                .verifiableCredentialTypesOr(List.of(typeFoo))
+                .build();
+
+        final VerifiableCredentialQuery barQuery = VerifiableCredentialQuery.builder()
+                .holderWalletId(wallet.getWalletId())
+                .verifiableCredentialTypesOr(List.of(typeBar))
+                .build();
+
+        final VerifiableCredentialQuery fooBarQuery = VerifiableCredentialQuery.builder()
+                .holderWalletId(wallet.getWalletId())
+                .verifiableCredentialTypesOr(List.of(typeFoo, typeBar))
+                .build();
+
+        final Page<VerifiableCredential> resultFoo = verifiableCredentialRepository.findAll(fooQuery, Pageable.unpaged());
+        final Page<VerifiableCredential> resultBar = verifiableCredentialRepository.findAll(barQuery, Pageable.unpaged());
+        final Page<VerifiableCredential> resultFooBar = verifiableCredentialRepository.findAll(fooBarQuery, Pageable.unpaged());
+
+        Assertions.assertEquals(1, resultFoo.getTotalElements());
+        Assertions.assertEquals(1, resultBar.getTotalElements());
+        Assertions.assertEquals(2, resultFooBar.getTotalElements());
     }
 }

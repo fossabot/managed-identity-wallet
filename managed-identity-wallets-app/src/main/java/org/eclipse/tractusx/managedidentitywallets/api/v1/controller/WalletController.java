@@ -24,6 +24,8 @@ package org.eclipse.tractusx.managedidentitywallets.api.v1.controller;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.eclipse.tractusx.managedidentitywallets.api.v1.apidocs.DidDocumentControllerApiDocs;
+import org.eclipse.tractusx.managedidentitywallets.api.v1.apidocs.WalletControllerApiDocs;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.RestURI;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.entity.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.ForbiddenException;
@@ -32,15 +34,6 @@ import org.eclipse.tractusx.managedidentitywallets.api.v1.dto.CreateWalletReques
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import lombok.extern.slf4j.Slf4j;
 
-import org.eclipse.tractusx.managedidentitywallets.apidocs.DidDocumentControllerApiDocs.DidOrBpnParameterDoc;
-import org.eclipse.tractusx.managedidentitywallets.apidocs.WalletControllerApiDocs.CreateWalletApiDoc;
-import org.eclipse.tractusx.managedidentitywallets.apidocs.WalletControllerApiDocs.PageNumberParameterDoc;
-import org.eclipse.tractusx.managedidentitywallets.apidocs.WalletControllerApiDocs.RetrieveWalletApiDoc;
-import org.eclipse.tractusx.managedidentitywallets.apidocs.WalletControllerApiDocs.RetrieveWalletsApiDoc;
-import org.eclipse.tractusx.managedidentitywallets.apidocs.WalletControllerApiDocs.SizeParameterDoc;
-import org.eclipse.tractusx.managedidentitywallets.apidocs.WalletControllerApiDocs.SortColumnParameterDoc;
-import org.eclipse.tractusx.managedidentitywallets.apidocs.WalletControllerApiDocs.SortTypeParameterDoc;
-import org.eclipse.tractusx.managedidentitywallets.apidocs.WalletControllerApiDocs.StoreVerifiableCredentialApiDoc;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -68,7 +61,7 @@ public class WalletController extends BaseController {
      * @param request the request
      * @return the response entity
      */
-    @CreateWalletApiDoc
+    @WalletControllerApiDocs.CreateWalletApiDoc
     @PostMapping(path = RestURI.WALLETS, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Wallet> createWallet(@Valid @RequestBody CreateWalletRequest request) {
         final String bpn = getBpn();
@@ -83,10 +76,10 @@ public class WalletController extends BaseController {
      * @param identifier the identifier
      * @return the response entity
      */
-    @StoreVerifiableCredentialApiDoc
+    @WalletControllerApiDocs.StoreVerifiableCredentialApiDoc
     @PostMapping(path = RestURI.API_WALLETS_IDENTIFIER_CREDENTIALS, consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Map<String, String>> storeCredential(@RequestBody Map<String, Object> data,
-                                                               @DidOrBpnParameterDoc @PathVariable(name = "identifier") String identifier) {
+                                                               @DidDocumentControllerApiDocs.DidOrBpnParameterDoc @PathVariable(name = "identifier") String identifier) {
         final String bpn = getBpn();
         log.debug("Received request to store credential in wallet with identifier {}. authorized by BPN: {}", identifier, bpn);
         return ResponseEntity.status(HttpStatus.CREATED).body(service.storeCredential(data, identifier, bpn));
@@ -99,9 +92,9 @@ public class WalletController extends BaseController {
      * @param withCredentials the with credentials
      * @return the wallet by bpn
      */
-    @RetrieveWalletApiDoc
+    @WalletControllerApiDocs.RetrieveWalletApiDoc
     @GetMapping(path = RestURI.API_WALLETS_IDENTIFIER, produces = MediaType.APPLICATION_JSON_VALUE)
-public ResponseEntity<Wallet> getWalletByIdentifier( @DidOrBpnParameterDoc @PathVariable(name = "identifier") String identifier,
+public ResponseEntity<Wallet> getWalletByIdentifier( @DidDocumentControllerApiDocs.DidOrBpnParameterDoc @PathVariable(name = "identifier") String identifier,
                                                         @RequestParam(name = "withCredentials", defaultValue = "false") boolean withCredentials) {
         final String bpn = getBpn();
         log.debug("Received request to retrieve wallet with identifier {}. authorized by BPN: {}", identifier, bpn);
@@ -113,14 +106,14 @@ public ResponseEntity<Wallet> getWalletByIdentifier( @DidOrBpnParameterDoc @Path
      *
      * @return the wallets
      */
-    @RetrieveWalletsApiDoc
+    @WalletControllerApiDocs.RetrieveWalletsApiDoc
     @GetMapping(path = RestURI.WALLETS, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Page<Wallet>> getWallets(
-            @PageNumberParameterDoc @RequestParam(required = false, defaultValue = "0") int pageNumber,
-            @SizeParameterDoc @RequestParam(required = false, defaultValue = Integer.MAX_VALUE
+            @WalletControllerApiDocs.PageNumberParameterDoc @RequestParam(required = false, defaultValue = "0") int pageNumber,
+            @WalletControllerApiDocs.SizeParameterDoc @RequestParam(required = false, defaultValue = Integer.MAX_VALUE
                     + "") int size,
-            @SortColumnParameterDoc @RequestParam(required = false, defaultValue = "createdAt") String sortColumn,
-            @SortTypeParameterDoc @RequestParam(required = false, defaultValue = "desc") String sortTpe) {
+            @WalletControllerApiDocs.SortColumnParameterDoc @RequestParam(required = false, defaultValue = "createdAt") String sortColumn,
+            @WalletControllerApiDocs.SortTypeParameterDoc @RequestParam(required = false, defaultValue = "desc") String sortTpe) {
         log.debug("Received request to retrieve wallets");
         if (!miwSettings.getAuthorityWalletBpn().equals(getBpn())) {
             throw new ForbiddenException();

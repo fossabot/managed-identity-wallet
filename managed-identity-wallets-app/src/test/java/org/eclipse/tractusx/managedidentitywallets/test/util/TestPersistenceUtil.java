@@ -71,7 +71,7 @@ public class TestPersistenceUtil {
 
         // delete all except authority wallet
         for (Wallet wallet : walletRepository.findAll(WalletQuery.builder().build(), Pageable.unpaged())) {
-            if (wallet.getWalletId().getText().equals("BPNL000000000000")) {
+            if (wallet.getWalletId().getText().equals(miwSettings.getAuthorityWalletBpn())) {
                 continue;
             }
 

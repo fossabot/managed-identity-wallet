@@ -22,10 +22,8 @@
 package org.eclipse.tractusx.managedidentitywallets.api.v1.dto;
 
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.*;
-import org.eclipse.tractusx.managedidentitywallets.constant.StringPool;
 
 
 /**
@@ -39,7 +37,6 @@ import org.eclipse.tractusx.managedidentitywallets.constant.StringPool;
 public class CreateWalletRequest {
 
     @NotBlank(message = "Please provide BPN")
-    @Pattern(regexp = StringPool.BPN_NUMBER_REGEX, message = "Please provide valid BPN")
     private String bpn;
 
     @NotBlank(message = "Please provide name")

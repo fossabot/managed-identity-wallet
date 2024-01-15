@@ -68,7 +68,7 @@ class GetIssuedVerifiableCredentialsUserApiHandler extends AbstractApiHandler {
         final Did issuerDid = didFactory.generateDid(walletId);
         final VerifiableCredentialIssuer verifiableCredentialIssuer = new VerifiableCredentialIssuer(issuerDid.toString());
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
-                .verifiableCredentialTypes(verifiableCredentialType)
+                .verifiableCredentialTypesOr(verifiableCredentialType)
                 .verifiableCredentialIssuer(verifiableCredentialIssuer)
                 .build();
 

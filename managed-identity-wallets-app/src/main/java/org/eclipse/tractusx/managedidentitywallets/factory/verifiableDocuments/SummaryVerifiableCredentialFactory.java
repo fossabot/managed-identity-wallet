@@ -111,7 +111,7 @@ public class SummaryVerifiableCredentialFactory extends AbstractVerifiableDocume
 
         return types.stream()
                 .map(t -> VerifiableCredentialQuery.builder()
-                        .verifiableCredentialTypes(List.of(t))
+                        .verifiableCredentialTypesOr(List.of(t))
                         .verifiableCredentialIssuer(issuer)
                         .holderWalletId(walletId)
                         .isExpired(false)

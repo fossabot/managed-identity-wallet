@@ -35,7 +35,7 @@ import java.util.List;
 @Getter
 @Builder
 public class VerifiableCredentialQuery {
-    List<VerifiableCredentialType> verifiableCredentialTypes;
+    List<VerifiableCredentialType> verifiableCredentialTypesOr;
     WalletId holderWalletId;
     VerifiableCredentialIssuer verifiableCredentialIssuer;
     VerifiableCredentialId verifiableCredentialId;

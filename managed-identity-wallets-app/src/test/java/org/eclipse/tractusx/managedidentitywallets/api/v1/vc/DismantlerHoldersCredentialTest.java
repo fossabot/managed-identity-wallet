@@ -97,7 +97,7 @@ class DismantlerHoldersCredentialTest extends MiwTestCase {
         Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatusCode().value());
 
         final VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
-                .verifiableCredentialTypes(List.of(new VerifiableCredentialType(MIWVerifiableCredentialType.DISMANTLER_CREDENTIAL)))
+                .verifiableCredentialTypesOr(List.of(new VerifiableCredentialType(MIWVerifiableCredentialType.DISMANTLER_CREDENTIAL)))
                 .holderWalletId(new WalletId(miwSettings.getAuthorityWalletBpn()))
                 .build();
         final List<VerifiableCredential> credentials = verifiableCredentialService.findAll(query).stream().toList();
@@ -126,7 +126,7 @@ class DismantlerHoldersCredentialTest extends MiwTestCase {
 
 
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
-                .verifiableCredentialTypes(List.of(new VerifiableCredentialType(MIWVerifiableCredentialType.DISMANTLER_CREDENTIAL)))
+                .verifiableCredentialTypesOr(List.of(new VerifiableCredentialType(MIWVerifiableCredentialType.DISMANTLER_CREDENTIAL)))
                 .holderWalletId(newWallet.getWalletId())
                 .build();
         final Optional<VerifiableCredential> createdVc = verifiableCredentialService.findOne(verifiableCredentialQuery);
@@ -172,7 +172,7 @@ class DismantlerHoldersCredentialTest extends MiwTestCase {
 
         ResponseEntity<String> response = restTemplate.exchange(RestURI.CREDENTIALS_ISSUER_DISMANTLER, HttpMethod.POST, entity, String.class);
 
-        Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatusCode().value());
+        Assertions.assertEquals(HttpStatus.CREATED.value(), response.getStatusCode().value(), "Credential should be created. " + response.getBody());
     }
 
     @Test

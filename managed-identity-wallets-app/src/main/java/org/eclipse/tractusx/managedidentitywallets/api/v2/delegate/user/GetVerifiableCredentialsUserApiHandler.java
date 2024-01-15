@@ -66,7 +66,7 @@ class GetVerifiableCredentialsUserApiHandler extends AbstractApiHandler {
                 .orElse(null);
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
                 .holderWalletId(walletId)
-                .verifiableCredentialTypes(verifiableCredentialType)
+                .verifiableCredentialTypesOr(verifiableCredentialType)
                 .verifiableCredentialIssuer(verifiableCredentialIssuer)
                 .build();
 

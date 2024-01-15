@@ -113,7 +113,7 @@ class MembershipHoldersCredentialTest extends MiwTestCase {
         //check summary VC in holder wallet
         VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
                 .holderWalletId(wallet.getWalletId())
-                .verifiableCredentialTypes(List.of(new VerifiableCredentialType(MIWVerifiableCredentialType.SUMMARY_CREDENTIAL)))
+                .verifiableCredentialTypesOr(List.of(new VerifiableCredentialType(MIWVerifiableCredentialType.SUMMARY_CREDENTIAL)))
                 .build();
         Optional<VerifiableCredential> summaryVc = verifiableCredentialService.findOne(query);
         Assertions.assertFalse(summaryVc.isEmpty());
@@ -150,7 +150,7 @@ class MembershipHoldersCredentialTest extends MiwTestCase {
         //stored VC should not be deleted
         VerifiableCredentialQuery query = VerifiableCredentialQuery.builder()
                 .holderWalletId(wallet.getWalletId())
-                .verifiableCredentialTypes(List.of(new VerifiableCredentialType(MIWVerifiableCredentialType.SUMMARY_CREDENTIAL)))
+                .verifiableCredentialTypesOr(List.of(new VerifiableCredentialType(MIWVerifiableCredentialType.SUMMARY_CREDENTIAL)))
                 .build();
         Optional<VerifiableCredential> summaryVc = verifiableCredentialService.findOne(query);
         Assertions.assertFalse(summaryVc.isEmpty());
@@ -175,7 +175,7 @@ class MembershipHoldersCredentialTest extends MiwTestCase {
         //check in tables
         VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
                 .verifiableCredentialId(new VerifiableCredentialId(verifiableCredential.getId().toString()))
-                .verifiableCredentialTypes(List.of(new VerifiableCredentialType(MIWVerifiableCredentialType.MEMBERSHIP_CREDENTIAL)))
+                .verifiableCredentialTypesOr(List.of(new VerifiableCredentialType(MIWVerifiableCredentialType.MEMBERSHIP_CREDENTIAL)))
                 .build();
         Optional<VerifiableCredential> membershipVc = verifiableCredentialService.findOne(verifiableCredentialQuery);
 
@@ -207,7 +207,7 @@ class MembershipHoldersCredentialTest extends MiwTestCase {
         //check in tables
         VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
                 .holderWalletId(wallet.getWalletId())
-                .verifiableCredentialTypes(List.of(new VerifiableCredentialType(MIWVerifiableCredentialType.MEMBERSHIP_CREDENTIAL)))
+                .verifiableCredentialTypesOr(List.of(new VerifiableCredentialType(MIWVerifiableCredentialType.MEMBERSHIP_CREDENTIAL)))
                 .build();
         Optional<VerifiableCredential> membershipVc = verifiableCredentialService.findOne(verifiableCredentialQuery);
 

@@ -27,7 +27,6 @@ import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.MIWVerifiable
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.RestURI;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.dto.IssueFrameworkCredentialRequest;
-import org.eclipse.tractusx.managedidentitywallets.api.v1.dto.IssueMembershipCredentialRequest;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.utils.TestUtils;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.factory.DidFactory;
@@ -120,7 +119,7 @@ class FrameworkHoldersCredentialTest extends MiwTestCase {
 
         //check summary credential
         final VerifiableCredentialQuery summaryQuery = VerifiableCredentialQuery.builder()
-                .verifiableCredentialTypes(List.of(new VerifiableCredentialType(MIWVerifiableCredentialType.SUMMARY_CREDENTIAL)))
+                .verifiableCredentialTypesOr(List.of(new VerifiableCredentialType(MIWVerifiableCredentialType.SUMMARY_CREDENTIAL)))
                 .holderWalletId(new WalletId(miwSettings.getAuthorityWalletBpn()))
                 .build();
         final VerifiableCredential summaryCredential = verifiableCredentialService.findOne(summaryQuery).orElseThrow();
@@ -140,7 +139,7 @@ class FrameworkHoldersCredentialTest extends MiwTestCase {
 
         //check in issuer tables
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
-                .verifiableCredentialTypes(List.of(new VerifiableCredentialType(type)))
+                .verifiableCredentialTypesOr(List.of(new VerifiableCredentialType(type)))
                 .holderWalletId(new WalletId(bpn))
                 .build();
         final Optional<VerifiableCredential> verifiableCredential = verifiableCredentialService.findOne(verifiableCredentialQuery);
@@ -219,7 +218,7 @@ class FrameworkHoldersCredentialTest extends MiwTestCase {
 
         //check summary credential
         final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
-                .verifiableCredentialTypes(List.of(new VerifiableCredentialType(MIWVerifiableCredentialType.SUMMARY_CREDENTIAL)))
+                .verifiableCredentialTypesOr(List.of(new VerifiableCredentialType(MIWVerifiableCredentialType.SUMMARY_CREDENTIAL)))
                 .holderWalletId(new WalletId(holderBpn))
                 .build();
         final VerifiableCredential summaryCredential = verifiableCredentialService.findOne(verifiableCredentialQuery)
