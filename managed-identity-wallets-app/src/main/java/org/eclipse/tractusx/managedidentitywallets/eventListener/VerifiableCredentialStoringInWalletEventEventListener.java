@@ -24,14 +24,21 @@ package org.eclipse.tractusx.managedidentitywallets.eventListener;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.MIWVerifiableCredentialType;
-import org.eclipse.tractusx.managedidentitywallets.command.UpdateSummaryVerifiableCredentialCommand;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.event.VerifiableCredentialStoringInWalletEvent;
+import org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments.SummaryVerifiableCredentialFactory;
+import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
+import org.eclipse.tractusx.managedidentitywallets.repository.database.query.VerifiableCredentialQuery;
+import org.eclipse.tractusx.managedidentitywallets.service.VerifiableCredentialService;
+import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredential;
 import org.springframework.context.event.EventListener;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -39,7 +46,9 @@ import org.springframework.transaction.annotation.Transactional;
 public class VerifiableCredentialStoringInWalletEventEventListener {
 
     private final MIWSettings miwSettings;
-    private final UpdateSummaryVerifiableCredentialCommand updateSummaryVerifiableCredentialCommand;
+    private final WalletService walletService;
+    private final VerifiableCredentialService verifiableCredentialService;
+    private final SummaryVerifiableCredentialFactory summaryVerifiableCredentialFactory;
 
     @EventListener
     @Transactional
@@ -55,7 +64,8 @@ public class VerifiableCredentialStoringInWalletEventEventListener {
             log.trace("Updating summary verifiable credential for wallet {}", wallet.getWalletId());
         }
 
-        updateSummaryVerifiableCredentialCommand.execute(wallet);
+        removeAllSummaryCredentialsFromWallet(wallet);
+        issueNewSummaryCredential(wallet);
     }
 
     private boolean isCxCredential(VerifiableCredential verifiableCredential) {
@@ -67,5 +77,23 @@ public class VerifiableCredentialStoringInWalletEventEventListener {
                 ||
                 miwSettings.getSupportedFrameworkVCTypes().stream().anyMatch(
                         type -> verifiableCredential.getTypes().stream().anyMatch(type::equalsIgnoreCase));
+    }
+
+
+    private void removeAllSummaryCredentialsFromWallet(Wallet wallet) {
+        final VerifiableCredentialType summaryVerifiableCredentialType = new VerifiableCredentialType(MIWVerifiableCredentialType.SUMMARY_CREDENTIAL);
+        final VerifiableCredentialQuery verifiableCredentialQuery = VerifiableCredentialQuery.builder()
+                .holderWalletId(wallet.getWalletId())
+                .verifiableCredentialTypesOr(List.of(summaryVerifiableCredentialType))
+                .build();
+
+        final Page<VerifiableCredential> summaryCredentials = verifiableCredentialService.findAll(verifiableCredentialQuery);
+        summaryCredentials.forEach(c -> walletService.removeVerifiableCredential(wallet, c));
+    }
+
+    private void issueNewSummaryCredential(Wallet wallet) {
+        final VerifiableCredential summaryCredential = summaryVerifiableCredentialFactory.createSummaryVerifiableCredential(wallet);
+        verifiableCredentialService.create(summaryCredential);
+        walletService.storeVerifiableCredential(wallet, summaryCredential);
     }
 }

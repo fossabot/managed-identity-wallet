@@ -20,26 +20,20 @@
 The Managed Identity Wallets Application is a Spring Boot project encompassing services, controllers, events, health
 checks, and additional functionalities. It also incorporates features related to Self-Sovereign Identity (SSI).
 
-<strong>Invoker Components</strong>
+The application is build in three layers (API, Business, Persistence) and is designed to be modular and extensible.
 
-The system comprises four distinct component types, each activated under specific conditions to potentially alter the
-application's state:
+**The API Layer** is responsible for exposing the application's functionalities to the outside world. It is mostly
+generated from a OpenAPI specification file. The project then implements the generated interfaces and maps the calls
+into the business layer.
 
-- API
-- Event Listener
-- Cron Jobs
-- Health Indicator
+**The Business Layer** is responsible for implementing the application's functionalities. It is mostly composed of
+services, events, and factories. All state changes are performed by services, which delegate the new state to the
+persistence layer. Events are used to notify other components of state changes. Factories are used to create business
+objects.
 
-<strong>Business Components</strong>
-
-These components have the ability to invoke factories, generating essential objects to execute their designated tasks.
-Utilizing these objects, they can access required services to fulfill their functions.
-
-<strong>Persistence Components</strong>
-
-Services initiate interactions with repositories to persist newly created or updated application states.
-
-<img src="../images/appDesign.png" alt="design.png" style="max-width: 800px">
+**The Persistence Layer** is responsible for persisting the application's state. At the time of writing the application
+state is persisted in a relational database and a key vault. The persistence layer is composed of repositories featuring a
+query model to retrieve data.
 
 ## Directory Structure
 
@@ -49,7 +43,6 @@ Services initiate interactions with repositories to persist newly created or upd
 | `/api`           | The api directory contains all REST API controllers.                                       | [Application API Documentation](./documentation/api)                 |
 | `/command`       | The command directory contains all command classes.                                        |                                                                      |
 | `/config`        | The config directory contains all configuration classes.                                   |                                                                      |
-| `/cron`          | The cron directory contains all cron job classes.                                          | [Application Cron Documentation](./documentation/cron)               |
 | `/event`         | The event directory contains all event classes.                                            | [Application Events Documentation](./documentation/events)           |
 | `/eventListener` | The eventListener directory contains all event listener classes.                           | [Application Events Documentation](./documentation/events)           |
 | `/exception`     | The exception directory contains all exception classes.                                    |                                                                      |
