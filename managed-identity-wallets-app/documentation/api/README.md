@@ -24,7 +24,8 @@ view please refer to the [API Documentation](../../../documentation/api/README.m
 
 ## Generators
 
-This project heavily relies on [OpenAPI Generator](https://openapi-generator.tech/). The following generators are used:
+This repository heavily relies on the [OpenAPI Generator](https://openapi-generator.tech/) project. The following
+generators are used:
 
 | Generator                                                                 | Project                                                                                                               | Description                                                                                             | 
 |---------------------------------------------------------------------------|-----------------------------------------------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|
@@ -37,4 +38,15 @@ This project heavily relies on [OpenAPI Generator](https://openapi-generator.tec
 | [markdown(beta)](https://openapi-generator.tech/docs/generators/markdown) | [managed-identity-wallets-client-markdown-v1](../../../managed-identity-wallets-markdown-v1/README.md)                | Generates an Markdown to document the API v1. The documentation is written into `documentation/api/v1/` | 
 | [markdown(beta)](https://openapi-generator.tech/docs/generators/markdown) | [managed-identity-wallets-client-markdown-v2](../../../managed-identity-wallets-markdown-v2/README.md)                | Generates an Markdown to document the API v2. The documentation is written into `documentation/api/v2/` |
 
-<sub>TBD</sub>
+## API v1
+
+> Deprecated. Not generated.
+
+As the API v1 was developed before the introduction of the API generators, the API v1 code
+does not use the generated code. This prevents the risk of introducing breaking changes, as the code might be slightly
+different from the generated OpenAPI spec code.
+
+Additionally, the `/api/v1` directory contains miscellaneous deprecated classes which are used by the v1 controllers.
+All these v1 classes remained as untouched as possible to prevent breaking changes, too.
+
+## API v2
