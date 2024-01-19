@@ -54,14 +54,14 @@ The Managed Identity Wallets (MIW) service implements the Self-Sovereign-Identit
 
 ## Documentation
 
-| Topic                     | Description                                                                                                                      | Link                                                       |
-|---------------------------|----------------------------------------------------------------------------------------------------------------------------------|------------------------------------------------------------|
-| API Documentation         | Dive into the intricacies of the MIW service's REST API with detailed documentation.                                             | [API Documentation](/documentation/api)                    |
-| Application Documentation | Access specific details related to the documentation of the Managed Identity Wallets Application.                                | [Application Documentation](/managed-identity-wallets-app) |
-| Developer Documentation   | Learn how to navigate and contribute to this repository from a developer's perspective.                                          | [Development Documentation](/documentation/development)    |
-| Integration Documentation | Understand the seamless integration process of the MIW service into various applications.                                        | [Integration Documentation](/documentation/integration)    |
-| Operations Documentation  | Find comprehensive information on the deployment and operational aspects of the MIW service.                                     | [Operations Documentation](/documentation/operations)      |
-| SSI Documentation         | Explore a detailed overview of the Self-Sovereign Identity (SSI) concept and its specific implementation within the MIW service. | [SSI Documentation](/documentation/ssi)                    |
+| Topic                      | Description                                                                                                                      | Link                                                      |
+|----------------------------|----------------------------------------------------------------------------------------------------------------------------------|-----------------------------------------------------------|
+| API Documentation          | Dive into the intricacies of the MIW service's REST API with detailed documentation.                                             | [API Documentation](/documentation/api)                   |
+| Code Documentation         | Access specific details related to the documentation of the Managed Identity Wallets Application.                                | [Code Documentation](/managed-identity-wallets-app)       |
+| Contribution Documentation | Learn how to navigate and contribute to this repository from a developer's perspective.                                          | [Contribution Documentation](/documentation/contribution) |
+| Integration Documentation  | Understand the seamless integration process of the MIW service into various applications.                                        | [Integration Documentation](/documentation/integration)   |
+| Operations Documentation   | Find comprehensive information on the deployment and operational aspects of the MIW service.                                     | [Operations Documentation](/documentation/operations)     |
+| SSI Documentation          | Explore a detailed overview of the Self-Sovereign Identity (SSI) concept and its specific implementation within the MIW service. | [SSI Documentation](/documentation/ssi)                   |
 
 If you find any gaps in our documentation, please don't hesitate to open a ticket. Let us know which topics you feel are
 not adequately covered, and we'll address them promptly. Your feedback is valuable in ensuring comprehensive
@@ -85,7 +85,8 @@ documentation.
 
 ## Reference of external lib
 
-Sometimes the utilized libraries provides valuable insights into the implementation. Here's a compilation of the key libraries employed in this project:
+Sometimes the utilized libraries provides valuable insights into the implementation. Here's a compilation of the key
+libraries employed in this project:
 
 1. https://spring.io/projects/spring-boot
 2. https://github.com/querydsl/querydsl

@@ -221,8 +221,9 @@ Access control through Verifiable Credentials could be implemented as follows:
 - All members within a data space place trust in one or more Verifiable Credential Issuers. This trust relationship can
   vary, accommodating scenarios where a single issuer is responsible for all Verifiable Credentials or where different
   issuers handle specific types of Verifiable Credentials, depending on the use case.
-- A participant in the data space securely stores these Verifiable Credentials in their digital wallet (which may not
-  necessarily a wallet in be the MIW).
+- The Issuers verteilen distribute these Verifiable Credentials to the participants (Holders) within the data space as
+  required.
+- A participant in the data space securely stores these Verifiable Credentials in their digital wallet.
 - When two participants within the data space intend to share data, they initiate the process by exchanging Verifiable
   Credentials. This exchange serves the purpose of verifying whether both participants belong to the same data space and
   possess the necessary access rights before proceeding with any data sharing activities.
