@@ -359,3 +359,6 @@ the participant in their capacity as a dismantler.
     }
     </pre>
 </details>
+
+> Proposed Verifiable Credentials schemas for data spaces a further discussed in
+> the [schemas documentation](../schemas/README.md).
