@@ -28,7 +28,7 @@ import org.eclipse.tractusx.managedidentitywallets.api.v1.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.entity.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.WalletNotFoundProblem;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
-import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
+import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519VerificationMethod;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.VerifiableCredentialRepository;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.WalletRepository;
@@ -114,7 +114,7 @@ public class CommonService {
 
         for (var key : wallet.getStoredEd25519Keys()) {
 
-            final ResolvedEd25519Key resolvedEd25519Key = vaultService.resolveKey(wallet, key).orElseThrow();
+            final ResolvedEd25519VerificationMethod resolvedEd25519Key = vaultService.resolveKey(wallet, key).orElseThrow();
             final byte[] privateKey = resolvedEd25519Key.getPrivateKey().getBytes();
             IPrivateKey x21559PrivateKey = new x21559PrivateKey(privateKey);
 

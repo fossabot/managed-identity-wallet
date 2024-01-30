@@ -30,9 +30,10 @@ import org.eclipse.tractusx.managedidentitywallets.api.v1.entity.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.exception.BadDataException;
 import org.eclipse.tractusx.managedidentitywallets.api.v1.utils.Validate;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
+import org.eclipse.tractusx.managedidentitywallets.models.Ed25519VerificationMethod;
 import org.eclipse.tractusx.managedidentitywallets.models.JsonWebToken;
-import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
-import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
+import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519VerificationMethod;
+import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519VerificationMethod;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialValidationResultViolation;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiablePresentationJwtValidationResult;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
@@ -116,8 +117,8 @@ public class PresentationService {
 
             //Build JWT
             final org.eclipse.tractusx.managedidentitywallets.models.Wallet domainWallet = walletService.findById(new WalletId(callerBpn)).orElseThrow();
-            final StoredEd25519Key latestKey = domainWallet.getStoredEd25519Keys().stream().max(Comparator.comparing(org.eclipse.tractusx.managedidentitywallets.models.Ed25519Key::getCreatedAt)).orElseThrow();
-            final ResolvedEd25519Key resolvedEd25519Key = vaultService.resolveKey(domainWallet, latestKey).orElseThrow();
+            final StoredEd25519VerificationMethod latestKey = domainWallet.getStoredEd25519Keys().stream().max(Comparator.comparing(Ed25519VerificationMethod::getCreatedAt)).orElseThrow();
+            final ResolvedEd25519VerificationMethod resolvedEd25519Key = vaultService.resolveKey(domainWallet, latestKey).orElseThrow();
 
             x21559PrivateKey privateKey = new x21559PrivateKey(resolvedEd25519Key.getPrivateKey().getBytes());
             SignedJWT presentation = presentationFactory.createPresentation(vpIssuerDid

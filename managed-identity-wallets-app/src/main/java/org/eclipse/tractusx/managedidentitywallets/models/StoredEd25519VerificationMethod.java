@@ -21,10 +21,28 @@
 
 package org.eclipse.tractusx.managedidentitywallets.models;
 
+import lombok.*;
+
 import java.time.OffsetDateTime;
 
-public interface Ed25519Key {
-    Ed25519KeyId getId();
-    DidFragment getDidFragment();
-    OffsetDateTime getCreatedAt();
+@Getter
+@AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
+@Builder
+@ToString
+public class StoredEd25519VerificationMethod implements Ed25519VerificationMethod {
+
+    @NonNull
+    private final Ed25519KeyId id;
+    @NonNull
+    private final DidFragment didFragment;
+    @NonNull
+    private final OffsetDateTime createdAt;
+
+    @NonNull
+    private final CypherText publicKey;
+
+    @NonNull
+    @ToString.Exclude
+    private final CypherText privateKey;
 }
+

@@ -23,14 +23,13 @@ package org.eclipse.tractusx.managedidentitywallets.models;
 
 import lombok.*;
 
-import java.time.Instant;
 import java.time.OffsetDateTime;
 
 @Getter
 @AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
 @Builder
 @ToString
-public class ResolvedEd25519Key implements Ed25519Key {
+public class ResolvedEd25519VerificationMethod implements Ed25519VerificationMethod {
 
     @NonNull
     private final Ed25519KeyId id;

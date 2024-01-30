@@ -65,7 +65,6 @@ public @interface IsSignatureValid {
             implements ConstraintValidator<IsSignatureValid, List<VerifiableCredential>> {
         private final ValidationService validationService;
 
-
         @Override
         public boolean isValid(List<VerifiableCredential> verifiableCredentials, ConstraintValidatorContext context) {
             return verifiableCredentials != null &&

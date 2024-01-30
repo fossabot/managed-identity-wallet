@@ -45,6 +45,7 @@ import java.util.stream.Collectors;
  */
 public class CustomAuthenticationConverter implements Converter<Jwt, AbstractAuthenticationToken> {
 
+    public static final String BPN_ATTRIBUTE = "bpn";
     private static final String ROLE_PREFIX = "ROLE_";
 
     private final JwtGrantedAuthoritiesConverter grantedAuthoritiesConverter;
@@ -73,7 +74,7 @@ public class CustomAuthenticationConverter implements Converter<Jwt, AbstractAut
 
     private String extractBpn(Jwt jwt) {
         Map<String, Object> claims = jwt.getClaims();
-        return claims.get(StringPool.BPN).toString();
+        return claims.get(BPN_ATTRIBUTE).toString();
     }
 
     private Collection<? extends GrantedAuthority> extractResourceRoles(Jwt jwt, String resourceId) {

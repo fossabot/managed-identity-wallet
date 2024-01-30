@@ -36,18 +36,18 @@ public class VaultService {
     @NonNull
     private final VaultRepository vaultRepository;
 
-    public Optional<ResolvedEd25519Key> resolveKey(@NonNull Wallet wallet, @NonNull final Ed25519Key key) {
+    public Optional<ResolvedEd25519VerificationMethod> resolveKey(@NonNull Wallet wallet, @NonNull final Ed25519VerificationMethod key) {
         return resolveKey(wallet, key.getId());
     }
 
-    public Optional<ResolvedEd25519Key> resolveKey(@NonNull Wallet wallet, @NonNull final Ed25519KeyId keyId) {
+    public Optional<ResolvedEd25519VerificationMethod> resolveKey(@NonNull Wallet wallet, @NonNull final Ed25519KeyId keyId) {
         return wallet.getStoredEd25519Keys().stream()
                 .filter(k -> k.getId().equals(keyId))
                 .findFirst()
                 .flatMap(k -> vaultRepository.resolveKey(wallet.getWalletId(), k));
     }
 
-    public StoredEd25519Key storeKey(@NonNull Wallet wallet, @NonNull final ResolvedEd25519Key key) {
+    public StoredEd25519VerificationMethod storeKey(@NonNull Wallet wallet, @NonNull final ResolvedEd25519VerificationMethod key) {
         return vaultRepository.storeKey(wallet.getWalletId(), key);
     }
 }

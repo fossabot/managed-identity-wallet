@@ -26,7 +26,7 @@ import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
-import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
+import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519VerificationMethod;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
@@ -70,7 +70,7 @@ public class DidDocumentFactory {
 
         for (var key : wallet.getStoredEd25519Keys()) {
 
-            final Optional<ResolvedEd25519Key> resolvedEd25519Key = vaultService.resolveKey(wallet, key);
+            final Optional<ResolvedEd25519VerificationMethod> resolvedEd25519Key = vaultService.resolveKey(wallet, key);
             if (resolvedEd25519Key.isEmpty()) {
                 log.warn("Key {} not found in vault. WalletId={}", key, wallet.getWalletId());
                 continue;

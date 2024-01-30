@@ -37,11 +37,13 @@ import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExcep
 
 import java.util.Map;
 
+import static org.eclipse.tractusx.managedidentitywallets.config.security.CustomAuthenticationConverter.BPN_ATTRIBUTE;
+
 @Slf4j
-@ControllerAdvice(basePackageClasses = {UserApi.class, AdministratorApi.class})
+@ControllerAdvice(basePackageClasses = { UserApi.class, AdministratorApi.class })
 public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
 
-    @ExceptionHandler(value = {WalletNotFoundException.class})
+    @ExceptionHandler(value = { WalletNotFoundException.class })
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     @ResponseBody
     public ResponseEntity<Object> handleWalletDoesNotExistException(WalletNotFoundException ex) {
@@ -52,7 +54,7 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(createMessage(ex.getMessage()));
     }
 
-    @ExceptionHandler(value = {VerifiableCredentialNotFoundException.class})
+    @ExceptionHandler(value = { VerifiableCredentialNotFoundException.class })
     @ResponseStatus(value = HttpStatus.NOT_FOUND)
     @ResponseBody
     public ResponseEntity<Object> handleVerifiableCredentialDoesNotExistException(VerifiableCredentialNotFoundException ex) {
@@ -63,7 +65,7 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(createMessage(ex.getMessage()));
     }
 
-    @ExceptionHandler(value = {VerifiableCredentialAlreadyExistsException.class})
+    @ExceptionHandler(value = { VerifiableCredentialAlreadyExistsException.class })
     @ResponseStatus(value = HttpStatus.CONFLICT)
     @ResponseBody
     public ResponseEntity<Object> handleVerifiableCredentialAlreadyExistsException(VerifiableCredentialAlreadyExistsException ex) {
@@ -74,7 +76,7 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(createMessage(ex.getMessage()));
     }
 
-    @ExceptionHandler(value = {WalletAlreadyExistsException.class})
+    @ExceptionHandler(value = { WalletAlreadyExistsException.class })
     @ResponseStatus(value = HttpStatus.CONFLICT)
     @ResponseBody
     public ResponseEntity<Object> handleWalletAlreadyExistsException(WalletAlreadyExistsException ex) {
@@ -85,7 +87,7 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(createMessage(ex.getMessage()));
     }
 
-    @ExceptionHandler(value = {VerifiableCredentialAlreadyStoredInWalletException.class})
+    @ExceptionHandler(value = { VerifiableCredentialAlreadyStoredInWalletException.class })
     @ResponseStatus(value = HttpStatus.CONFLICT)
     @ResponseBody
     public ResponseEntity<Object> handleVerifiableCredentialAlreadyStoredInWalletException(VerifiableCredentialAlreadyStoredInWalletException ex) {
@@ -96,7 +98,7 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(createMessage(ex.getMessage()));
     }
 
-    @ExceptionHandler(value = {ConstraintViolationException.class})
+    @ExceptionHandler(value = { ConstraintViolationException.class })
     @ResponseStatus(value = HttpStatus.BAD_REQUEST)
     @ResponseBody
     public ResponseEntity<Object> handleConstraintViolationException(ConstraintViolationException ex) {
@@ -106,7 +108,7 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
         return ResponseEntity.badRequest().body(createMessage(ex.getMessage()));
     }
 
-    @ExceptionHandler(value = {UnexpectedRollbackException.class})
+    @ExceptionHandler(value = { UnexpectedRollbackException.class })
     @ResponseStatus(value = HttpStatus.INTERNAL_SERVER_ERROR)
     @ResponseBody
     public ResponseEntity<Object> handleUnexpectedRollbackException(UnexpectedRollbackException ex) {
@@ -115,14 +117,17 @@ public class DefaultErrorHandlerAdvice extends ResponseEntityExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(createMessage(ex.getMessage()));
     }
 
-    @ExceptionHandler(value = {BpnAttributeMissingException.class})
+    @ExceptionHandler(value = { BpnAttributeMissingException.class })
     @ResponseStatus(value = HttpStatus.FORBIDDEN)
     @ResponseBody
     public ResponseEntity<Object> handleBpnAttributeRequiredException(BpnAttributeMissingException ex) {
         log.error("BpnAttributeRequiredException: {}", ex.getMessage(), ex);
 
         return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(createMessage("Identity Token is missing BPN attribute. Please contact your identity provider."));
+                .body(createMessage(
+                        String.format(
+                                "Identity token contains no '%s' attribute. Please contact your identity provider.",
+                                BPN_ATTRIBUTE)));
     }
 
     private static Object createMessage(String message) {

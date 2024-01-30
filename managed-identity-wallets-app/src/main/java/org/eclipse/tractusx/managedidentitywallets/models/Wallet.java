@@ -23,9 +23,7 @@ package org.eclipse.tractusx.managedidentitywallets.models;
 
 import lombok.*;
 
-import java.time.Instant;
 import java.time.OffsetDateTime;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
@@ -46,9 +44,9 @@ public class Wallet {
 
     @NonNull
     @Builder.Default
-    private final List<StoredEd25519Key> storedEd25519Keys = Collections.emptyList();
+    private final List<StoredEd25519VerificationMethod> storedEd25519Keys = Collections.emptyList();
 
-    public List<StoredEd25519Key> getStoredEd25519Keys() {
+    public List<StoredEd25519VerificationMethod> getStoredEd25519Keys() {
         return Collections.unmodifiableList(storedEd25519Keys);
     }
 }

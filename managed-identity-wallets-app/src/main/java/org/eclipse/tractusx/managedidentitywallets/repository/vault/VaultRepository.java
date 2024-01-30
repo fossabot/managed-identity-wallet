@@ -22,16 +22,15 @@
 package org.eclipse.tractusx.managedidentitywallets.repository.vault;
 
 import lombok.NonNull;
-import org.eclipse.tractusx.managedidentitywallets.models.Ed25519KeyId;
-import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
-import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.models.*;
+import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519VerificationMethod;
+import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519VerificationMethod;
 
 import java.util.Optional;
 
 public interface VaultRepository {
 
-    Optional<ResolvedEd25519Key> resolveKey(@NonNull WalletId walletId, StoredEd25519Key storedEd25519Key);
+    Optional<ResolvedEd25519VerificationMethod> resolveKey(@NonNull WalletId walletId, StoredEd25519VerificationMethod storedEd25519Key);
 
-    StoredEd25519Key storeKey(@NonNull WalletId walletId, @NonNull ResolvedEd25519Key resolvedEd25519Key);
+    StoredEd25519VerificationMethod storeKey(@NonNull WalletId walletId, @NonNull ResolvedEd25519VerificationMethod resolvedEd25519Key);
 }

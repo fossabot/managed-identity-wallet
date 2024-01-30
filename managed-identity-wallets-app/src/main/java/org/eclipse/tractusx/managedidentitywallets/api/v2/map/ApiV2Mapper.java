@@ -74,12 +74,12 @@ public interface ApiV2Mapper {
     @Mapping(target = "id.text", source = "id")
     @Mapping(target = "didFragment.text", source = "didFragment")
     @Mapping(target = "createdAt", source = "created")
-    StoredEd25519Key mapStoredEd25519Key(WalletKeyV2 walletKeyV2);
+    StoredEd25519VerificationMethod mapStoredEd25519Key(WalletKeyV2 walletKeyV2);
 
     @Mapping(target = "id", source = "id.text")
     @Mapping(target = "didFragment", source = "didFragment.text")
     @Mapping(target = "created", source = "createdAt")
-    WalletKeyV2 mapWalletKey(StoredEd25519Key key);
+    WalletKeyV2 mapWalletKey(StoredEd25519VerificationMethod key);
 
     @Mapping(target = "walletId.text", source = "id")
     @Mapping(target = "walletName.text", source = "name")

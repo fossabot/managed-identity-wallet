@@ -33,10 +33,10 @@ import java.util.*;
 @RequiredArgsConstructor
 public class InMemoryVaultRepository implements VaultRepository {
 
-    private final Map<VaultIdentifier, ResolvedEd25519Key> keys = new HashMap<>();
+    private final Map<VaultIdentifier, ResolvedEd25519VerificationMethod> keys = new HashMap<>();
 
     @Override
-    public Optional<ResolvedEd25519Key> resolveKey(@NonNull final WalletId walletId, @NonNull StoredEd25519Key storedEd25519Key) {
+    public Optional<ResolvedEd25519VerificationMethod> resolveKey(@NonNull final WalletId walletId, @NonNull StoredEd25519VerificationMethod storedEd25519Key) {
         final VaultIdentifier vaultIdentifier = new VaultIdentifier(walletId, storedEd25519Key.getId());
         if(log.isTraceEnabled()){
             log.trace("Resolving key with identifier {}", vaultIdentifier);
@@ -46,7 +46,7 @@ public class InMemoryVaultRepository implements VaultRepository {
     }
 
     @Override
-    public StoredEd25519Key storeKey(@NonNull final WalletId walletId, @NonNull final ResolvedEd25519Key resolvedEd25519Key) {
+    public StoredEd25519VerificationMethod storeKey(@NonNull final WalletId walletId, @NonNull final ResolvedEd25519VerificationMethod resolvedEd25519Key) {
         final VaultIdentifier vaultIdentifier = new VaultIdentifier(walletId, resolvedEd25519Key.getId());
         if(log.isTraceEnabled()){
             log.trace("Storing key with identifier {}", vaultIdentifier);
@@ -56,8 +56,8 @@ public class InMemoryVaultRepository implements VaultRepository {
         return mapToStoredKey(resolvedEd25519Key);
     }
 
-    private static StoredEd25519Key mapToStoredKey(@NonNull final ResolvedEd25519Key resolvedEd25519Key) {
-        return StoredEd25519Key.builder()
+    private static StoredEd25519VerificationMethod mapToStoredKey(@NonNull final ResolvedEd25519VerificationMethod resolvedEd25519Key) {
+        return StoredEd25519VerificationMethod.builder()
                 .id(resolvedEd25519Key.getId())
                 .createdAt(resolvedEd25519Key.getCreatedAt())
                 .didFragment(resolvedEd25519Key.getDidFragment())

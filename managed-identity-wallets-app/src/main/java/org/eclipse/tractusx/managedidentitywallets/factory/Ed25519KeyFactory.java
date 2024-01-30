@@ -21,13 +21,12 @@
 
 package org.eclipse.tractusx.managedidentitywallets.factory;
 
-import io.ipfs.multibase.binary.Base64;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.models.DidFragment;
 import org.eclipse.tractusx.managedidentitywallets.models.Ed25519KeyId;
 import org.eclipse.tractusx.managedidentitywallets.models.PlainText;
-import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
+import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519VerificationMethod;
 import org.eclipse.tractusx.ssi.lib.crypt.IKeyGenerator;
 import org.eclipse.tractusx.ssi.lib.crypt.KeyPair;
 import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559Generator;
@@ -40,19 +39,19 @@ import java.util.UUID;
 @Component
 public class Ed25519KeyFactory {
 
-    public ResolvedEd25519Key generateNewEd25519Key() {
+    public ResolvedEd25519VerificationMethod generateNewEd25519Key() {
         return generateNewEd25519Key(new DidFragment(UUID.randomUUID().toString()));
     }
 
     @SneakyThrows(KeyGenerationException.class)
-    public ResolvedEd25519Key generateNewEd25519Key(@NonNull DidFragment didFragment) {
+    public ResolvedEd25519VerificationMethod generateNewEd25519Key(@NonNull DidFragment didFragment) {
 
         final IKeyGenerator keyGenerator = new x21559Generator();
         final KeyPair keyPair = keyGenerator.generateKey();
 
         final Ed25519KeyId keyId = new Ed25519KeyId(UUID.randomUUID().toString());
 
-        return ResolvedEd25519Key.builder()
+        return ResolvedEd25519VerificationMethod.builder()
                 .id(keyId)
                 .privateKey(new PlainText(keyPair.getPrivateKey().asByte()))
                 .publicKey(new PlainText(keyPair.getPublicKey().asByte()))

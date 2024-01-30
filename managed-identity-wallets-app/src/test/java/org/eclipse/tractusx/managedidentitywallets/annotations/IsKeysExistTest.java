@@ -86,7 +86,7 @@ public class IsKeysExistTest {
         return newWallet(Collections.emptyList());
     }
 
-    private Wallet newWallet(List<StoredEd25519Key> keys) {
+    private Wallet newWallet(List<StoredEd25519VerificationMethod> keys) {
         return Wallet.builder()
                 .walletId(new WalletId("id-" + UUID.randomUUID()))
                 .walletName(new WalletName("" + UUID.randomUUID()))
@@ -95,8 +95,8 @@ public class IsKeysExistTest {
                 .build();
     }
 
-    private ResolvedEd25519Key createResolvedKey(@NonNull String id) {
-        return ResolvedEd25519Key.builder()
+    private ResolvedEd25519VerificationMethod createResolvedKey(@NonNull String id) {
+        return ResolvedEd25519VerificationMethod.builder()
                 .id(new Ed25519KeyId(id))
                 .didFragment(new DidFragment(id))
                 .createdAt(OffsetDateTime.now())
@@ -105,8 +105,8 @@ public class IsKeysExistTest {
                 .build();
     }
 
-    private StoredEd25519Key createStoredKey(@NonNull String id) {
-        return StoredEd25519Key.builder()
+    private StoredEd25519VerificationMethod createStoredKey(@NonNull String id) {
+        return StoredEd25519VerificationMethod.builder()
                 .id(new Ed25519KeyId(id))
                 .didFragment(new DidFragment(id))
                 .createdAt(OffsetDateTime.now())

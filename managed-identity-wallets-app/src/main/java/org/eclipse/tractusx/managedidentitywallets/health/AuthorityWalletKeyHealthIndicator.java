@@ -25,10 +25,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.config.HealthConfiguration;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
-import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
-import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
-import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
-import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
+import org.eclipse.tractusx.managedidentitywallets.models.*;
+import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519VerificationMethod;
+import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519VerificationMethod;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.springframework.boot.actuate.health.AbstractHealthIndicator;
@@ -65,7 +64,7 @@ public class AuthorityWalletKeyHealthIndicator extends AbstractHealthIndicator {
             return;
         }
 
-        final List<StoredEd25519Key> keys = wallet.get().getStoredEd25519Keys();
+        final List<StoredEd25519VerificationMethod> keys = wallet.get().getStoredEd25519Keys();
         final int keyCount = keys.size();
         builder.withDetail("authorityWallet-key-count", keyCount);
         if (keyCount == 0) {
@@ -74,8 +73,8 @@ public class AuthorityWalletKeyHealthIndicator extends AbstractHealthIndicator {
         }
 
         boolean allKeysPresent = true;
-        for (final StoredEd25519Key key : keys) {
-            final Optional<ResolvedEd25519Key> resolvedKey = vaultService.resolveKey(wallet.get(), key);
+        for (final StoredEd25519VerificationMethod key : keys) {
+            final Optional<ResolvedEd25519VerificationMethod> resolvedKey = vaultService.resolveKey(wallet.get(), key);
             if (resolvedKey.isEmpty()) {
                 final String msg = String.format("Authority wallet key not found in vault: %s", key);
                 builder.withDetail("authorityWallet-key-presence", msg);

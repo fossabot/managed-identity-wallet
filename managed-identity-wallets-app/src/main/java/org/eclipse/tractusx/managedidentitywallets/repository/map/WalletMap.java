@@ -40,9 +40,9 @@ public class WalletMap extends AbstractMap<Wallet, WalletEntity> {
         final WalletId walletId = new WalletId(entity.getId());
         final WalletName walletName = new WalletName(entity.getName());
 
-        final List<StoredEd25519Key> keys = entity.getEd25519Keys()
+        final List<StoredEd25519VerificationMethod> keys = entity.getEd25519Keys()
                 .stream().map(
-                        key -> StoredEd25519Key.builder()
+                        key -> StoredEd25519VerificationMethod.builder()
                                 .id(new Ed25519KeyId(key.getId()))
                                 .didFragment(new DidFragment(key.getDidFragment()))
                                 .publicKey(new CypherText(key.getPublicKeyCypherTextBase64()))

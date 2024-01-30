@@ -21,9 +21,8 @@
 
 package org.eclipse.tractusx.managedidentitywallets.factory;
 
-import com.nimbusds.jwt.SignedJWT;
 import lombok.SneakyThrows;
-import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519Key;
+import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519VerificationMethod;
 import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559PrivateKey;
 import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559PublicKey;
 import org.eclipse.tractusx.ssi.lib.did.web.DidWebResolver;
@@ -35,11 +34,8 @@ import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
 import java.net.http.HttpClient;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 
-public class Ed25519KeyFactoryTest {
+public class Ed25519VerificationMethodFactoryTest {
 
 
     private final Ed25519KeyFactory ed25519KeyFactory = new Ed25519KeyFactory();
@@ -49,7 +45,7 @@ public class Ed25519KeyFactoryTest {
     @SneakyThrows
     @Test
     public void testGeneratedKeyWithProof() {
-        final ResolvedEd25519Key key = ed25519KeyFactory.generateNewEd25519Key();
+        final ResolvedEd25519VerificationMethod key = ed25519KeyFactory.generateNewEd25519Key();
         final x21559PrivateKey privateKey = new x21559PrivateKey(key.getPrivateKey().getBytes());
         final x21559PublicKey publicKey = new x21559PublicKey(key.getPublicKey().getBytes());
 

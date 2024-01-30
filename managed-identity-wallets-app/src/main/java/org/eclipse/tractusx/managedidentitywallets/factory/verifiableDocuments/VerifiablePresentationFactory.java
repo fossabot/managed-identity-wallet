@@ -86,9 +86,9 @@ public class VerifiablePresentationFactory extends AbstractVerifiableDocumentFac
         final Did issuerDid = didFactory.generateDid(issuer);
         final SerializedJwtPresentationFactory factory = createJwtFactory(issuerDid);
 
-        final ResolvedEd25519Key key = issuer.getStoredEd25519Keys()
+        final ResolvedEd25519VerificationMethod key = issuer.getStoredEd25519Keys()
                 .stream()
-                .max(Comparator.comparing(StoredEd25519Key::getCreatedAt))
+                .max(Comparator.comparing(StoredEd25519VerificationMethod::getCreatedAt))
                 .map(k -> vaultService.resolveKey(issuer, k))
                 .filter(Optional::isPresent)
                 .map(Optional::get)

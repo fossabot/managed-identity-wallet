@@ -29,7 +29,7 @@ import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentia
 import org.eclipse.tractusx.managedidentitywallets.exception.VerifiableCredentialNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletAlreadyExistsException;
 import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
-import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519Key;
+import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519VerificationMethod;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialId;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
@@ -118,7 +118,7 @@ public class WalletRepository {
         walletEntity.setName(newWalletName);
 
         final List<Ed25519KeyEntity> ed25519KeyEntities = new ArrayList<>();
-        for (final StoredEd25519Key storedEd25519Key : wallet.getStoredEd25519Keys()) {
+        for (final StoredEd25519VerificationMethod storedEd25519Key : wallet.getStoredEd25519Keys()) {
             // keep keys that are already in db or generate new ones
             // it should not be possible to update the key itself
             walletEntity.getEd25519Keys().stream().filter(

@@ -25,6 +25,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.delegate.AbstractApiHandler;
 import org.eclipse.tractusx.managedidentitywallets.api.v2.map.ApiV2Mapper;
+import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundException;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
@@ -47,7 +48,7 @@ class GetWalletUserApiHandler extends AbstractApiHandler {
         logIfDebug("userGetWallet(walletId={})", walletId);
 
         final Wallet wallet = walletService.findById(walletId)
-                .orElseThrow();
+                .orElseThrow(() -> new WalletNotFoundException(walletId));
 
         final WalletResponsePayloadV2 payloadV2 = apiMapper.mapWalletResponsePayloadV2(wallet);
         return ResponseEntity.ok(payloadV2);

@@ -38,7 +38,7 @@ public class VaultRepositoryImpl implements VaultRepository {
     @NonNull
     private final VaultTemplate vaultTemplate;
 
-    public Optional<ResolvedEd25519Key> resolveKey(@NonNull final WalletId walletId, @NonNull StoredEd25519Key storedEd25519Key) {
+    public Optional<ResolvedEd25519VerificationMethod> resolveKey(@NonNull final WalletId walletId, @NonNull StoredEd25519VerificationMethod storedEd25519Key) {
         final VaultIdentifier vaultIdentifier = new VaultIdentifier(walletId, storedEd25519Key.getId());
         if (log.isTraceEnabled()) {
             log.trace("Resolving key with identifier {}", vaultIdentifier);
@@ -50,7 +50,7 @@ public class VaultRepositoryImpl implements VaultRepository {
         final PlainText publicKey = decrypt(vaultIdentifier, storedEd25519Key.getPublicKey());
         final PlainText privateKey = decrypt(vaultIdentifier, storedEd25519Key.getPrivateKey());
 
-        final ResolvedEd25519Key resolvedKey = ResolvedEd25519Key.builder()
+        final ResolvedEd25519VerificationMethod resolvedKey = ResolvedEd25519VerificationMethod.builder()
                 .id(storedEd25519Key.getId())
                 .createdAt(storedEd25519Key.getCreatedAt())
                 .didFragment(storedEd25519Key.getDidFragment())
@@ -60,7 +60,7 @@ public class VaultRepositoryImpl implements VaultRepository {
         return Optional.of(resolvedKey);
     }
 
-    public StoredEd25519Key storeKey(@NonNull final WalletId walletId, @NonNull final ResolvedEd25519Key resolvedEd25519Key) {
+    public StoredEd25519VerificationMethod storeKey(@NonNull final WalletId walletId, @NonNull final ResolvedEd25519VerificationMethod resolvedEd25519Key) {
         final VaultIdentifier vaultIdentifier = new VaultIdentifier(walletId, resolvedEd25519Key.getId());
         if (log.isTraceEnabled()) {
             log.trace("Storing key with identifier {}", vaultIdentifier);
@@ -69,7 +69,7 @@ public class VaultRepositoryImpl implements VaultRepository {
         final CypherText publicKey = encrypt(vaultIdentifier, resolvedEd25519Key.getPublicKey());
         final CypherText privateKey = encrypt(vaultIdentifier, resolvedEd25519Key.getPrivateKey());
 
-        return StoredEd25519Key.builder()
+        return StoredEd25519VerificationMethod.builder()
                 .id(resolvedEd25519Key.getId())
                 .createdAt(resolvedEd25519Key.getCreatedAt())
                 .didFragment(resolvedEd25519Key.getDidFragment())
