@@ -23,16 +23,20 @@ repositories {
     mavenCentral()
 }
 
+sourceSets {
+    main {
+        java {
+            srcDirs 'src/main/java'
+            srcDirs 'build/generated/openapi/src/main/java'
+        }
+    }
+}
+
 ext {
 
 }
 
 dependencies {
-//    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-//    implementation 'org.springframework.boot:spring-boot-starter-validation'
-//    implementation 'org.springframework.boot:spring-boot-starter-web'
-//    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-//    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.security:spring-security-oauth2-resource-server'
     implementation 'org.springframework.security:spring-security-oauth2-jose'
     implementation "org.springdoc:springdoc-openapi-starter-common:${openApiVersion}"
@@ -70,11 +74,11 @@ openApiGenerate {
     inputSpec.set("$rootDir/managed-identity-wallets-app/src/main/resources/static/openapi_v2.yaml")
     outputDir.set("$buildDir/generated/openapi")
 
-    invokerPackage.set("org.eclipse.tractusx.managedidentitywallets.okhttp3.v2.client")
-    apiPackage.set("org.eclipse.tractusx.managedidentitywallets.okhttp3.v2.controllers")
-    modelPackage.set("org.eclipse.tractusx.managedidentitywallets.okhttp3.v2.models")
-    groupId.set("org.eclipse.tractusx.managedidentitywallets.okhttp3")
-    apiNameSuffix.set("V2")
+    invokerPackage.set("org.eclipse.tractusx.managedidentitywallets.client.v2.okhttp3")
+    apiPackage.set("org.eclipse.tractusx.managedidentitywallets.client.v2.okhttp3.controllers")
+    modelPackage.set("org.eclipse.tractusx.managedidentitywallets.client.v2.okhttp3.models")
+    groupId.set("org.eclipse.tractusx.managedidentitywallets.client.v2.okhttp3")
+    apiNameSuffix.set("ManagedIdentityWalletApiV2")
     modelNameSuffix.set("V2")
     generateApiTests.set(false)
     generateModelTests.set(false)

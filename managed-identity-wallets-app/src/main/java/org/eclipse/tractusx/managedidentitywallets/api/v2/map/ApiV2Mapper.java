@@ -111,6 +111,7 @@ public interface ApiV2Mapper {
     @Mapping(target = "walletId.text", source = "id")
     @Mapping(target = "walletName.text", source = "name")
     @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "storedEd25519Keys", ignore = true)
     Wallet mapCreateWalletResponsePayloadV2(CreateWalletRequestPayloadV2 wallet);
 
     @Mapping(target = "id", source = "walletId.text")

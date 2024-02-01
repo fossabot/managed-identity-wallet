@@ -36,11 +36,6 @@ ext {
 }
 
 dependencies {
-//    implementation 'org.springframework.boot:spring-boot-starter-actuator'
-//    implementation 'org.springframework.boot:spring-boot-starter-validation'
-//    implementation 'org.springframework.boot:spring-boot-starter-web'
-//    implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-//    implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation "org.springdoc:springdoc-openapi-starter-common:${openApiVersion}"
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:${openApiVersion}"
     implementation 'javax.annotation:javax.annotation-api:1.3.2'
@@ -63,11 +58,11 @@ openApiGenerate {
     inputSpec.set("$rootDir/managed-identity-wallets-app/src/main/resources/static/openapi_v2.yaml")
     outputDir.set("$buildDir/generated/openapi")
 
-    invokerPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.v2.client")
-    apiPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.v2.controllers")
-    modelPackage.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate.v2.models")
-    groupId.set("org.eclipse.tractusx.managedidentitywallets.spring.resttemplate")
-    apiNameSuffix.set("V2")
+    invokerPackage.set("org.eclipse.tractusx.managedidentitywallets.client.v2.resttemplate")
+    apiPackage.set("org.eclipse.tractusx.managedidentitywallets.client.v2.resttemplate.controllers")
+    modelPackage.set("org.eclipse.tractusx.managedidentitywallets.client.v2.resttemplate.models")
+    groupId.set("org.eclipse.tractusx.managedidentitywallets.client.v2.resttemplate")
+    apiNameSuffix.set("ManagedIdentityWalletApiV2")
     modelNameSuffix.set("V2")
     generateApiTests.set(false)
     generateModelTests.set(false)
