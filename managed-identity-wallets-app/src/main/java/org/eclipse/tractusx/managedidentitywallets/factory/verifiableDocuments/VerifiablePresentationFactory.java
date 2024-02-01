@@ -88,7 +88,7 @@ public class VerifiablePresentationFactory extends AbstractVerifiableDocumentFac
 
         final ResolvedEd25519VerificationMethod key = issuer.getStoredEd25519Keys()
                 .stream()
-                .max(Comparator.comparing(StoredEd25519VerificationMethod::getCreatedAt))
+                .max(Comparator.comparing(PersistedEd25519VerificationMethod::getCreatedAt))
                 .map(k -> vaultService.resolveKey(issuer, k))
                 .filter(Optional::isPresent)
                 .map(Optional::get)

@@ -19,18 +19,32 @@
  * ******************************************************************************
  */
 
-package org.eclipse.tractusx.managedidentitywallets.repository.vault;
+package org.eclipse.tractusx.managedidentitywallets.models;
 
+import io.ipfs.multibase.binary.Base64;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
 import lombok.NonNull;
-import org.eclipse.tractusx.managedidentitywallets.models.*;
-import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519VerificationMethod;
-import org.eclipse.tractusx.managedidentitywallets.models.PersistedEd25519VerificationMethod;
+import lombok.RequiredArgsConstructor;
 
-import java.util.Optional;
+@Getter
+@EqualsAndHashCode
+@RequiredArgsConstructor
+public class PrivateKeyPlainText {
 
-public interface VaultRepository {
+    public PrivateKeyPlainText(byte[] bytes) {
+        this.base64 = Base64.encodeBase64String(bytes);
+    }
 
-    Optional<ResolvedEd25519VerificationMethod> resolveKey(@NonNull WalletId walletId, PersistedEd25519VerificationMethod storedEd25519Key);
+    @NonNull
+    private final String base64;
 
-    PersistedEd25519VerificationMethod storeKey(@NonNull WalletId walletId, @NonNull ResolvedEd25519VerificationMethod resolvedEd25519Key);
+    @Override
+    public String toString() {
+        return base64;
+    }
+
+    public byte[] getBytes() {
+        return org.bouncycastle.util.encoders.Base64.decode(base64);
+    }
 }

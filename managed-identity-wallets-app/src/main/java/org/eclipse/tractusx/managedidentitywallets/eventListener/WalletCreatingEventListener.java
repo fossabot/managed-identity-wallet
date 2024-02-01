@@ -68,7 +68,7 @@ public class WalletCreatingEventListener {
         final DidFragment didFragment = new DidFragment("key-1");
         final ResolvedEd25519VerificationMethod resolvedEd25519Key = ed25519KeyFactory.generateNewEd25519Key(didFragment);
 
-        final StoredEd25519VerificationMethod newEd25519Key = vaultService.storeKey(wallet, resolvedEd25519Key);
+        final PersistedEd25519VerificationMethod newEd25519Key = vaultService.storeKey(wallet, resolvedEd25519Key);
 
         final Wallet updatedWallet = Wallet.builder()
                 .walletId(wallet.getWalletId())

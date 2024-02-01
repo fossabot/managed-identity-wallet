@@ -40,13 +40,13 @@ public class WalletMap extends AbstractMap<Wallet, WalletEntity> {
         final WalletId walletId = new WalletId(entity.getId());
         final WalletName walletName = new WalletName(entity.getName());
 
-        final List<StoredEd25519VerificationMethod> keys = entity.getEd25519Keys()
+        final List<PersistedEd25519VerificationMethod> keys = entity.getEd25519Keys()
                 .stream().map(
-                        key -> StoredEd25519VerificationMethod.builder()
+                        key -> PersistedEd25519VerificationMethod.builder()
                                 .id(new Ed25519KeyId(key.getId()))
                                 .didFragment(new DidFragment(key.getDidFragment()))
-                                .publicKey(new CypherText(key.getPublicKeyCypherTextBase64()))
-                                .privateKey(new CypherText(key.getPrivateKeyCypherTextBase64()))
+                                .publicKey(new PublicKeyCypherText(key.getPublicKeyCypherTextBase64()))
+                                .privateKey(new PrivateKeyCypherText(key.getPrivateKeyCypherTextBase64()))
                                 .createdAt(key.getCreatedAt())
                                 .build()
                 ).collect(Collectors.toList());

@@ -35,7 +35,7 @@ public interface ApiV2Mapper {
     @ValueMapping(target = "INCORRECT_JSON_LD_FORMAT", source = "INVALID_JSONLD_FORMAT")
     @ValueMapping(target = "INCORRECT_SIGNATURE", source = "INVALID_SIGNATURE")
     @ValueMapping(target = "EXPIRED", source = "EXPIRED")
-    ValidateVerifiablePresentationJwtResponsePayloadV2.VerifiablePresentationViolationsEnum getVerifiableCredentialValidationResultViolationsInnerV2(VerifiablePresentationJwtValidationResult.Type  type);
+    ValidateVerifiablePresentationJwtResponsePayloadV2.VerifiablePresentationViolationsEnum getVerifiableCredentialValidationResultViolationsInnerV2(VerifiablePresentationJwtValidationResult.Type type);
 
     @Mapping(target = "isValid", source = "valid")
     @Mapping(target = "verifiableCredentialResult", source = "verifiableCredentialResult")
@@ -46,7 +46,7 @@ public interface ApiV2Mapper {
     @ValueMapping(target = "INCORRECT_SIGNATURE", source = "INVALID_SIGNATURE")
     @ValueMapping(target = "NO_EMBEDDED_SIGNATURE", source = "NO_EMBEDDED_SIGNATURE")
     @ValueMapping(target = "EXPIRED", source = "EXPIRED")
-    ValidateVerifiablePresentationResponsePayloadV2.VerifiablePresentationViolationsEnum getVerifiableCredentialValidationResultViolationsInnerV2(VerifiablePresentationValidationResult.Type  type);
+    ValidateVerifiablePresentationResponsePayloadV2.VerifiablePresentationViolationsEnum getVerifiableCredentialValidationResultViolationsInnerV2(VerifiablePresentationValidationResult.Type type);
 
     @Mapping(target = "isValid", source = "valid")
     @Mapping(target = "verifiableCredentialResult", source = "verifiableCredentialResult")
@@ -74,12 +74,15 @@ public interface ApiV2Mapper {
     @Mapping(target = "id.text", source = "id")
     @Mapping(target = "didFragment.text", source = "didFragment")
     @Mapping(target = "createdAt", source = "created")
-    StoredEd25519VerificationMethod mapStoredEd25519Key(WalletKeyV2 walletKeyV2);
+    @Mapping(target = "publicKey.base64", source = "publicKey")
+    @Mapping(target = "privateKey", ignore = true)
+    PersistedEd25519VerificationMethod mapStoredEd25519Key(WalletKeyV2 walletKeyV2);
 
     @Mapping(target = "id", source = "id.text")
     @Mapping(target = "didFragment", source = "didFragment.text")
     @Mapping(target = "created", source = "createdAt")
-    WalletKeyV2 mapWalletKey(StoredEd25519VerificationMethod key);
+    @Mapping(target = "publicKey", source = "publicKey.base64")
+    WalletKeyV2 mapWalletKey(PersistedEd25519VerificationMethod key);
 
     @Mapping(target = "walletId.text", source = "id")
     @Mapping(target = "walletName.text", source = "name")
@@ -107,6 +110,7 @@ public interface ApiV2Mapper {
 
     @Mapping(target = "walletId.text", source = "id")
     @Mapping(target = "walletName.text", source = "name")
+    @Mapping(target = "createdAt", ignore = true)
     Wallet mapCreateWalletResponsePayloadV2(CreateWalletRequestPayloadV2 wallet);
 
     @Mapping(target = "id", source = "walletId.text")

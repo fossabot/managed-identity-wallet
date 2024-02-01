@@ -21,28 +21,21 @@
 
 package org.eclipse.tractusx.managedidentitywallets.models;
 
-import lombok.*;
-
-import java.time.OffsetDateTime;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Getter
-@AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
-@Builder
-@ToString
-public class StoredEd25519VerificationMethod implements Ed25519VerificationMethod {
+@EqualsAndHashCode
+@RequiredArgsConstructor
+public class PublicKeyCypherText {
 
     @NonNull
-    private final Ed25519KeyId id;
-    @NonNull
-    private final DidFragment didFragment;
-    @NonNull
-    private final OffsetDateTime createdAt;
+    private final String base64;
 
-    @NonNull
-    private final CypherText publicKey;
-
-    @NonNull
-    @ToString.Exclude
-    private final CypherText privateKey;
+    @Override
+    public String toString() {
+        return base64;
+    }
 }
-

@@ -24,8 +24,8 @@ package org.eclipse.tractusx.managedidentitywallets.factory.verifiableDocuments;
 import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
+import org.eclipse.tractusx.managedidentitywallets.models.PersistedEd25519VerificationMethod;
 import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519VerificationMethod;
-import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519VerificationMethod;
 import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
@@ -123,7 +123,7 @@ public abstract class AbstractVerifiableDocumentFactory {
 
         final ResolvedEd25519VerificationMethod latestKey = issuerWallet.getStoredEd25519Keys()
                 .stream()
-                .max(Comparator.comparing(StoredEd25519VerificationMethod::getCreatedAt))
+                .max(Comparator.comparing(PersistedEd25519VerificationMethod::getCreatedAt))
                 .map(k -> vaultService.resolveKey(issuerWallet, k))
                 .filter(Optional::isPresent)
                 .map(Optional::get)

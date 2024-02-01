@@ -33,7 +33,7 @@ import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.models.Ed25519VerificationMethod;
 import org.eclipse.tractusx.managedidentitywallets.models.JsonWebToken;
 import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519VerificationMethod;
-import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519VerificationMethod;
+import org.eclipse.tractusx.managedidentitywallets.models.PersistedEd25519VerificationMethod;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiableCredentialValidationResultViolation;
 import org.eclipse.tractusx.managedidentitywallets.models.VerifiablePresentationJwtValidationResult;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
@@ -117,7 +117,7 @@ public class PresentationService {
 
             //Build JWT
             final org.eclipse.tractusx.managedidentitywallets.models.Wallet domainWallet = walletService.findById(new WalletId(callerBpn)).orElseThrow();
-            final StoredEd25519VerificationMethod latestKey = domainWallet.getStoredEd25519Keys().stream().max(Comparator.comparing(Ed25519VerificationMethod::getCreatedAt)).orElseThrow();
+            final PersistedEd25519VerificationMethod latestKey = domainWallet.getStoredEd25519Keys().stream().max(Comparator.comparing(Ed25519VerificationMethod::getCreatedAt)).orElseThrow();
             final ResolvedEd25519VerificationMethod resolvedEd25519Key = vaultService.resolveKey(domainWallet, latestKey).orElseThrow();
 
             x21559PrivateKey privateKey = new x21559PrivateKey(resolvedEd25519Key.getPrivateKey().getBytes());

@@ -44,9 +44,9 @@ public class Wallet {
 
     @NonNull
     @Builder.Default
-    private final List<StoredEd25519VerificationMethod> storedEd25519Keys = Collections.emptyList();
+    private final List<PersistedEd25519VerificationMethod> storedEd25519Keys = Collections.emptyList();
 
-    public List<StoredEd25519VerificationMethod> getStoredEd25519Keys() {
+    public List<PersistedEd25519VerificationMethod> getStoredEd25519Keys() {
         return Collections.unmodifiableList(storedEd25519Keys);
     }
 }

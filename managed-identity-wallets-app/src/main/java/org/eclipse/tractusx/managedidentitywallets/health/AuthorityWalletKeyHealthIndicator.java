@@ -27,7 +27,7 @@ import org.eclipse.tractusx.managedidentitywallets.config.HealthConfiguration;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
 import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519VerificationMethod;
-import org.eclipse.tractusx.managedidentitywallets.models.StoredEd25519VerificationMethod;
+import org.eclipse.tractusx.managedidentitywallets.models.PersistedEd25519VerificationMethod;
 import org.eclipse.tractusx.managedidentitywallets.service.VaultService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
 import org.springframework.boot.actuate.health.AbstractHealthIndicator;
@@ -64,7 +64,7 @@ public class AuthorityWalletKeyHealthIndicator extends AbstractHealthIndicator {
             return;
         }
 
-        final List<StoredEd25519VerificationMethod> keys = wallet.get().getStoredEd25519Keys();
+        final List<PersistedEd25519VerificationMethod> keys = wallet.get().getStoredEd25519Keys();
         final int keyCount = keys.size();
         builder.withDetail("authorityWallet-key-count", keyCount);
         if (keyCount == 0) {
@@ -73,7 +73,7 @@ public class AuthorityWalletKeyHealthIndicator extends AbstractHealthIndicator {
         }
 
         boolean allKeysPresent = true;
-        for (final StoredEd25519VerificationMethod key : keys) {
+        for (final PersistedEd25519VerificationMethod key : keys) {
             final Optional<ResolvedEd25519VerificationMethod> resolvedKey = vaultService.resolveKey(wallet.get(), key);
             if (resolvedKey.isEmpty()) {
                 final String msg = String.format("Authority wallet key not found in vault: %s", key);

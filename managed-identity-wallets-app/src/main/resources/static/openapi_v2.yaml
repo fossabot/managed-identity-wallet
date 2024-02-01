@@ -601,6 +601,9 @@ components:
         didFragment:
           type: string
           description: The DID fragment of the key.
+        publicKey:
+          type: string
+          description: The public key base64 encoded.
         created:
           type: string
           format: date-time

@@ -21,13 +21,30 @@
 
 package org.eclipse.tractusx.managedidentitywallets.models;
 
-import lombok.*;
+import io.ipfs.multibase.binary.Base64;
+import lombok.EqualsAndHashCode;
+import lombok.Getter;
+import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 
 @Getter
 @EqualsAndHashCode
-@ToString
-@AllArgsConstructor
-public class VaultSecret {
+@RequiredArgsConstructor
+public class PublicKeyPlainText {
+
+    public PublicKeyPlainText(byte[] bytes) {
+        this.base64 = Base64.encodeBase64String(bytes);
+    }
+
     @NonNull
-    private final String text;
+    private final String base64;
+
+    @Override
+    public String toString() {
+        return base64;
+    }
+
+    public byte[] getBytes() {
+        return org.bouncycastle.util.encoders.Base64.decode(base64);
+    }
 }

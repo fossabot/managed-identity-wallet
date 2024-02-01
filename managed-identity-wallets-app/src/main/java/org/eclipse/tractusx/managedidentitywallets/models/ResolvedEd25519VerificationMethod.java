@@ -39,9 +39,9 @@ public class ResolvedEd25519VerificationMethod implements Ed25519VerificationMet
     private final OffsetDateTime createdAt;
 
     @NonNull
-    private final PlainText publicKey;
+    private final PublicKeyPlainText publicKey;
 
     @NonNull
     @ToString.Exclude
-    private final PlainText privateKey;
+    private final PrivateKeyPlainText privateKey;
 }

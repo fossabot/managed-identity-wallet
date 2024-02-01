@@ -38,7 +38,7 @@ public class VaultRepositoryImpl implements VaultRepository {
     @NonNull
     private final VaultTemplate vaultTemplate;
 
-    public Optional<ResolvedEd25519VerificationMethod> resolveKey(@NonNull final WalletId walletId, @NonNull StoredEd25519VerificationMethod storedEd25519Key) {
+    public Optional<ResolvedEd25519VerificationMethod> resolveKey(@NonNull final WalletId walletId, @NonNull PersistedEd25519VerificationMethod storedEd25519Key) {
         final VaultIdentifier vaultIdentifier = new VaultIdentifier(walletId, storedEd25519Key.getId());
         if (log.isTraceEnabled()) {
             log.trace("Resolving key with identifier {}", vaultIdentifier);
@@ -47,8 +47,8 @@ public class VaultRepositoryImpl implements VaultRepository {
             return Optional.empty();
         }
 
-        final PlainText publicKey = decrypt(vaultIdentifier, storedEd25519Key.getPublicKey());
-        final PlainText privateKey = decrypt(vaultIdentifier, storedEd25519Key.getPrivateKey());
+        final PublicKeyPlainText publicKey = decrypt(vaultIdentifier, storedEd25519Key.getPublicKey());
+        final PrivateKeyPlainText privateKey = decrypt(vaultIdentifier, storedEd25519Key.getPrivateKey());
 
         final ResolvedEd25519VerificationMethod resolvedKey = ResolvedEd25519VerificationMethod.builder()
                 .id(storedEd25519Key.getId())
@@ -60,16 +60,16 @@ public class VaultRepositoryImpl implements VaultRepository {
         return Optional.of(resolvedKey);
     }
 
-    public StoredEd25519VerificationMethod storeKey(@NonNull final WalletId walletId, @NonNull final ResolvedEd25519VerificationMethod resolvedEd25519Key) {
+    public PersistedEd25519VerificationMethod storeKey(@NonNull final WalletId walletId, @NonNull final ResolvedEd25519VerificationMethod resolvedEd25519Key) {
         final VaultIdentifier vaultIdentifier = new VaultIdentifier(walletId, resolvedEd25519Key.getId());
         if (log.isTraceEnabled()) {
             log.trace("Storing key with identifier {}", vaultIdentifier);
         }
 
-        final CypherText publicKey = encrypt(vaultIdentifier, resolvedEd25519Key.getPublicKey());
-        final CypherText privateKey = encrypt(vaultIdentifier, resolvedEd25519Key.getPrivateKey());
+        final PublicKeyCypherText publicKey = encrypt(vaultIdentifier, resolvedEd25519Key.getPublicKey());
+        final PrivateKeyCypherText privateKey = encrypt(vaultIdentifier, resolvedEd25519Key.getPrivateKey());
 
-        return StoredEd25519VerificationMethod.builder()
+        return PersistedEd25519VerificationMethod.builder()
                 .id(resolvedEd25519Key.getId())
                 .createdAt(resolvedEd25519Key.getCreatedAt())
                 .didFragment(resolvedEd25519Key.getDidFragment())
@@ -78,16 +78,29 @@ public class VaultRepositoryImpl implements VaultRepository {
                 .build();
     }
 
-    private PlainText decrypt(@NonNull VaultIdentifier vaultIdentifier, @NonNull CypherText cypherText) {
+
+    private PublicKeyPlainText decrypt(@NonNull VaultIdentifier vaultIdentifier, @NonNull PublicKeyCypherText PrivateKeyCypherText) {
         final String value = prepareEncryptKey(vaultIdentifier)
-                .decrypt(vaultIdentifier.getIdentifier(), cypherText.getBase64());
-        return new PlainText(value);
+                .decrypt(vaultIdentifier.getIdentifier(), PrivateKeyCypherText.getBase64());
+        return new PublicKeyPlainText(value);
     }
 
-    private CypherText encrypt(@NonNull VaultIdentifier vaultIdentifier, @NonNull PlainText plainText) {
+    private PrivateKeyPlainText decrypt(@NonNull VaultIdentifier vaultIdentifier, @NonNull PrivateKeyCypherText PrivateKeyCypherText) {
         final String value = prepareEncryptKey(vaultIdentifier)
-                .encrypt(vaultIdentifier.getIdentifier(), plainText.getBase64());
-        return new CypherText(value);
+                .decrypt(vaultIdentifier.getIdentifier(), PrivateKeyCypherText.getBase64());
+        return new PrivateKeyPlainText(value);
+    }
+
+    private PublicKeyCypherText encrypt(@NonNull VaultIdentifier vaultIdentifier, @NonNull PublicKeyPlainText publicKeyPlainText) {
+        final String value = prepareEncryptKey(vaultIdentifier)
+                .encrypt(vaultIdentifier.getIdentifier(), publicKeyPlainText.getBase64());
+        return new PublicKeyCypherText(value);
+    }
+
+    private PrivateKeyCypherText encrypt(@NonNull VaultIdentifier vaultIdentifier, @NonNull PrivateKeyPlainText publicKeyPlainText) {
+        final String value = prepareEncryptKey(vaultIdentifier)
+                .encrypt(vaultIdentifier.getIdentifier(), publicKeyPlainText.getBase64());
+        return new PrivateKeyCypherText(value);
     }
 
     private boolean existsKey(@NonNull VaultIdentifier vaultIdentifier) {

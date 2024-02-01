@@ -86,7 +86,7 @@ public class IsKeysExistTest {
         return newWallet(Collections.emptyList());
     }
 
-    private Wallet newWallet(List<StoredEd25519VerificationMethod> keys) {
+    private Wallet newWallet(List<PersistedEd25519VerificationMethod> keys) {
         return Wallet.builder()
                 .walletId(new WalletId("id-" + UUID.randomUUID()))
                 .walletName(new WalletName("" + UUID.randomUUID()))
@@ -100,18 +100,18 @@ public class IsKeysExistTest {
                 .id(new Ed25519KeyId(id))
                 .didFragment(new DidFragment(id))
                 .createdAt(OffsetDateTime.now())
-                .privateKey(new PlainText(id))
-                .publicKey(new PlainText(id))
+                .privateKey(new PrivateKeyPlainText(id))
+                .publicKey(new PublicKeyPlainText(id))
                 .build();
     }
 
-    private StoredEd25519VerificationMethod createStoredKey(@NonNull String id) {
-        return StoredEd25519VerificationMethod.builder()
+    private PersistedEd25519VerificationMethod createStoredKey(@NonNull String id) {
+        return PersistedEd25519VerificationMethod.builder()
                 .id(new Ed25519KeyId(id))
                 .didFragment(new DidFragment(id))
                 .createdAt(OffsetDateTime.now())
-                .privateKey(new CypherText(id))
-                .publicKey(new CypherText(id))
+                .privateKey(new PrivateKeyCypherText(id))
+                .publicKey(new PublicKeyCypherText(id))
                 .build();
     }
 }

@@ -25,12 +25,11 @@ import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
-import org.bouncycastle.util.encoders.Base64;
 
 @Getter
 @EqualsAndHashCode
 @RequiredArgsConstructor
-public class CypherText {
+public class PrivateKeyCypherText {
 
     @NonNull
     private final String base64;

@@ -21,30 +21,25 @@
 
 package org.eclipse.tractusx.managedidentitywallets.models;
 
-import io.ipfs.multibase.binary.Base64;
-import lombok.EqualsAndHashCode;
-import lombok.Getter;
-import lombok.NonNull;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
+
+import java.time.OffsetDateTime;
 
 @Getter
-@EqualsAndHashCode
-@RequiredArgsConstructor
-public class PlainText {
-
-    public PlainText(byte[] bytes) {
-        this.base64 = Base64.encodeBase64String(bytes);
-    }
+@AllArgsConstructor(access = lombok.AccessLevel.PRIVATE)
+@Builder
+@ToString
+public class PersistedEd25519VerificationMethod implements Ed25519VerificationMethod {
 
     @NonNull
-    private final String base64;
-
-    @Override
-    public String toString() {
-        return base64;
-    }
-
-    public byte[] getBytes() {
-        return org.bouncycastle.util.encoders.Base64.decode(base64);
-    }
+    private final Ed25519KeyId id;
+    @NonNull
+    private final DidFragment didFragment;
+    @NonNull
+    private final OffsetDateTime createdAt;
+    @NonNull
+    private final PublicKeyCypherText publicKey;
+    @NonNull
+    @ToString.Exclude
+    private final PrivateKeyCypherText privateKey;
 }

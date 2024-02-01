@@ -25,7 +25,8 @@ import lombok.NonNull;
 import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.models.DidFragment;
 import org.eclipse.tractusx.managedidentitywallets.models.Ed25519KeyId;
-import org.eclipse.tractusx.managedidentitywallets.models.PlainText;
+import org.eclipse.tractusx.managedidentitywallets.models.PrivateKeyPlainText;
+import org.eclipse.tractusx.managedidentitywallets.models.PublicKeyPlainText;
 import org.eclipse.tractusx.managedidentitywallets.models.ResolvedEd25519VerificationMethod;
 import org.eclipse.tractusx.ssi.lib.crypt.IKeyGenerator;
 import org.eclipse.tractusx.ssi.lib.crypt.KeyPair;
@@ -53,12 +54,10 @@ public class Ed25519KeyFactory {
 
         return ResolvedEd25519VerificationMethod.builder()
                 .id(keyId)
-                .privateKey(new PlainText(keyPair.getPrivateKey().asByte()))
-                .publicKey(new PlainText(keyPair.getPublicKey().asByte()))
+                .privateKey(new PrivateKeyPlainText(keyPair.getPrivateKey().asByte()))
+                .publicKey(new PublicKeyPlainText(keyPair.getPublicKey().asByte()))
                 .didFragment(didFragment)
                 .createdAt(OffsetDateTime.now())
                 .build();
     }
-
-
 }

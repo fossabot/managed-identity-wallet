@@ -36,7 +36,7 @@ public class InMemoryVaultRepository implements VaultRepository {
     private final Map<VaultIdentifier, ResolvedEd25519VerificationMethod> keys = new HashMap<>();
 
     @Override
-    public Optional<ResolvedEd25519VerificationMethod> resolveKey(@NonNull final WalletId walletId, @NonNull StoredEd25519VerificationMethod storedEd25519Key) {
+    public Optional<ResolvedEd25519VerificationMethod> resolveKey(@NonNull final WalletId walletId, @NonNull PersistedEd25519VerificationMethod storedEd25519Key) {
         final VaultIdentifier vaultIdentifier = new VaultIdentifier(walletId, storedEd25519Key.getId());
         if(log.isTraceEnabled()){
             log.trace("Resolving key with identifier {}", vaultIdentifier);
@@ -46,7 +46,7 @@ public class InMemoryVaultRepository implements VaultRepository {
     }
 
     @Override
-    public StoredEd25519VerificationMethod storeKey(@NonNull final WalletId walletId, @NonNull final ResolvedEd25519VerificationMethod resolvedEd25519Key) {
+    public PersistedEd25519VerificationMethod storeKey(@NonNull final WalletId walletId, @NonNull final ResolvedEd25519VerificationMethod resolvedEd25519Key) {
         final VaultIdentifier vaultIdentifier = new VaultIdentifier(walletId, resolvedEd25519Key.getId());
         if(log.isTraceEnabled()){
             log.trace("Storing key with identifier {}", vaultIdentifier);
@@ -56,8 +56,8 @@ public class InMemoryVaultRepository implements VaultRepository {
         return mapToStoredKey(resolvedEd25519Key);
     }
 
-    private static StoredEd25519VerificationMethod mapToStoredKey(@NonNull final ResolvedEd25519VerificationMethod resolvedEd25519Key) {
-        return StoredEd25519VerificationMethod.builder()
+    private static PersistedEd25519VerificationMethod mapToStoredKey(@NonNull final ResolvedEd25519VerificationMethod resolvedEd25519Key) {
+        return PersistedEd25519VerificationMethod.builder()
                 .id(resolvedEd25519Key.getId())
                 .createdAt(resolvedEd25519Key.getCreatedAt())
                 .didFragment(resolvedEd25519Key.getDidFragment())
@@ -66,7 +66,11 @@ public class InMemoryVaultRepository implements VaultRepository {
                 .build();
     }
 
-    private static CypherText mapToCypherText(@NonNull final PlainText plainText) {
-        return new CypherText(plainText.getBase64());
+    private static PublicKeyCypherText mapToCypherText(@NonNull final PublicKeyPlainText publicKeyPlainText) {
+        return new PublicKeyCypherText(publicKeyPlainText.getBase64());
+    }
+
+    private static PrivateKeyCypherText mapToCypherText(@NonNull final PrivateKeyPlainText publicKeyPlainText) {
+        return new PrivateKeyCypherText(publicKeyPlainText.getBase64());
     }
 }

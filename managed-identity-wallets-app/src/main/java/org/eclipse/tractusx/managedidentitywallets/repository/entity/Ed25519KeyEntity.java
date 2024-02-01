@@ -55,7 +55,7 @@ public class Ed25519KeyEntity extends AbstractEntity {
 
     @Column(name = COLUMN_PRIVATE_KEY_CYPHER_TEXT_BASE_64, nullable = false, updatable = false)
     @ToString.Exclude
-    private String privateKeyCypherTextBase64;
+    private String PrivateKeyCypherTextBase64;
 
     @ManyToOne
     @JoinColumn(name = COLUMN_WALLET_ID, nullable = false, updatable = false)

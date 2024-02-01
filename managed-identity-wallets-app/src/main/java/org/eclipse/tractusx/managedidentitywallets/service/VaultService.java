@@ -47,7 +47,7 @@ public class VaultService {
                 .flatMap(k -> vaultRepository.resolveKey(wallet.getWalletId(), k));
     }
 
-    public StoredEd25519VerificationMethod storeKey(@NonNull Wallet wallet, @NonNull final ResolvedEd25519VerificationMethod key) {
+    public PersistedEd25519VerificationMethod storeKey(@NonNull Wallet wallet, @NonNull final ResolvedEd25519VerificationMethod key) {
         return vaultRepository.storeKey(wallet.getWalletId(), key);
     }
 }
