@@ -82,6 +82,7 @@ public class GetWalletUserApiHandlerTest extends RestAssuredTestCase {
                 .when()
                 .get("/api/v2/wallet")
                 .then()
+                .log().all()
                 .statusCode(200)
                 .body("id", equalTo(bpn));
     }

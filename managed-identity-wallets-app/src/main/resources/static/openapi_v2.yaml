@@ -16,6 +16,8 @@ paths:
         - User
       summary: Get Wallet
       description: Retrieves wallet information.
+      security:
+        - OAuth2: [ miw:user ]
       responses:
         '200':
           description: Successful response with wallet information.
@@ -31,6 +33,8 @@ paths:
         - User
       summary: Get Verifiable Credentials
       description: Retrieves a list of Verifiable Credentials from the wallet.
+      security:
+        - OAuth2: [ miw:user ]
       parameters:
         - $ref: '#/components/parameters/Query_Page'
         - $ref: '#/components/parameters/Query_Per_Page'
@@ -49,6 +53,8 @@ paths:
         - User
       summary: Create Verifiable Credential
       description: Stores the Verifiable Credential in the wallet.
+      security:
+        - OAuth2: [ miw:user ]
       requestBody:
         required: true
         content:
@@ -72,6 +78,8 @@ paths:
         - User
       summary: Get Verifiable Credential by ID
       description: Retrieves a verifiable credential from the wallet by ID.
+      security:
+        - OAuth2: [ miw:user ]
       parameters:
         - $ref: '#/components/parameters/Path_Verifiable_Credential_Id'
       responses:
@@ -89,6 +97,8 @@ paths:
         - User
       summary: Delete Verifiable Credential
       description: Removes Verifiable Credential from the wallet by ID.
+      security:
+        - OAuth2: [ miw:user ]
       parameters:
         - $ref: '#/components/parameters/Path_Verifiable_Credential_Id'
       responses:
@@ -104,6 +114,8 @@ paths:
         - User
       summary: Issue Verifiable Presentation
       description: Issues a new Verifiable Presentation.
+      security:
+        - OAuth2: [ miw:user ]
       requestBody:
         content:
           application/json:
@@ -126,6 +138,8 @@ paths:
         - User
       summary: Issue Verifiable Presentation as JWT
       description: Issues a new Verifiable Presentation as JWT.
+      security:
+        - OAuth2: [ miw:user ]
       requestBody:
         content:
           application/json:
@@ -148,6 +162,8 @@ paths:
         - User
       summary: Get Issued Verifiable Credentials
       description: Retrieves a list of issued Verifiable Credentials. These Verifiable Credentials may or may not be stored in the wallet.
+      security:
+        - OAuth2: [ miw:user ]
       parameters:
         - $ref: '#/components/parameters/Query_Page'
         - $ref: '#/components/parameters/Query_Per_Page'
@@ -165,6 +181,8 @@ paths:
         - User
       summary: Issue Verifiable Credential
       description: Issues a new Verifiable Credential.
+      security:
+        - OAuth2: [ miw:user ]
       requestBody:
         content:
           application/json:
@@ -186,6 +204,8 @@ paths:
         - User
       summary: Validate Verifiable Credential
       description: Validates a Verifiable Credential
+      security:
+        - OAuth2: [ miw:user ]
       requestBody:
         content:
           application/json:
@@ -207,6 +227,8 @@ paths:
         - User
       summary: Validate Verifiable Presentation
       description: Validates a Verifiable Presentation
+      security:
+        - OAuth2: [ miw:user ]
       requestBody:
         content:
           application/json:
@@ -228,6 +250,8 @@ paths:
         - User
       summary: Validate Verifiable JWT Presentation
       description: Validates a Verifiable JWT Presentation
+      security:
+        - OAuth2: [ miw:user ]
       requestBody:
         content:
           application/json:
@@ -253,6 +277,8 @@ paths:
         - $ref: '#/components/parameters/Query_Page'
         - $ref: '#/components/parameters/Query_Per_Page'
       description: Retrieves a list of wallets.
+      security:
+        - OAuth2: [ miw:admin ]
       responses:
         '200':
           description: Successful response with a list of wallets.
@@ -266,6 +292,8 @@ paths:
         - Administrator
       summary: Create Wallet for User
       description: Creates a wallet for a user.
+      security:
+        - OAuth2: [ miw:admin ]
       requestBody:
         required: true
         content:
@@ -290,6 +318,8 @@ paths:
         - Administrator
       summary: Update Wallet for User
       description: Updates a wallet for a user by user ID.
+      security:
+        - OAuth2: [ miw:admin ]
       requestBody:
         required: true
         content:
@@ -313,6 +343,8 @@ paths:
         - Administrator
       summary: Get Wallet for User
       description: Retrieves a wallet for a user by user ID.
+      security:
+        - OAuth2: [ miw:admin ]
       parameters:
         - $ref: '#/components/parameters/Path_Wallet_Id'
       responses:
@@ -330,6 +362,8 @@ paths:
         - Administrator
       summary: Delete Wallet for User
       description: Deletes a wallet for by wallet ID.
+      security:
+        - OAuth2: [ miw:admin ]
       parameters:
         - $ref: '#/components/parameters/Path_Wallet_Id'
       responses:
@@ -343,6 +377,8 @@ paths:
         - Administrator
       summary: Get Verifiable Credentials
       description: Retrieves a list of verifiable credentials
+      security:
+        - OAuth2: [ miw:admin ]
       parameters:
         - $ref: '#/components/parameters/Query_Page'
         - $ref: '#/components/parameters/Query_Per_Page'
@@ -363,6 +399,8 @@ paths:
         - Administrator
       summary: Create Verifiable Credential
       description: Creates a verifiable credential
+      security:
+        - OAuth2: [ miw:admin ]
       requestBody:
         required: true
         content:
@@ -386,6 +424,8 @@ paths:
         - Administrator
       summary: Get Verifiable Credentials by Id
       description: Retrieves a list of verifiable credentials for a user by user ID.
+      security:
+        - OAuth2: [ miw:admin ]
       parameters:
         - $ref: '#/components/parameters/Path_Verifiable_Credential_Id'
       responses:
@@ -403,6 +443,8 @@ paths:
         - Administrator
       summary: Delete Verifiable Credential
       description: Deletes a verifiable credential
+      security:
+        - OAuth2: [ miw:admin ]
       parameters:
         - $ref: '#/components/parameters/Path_Verifiable_Credential_Id'
       responses:
@@ -804,6 +846,5 @@ components:
           authorizationUrl: https://example.com/oauth/authorize
           tokenUrl: https://example.com/oauth/token
           scopes:
-            read: Grants read access
-            write: Grants write access
-            admin: Grants access to admin operations
+            miw:admin: Grants access to admin operations
+            miw:user: Grants access to user operations

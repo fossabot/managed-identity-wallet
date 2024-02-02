@@ -57,8 +57,6 @@ public class TestAuthV2Util {
     private static final String KEYCLOAK_ADMIN_USER_PASSWORD = "admin";
     private static final String ATTRIBUTE_BPN = "bpn";
 
-    private final TestPersistenceUtil testPersistenceUtil;
-
     public Header getAuthHeader(@NonNull List<String> roles) {
         return getAuthHeader(roles, null);
     }
@@ -94,7 +92,7 @@ public class TestAuthV2Util {
         return new Header(HttpHeaders.AUTHORIZATION, "Bearer " + token);
     }
 
-    public void createRealm(String newRealmName) {
+    private void createRealm(@NonNull String newRealmName) {
         final Keycloak keycloak = getAdminKeycloak();
 
         RealmsResource realmsResource = keycloak.realms();
@@ -111,7 +109,7 @@ public class TestAuthV2Util {
         realmsResource.create(newRealm);
     }
 
-    public Client createClient(@NonNull String clientId, @NonNull String clientSecret) {
+    private Client createClient(@NonNull String clientId, @NonNull String clientSecret) {
         final Keycloak keycloak = getAdminKeycloak();
 
         final RealmResource realmResource = keycloak.realm(KEYCLOAK_DEFAULT_REALM);
@@ -119,7 +117,7 @@ public class TestAuthV2Util {
 
         final Optional<ClientRepresentation> existingClient = clientsResource.findAll().stream().filter(client -> client.getClientId().equals(clientId)).findFirst();
         if (existingClient.isPresent()) {
-            return new Client(existingClient.get().getId(), clientId);
+            return new Client(existingClient.get().getId(), clientId, existingClient.get().getSecret());
         }
 
         /* map bpn attribute in access token */
@@ -153,7 +151,7 @@ public class TestAuthV2Util {
 
         final String responseClientId = CreatedResponseUtil.getCreatedId(response);
 
-        return new Client(responseClientId, clientId);
+        return new Client(responseClientId, clientId, clientSecret);
     }
 
     private User createUser() {
@@ -190,7 +188,7 @@ public class TestAuthV2Util {
         return new User(userId, name, password);
     }
 
-    public Role createClientRole(@NonNull Client client, @NonNull String roleName) {
+    private Role createClientRole(@NonNull Client client, @NonNull String roleName) {
         final Keycloak keycloak = getAdminKeycloak();
 
         final RealmResource realmResource = keycloak.realm(KEYCLOAK_DEFAULT_REALM);
@@ -218,7 +216,7 @@ public class TestAuthV2Util {
         return new Role(role.getId(), roleName);
     }
 
-    public void assignClientRoleToUser(@NonNull User user, @NonNull Role role, @NonNull Client client) {
+    private void assignClientRoleToUser(@NonNull User user, @NonNull Role role, @NonNull Client client) {
         final Keycloak keycloak = getAdminKeycloak();
 
         final RealmResource realmResource = keycloak.realm(KEYCLOAK_DEFAULT_REALM);
@@ -229,7 +227,7 @@ public class TestAuthV2Util {
         userResource.roles().clientLevel(client.getId()).add(Collections.singletonList(roleRepresentation));
     }
 
-    public String getBearerToken(User user) {
+    private String getBearerToken(@NonNull User user) {
         Keycloak keycloak = KeycloakBuilder.builder()
                 .serverUrl(KEYCLOAK_URL)
                 .realm(KEYCLOAK_DEFAULT_REALM)
@@ -272,5 +270,6 @@ public class TestAuthV2Util {
         String id;
         /* also the name */
         String clientId;
+        String clientSecret;
     }
 }

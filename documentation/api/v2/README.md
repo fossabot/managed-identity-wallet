@@ -72,7 +72,6 @@ All URIs are relative to */api/v2*
 - **Flow**: accessCode
 - **Authorization URL**: https://example.com/oauth/authorize
 - **Scopes**: 
-  - read: Grants read access
-  - write: Grants write access
-  - admin: Grants access to admin operations
+  - miw:admin: Grants access to admin operations
+  - miw:user: Grants access to user operations
 
