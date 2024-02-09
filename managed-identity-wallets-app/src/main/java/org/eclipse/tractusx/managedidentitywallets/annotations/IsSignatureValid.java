@@ -55,6 +55,7 @@ public @interface IsSignatureValid {
         public boolean isValid(VerifiableCredential verifiableCredential, ConstraintValidatorContext context) {
             return verifiableCredential != null &&
                     validationService.hasSignature(verifiableCredential) &&
+                    // TODO if signature cannot be checked log info and ignore
                     validationService.isSignatureValid(verifiableCredential);
         }
     }
@@ -69,6 +70,7 @@ public @interface IsSignatureValid {
         public boolean isValid(List<VerifiableCredential> verifiableCredentials, ConstraintValidatorContext context) {
             return verifiableCredentials != null &&
                     validationService.hasSignature(verifiableCredentials) &&
+                    // TODO if signature cannot be checked log info and ignore
                     validationService.isSignatureValid(verifiableCredentials);
 
         }
