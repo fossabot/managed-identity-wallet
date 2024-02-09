@@ -37,7 +37,7 @@ import java.io.Serializable;
 @ToString
 public class VerifiableCredentialTypeIntersectionEntity extends AbstractEntity {
 
-    public static final String TABLE_NAME = "verifiable_credential_type_intersection";
+    public static final String TABLE_NAME = "type_verifiable_credential_intersection";
     public static final String COLUMN_VERIFIABLE_CREDENTIAL_ID = "verifiable_credential_id";
     public static final String COLUMN_VERIFIABLE_CREDENTIAL_ISSUER_ID = "verifiable_credential_type_id";
 

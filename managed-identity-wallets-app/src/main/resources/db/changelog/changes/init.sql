@@ -94,7 +94,7 @@ CREATE TABLE IF NOT EXISTS verifiable_credential_wallet_intersection
 );
 
 /* Verifiable Credential Type Intersection Table */
-CREATE TABLE IF NOT EXISTS verifiable_credential_type_intersection
+CREATE TABLE IF NOT EXISTS type_verifiable_credential_intersection
 (
     verifiable_credential_id      varchar(255) NOT NULL,
     verifiable_credential_type_id varchar(255) NOT NULL,
@@ -107,7 +107,7 @@ CREATE TABLE IF NOT EXISTS verifiable_credential_type_intersection
 );
 
 /* Verifiable Credential Issuer Intersection Table */
-CREATE TABLE IF NOT EXISTS verifiable_credential_issuer_intersection
+CREATE TABLE IF NOT EXISTS issuer_verifiable_credential_intersection
 (
     verifiable_credential_id        varchar(255) NOT NULL,
     verifiable_credential_issuer_id varchar(255) NOT NULL,
