@@ -21,12 +21,12 @@
 
 package org.eclipse.tractusx.managedidentitywallets.repository.database;
 
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.Ed25519KeyEntity;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.EncryptionKeyEntity;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface Ed25519KeyJpaRepository extends CrudRepository<Ed25519KeyEntity, String>,
-        JpaRepository<Ed25519KeyEntity, String> {
+public interface EncryptionKeyJpaRepository extends CrudRepository<EncryptionKeyEntity, String>,
+        JpaRepository<EncryptionKeyEntity, String> {
 }

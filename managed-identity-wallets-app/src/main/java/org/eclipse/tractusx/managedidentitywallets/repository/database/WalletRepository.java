@@ -35,7 +35,8 @@ import org.eclipse.tractusx.managedidentitywallets.models.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.models.WalletId;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.predicate.WalletWithVerifiableCredentialPredicate;
 import org.eclipse.tractusx.managedidentitywallets.repository.database.query.WalletWithVerifiableCredentialQuery;
-import org.eclipse.tractusx.managedidentitywallets.repository.entity.Ed25519KeyEntity;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.EncryptionKeyEntity;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.EncryptionKeyEntityType;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.VerifiableCredentialWalletIntersectionEntity;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
@@ -62,7 +63,7 @@ public class WalletRepository {
     private final WalletJpaRepository walletJpaRepository;
     private final VerifiableCredentialJpaRepository verifiableCredentialJpaRepository;
     private final VerifiableCredentialWalletIntersectionJpaRepository verifiableCredentialWalletIntersectionJpaRepository;
-    private final Ed25519KeyJpaRepository ed25519KeyJpaRepository;
+    private final EncryptionKeyJpaRepository encryptionKeyJpaRepository;
     private final WalletMap walletMap;
 
     @Transactional
@@ -76,9 +77,9 @@ public class WalletRepository {
         walletEntity.setId(walletId);
         walletEntity.setName(walletName);
 
-        final List<Ed25519KeyEntity> ed25519KeyEntities = wallet.getStoredEd25519Keys().stream()
+        final List<EncryptionKeyEntity> ed25519KeyEntities = wallet.getStoredEd25519Keys().stream()
                 .map(k -> {
-                    final Ed25519KeyEntity keyEntity = new Ed25519KeyEntity();
+                    final EncryptionKeyEntity keyEntity = new EncryptionKeyEntity();
                     keyEntity.setId(UUID.randomUUID().toString());
                     keyEntity.setWallet(walletEntity);
                     keyEntity.setDidFragment(k.getDidFragment().getText());
@@ -86,7 +87,7 @@ public class WalletRepository {
                     keyEntity.setPrivateKeyCypherTextBase64(k.getPrivateKey().getBase64());
                     return keyEntity;
                 }).collect(Collectors.toList());
-        walletEntity.setEd25519Keys(ed25519KeyEntities);
+        walletEntity.setEncryptionKeys(ed25519KeyEntities);
 
         /* Assert Wallet Does Not Exist */
         if (walletJpaRepository.existsById(walletId)) {
@@ -99,7 +100,7 @@ public class WalletRepository {
         }
 
         walletJpaRepository.save(walletEntity);
-        ed25519KeyJpaRepository.saveAll(ed25519KeyEntities);
+        encryptionKeyJpaRepository.saveAll(ed25519KeyEntities);
     }
 
     @Transactional
@@ -117,15 +118,16 @@ public class WalletRepository {
         final String newWalletName = wallet.getWalletName().getText();
         walletEntity.setName(newWalletName);
 
-        final List<Ed25519KeyEntity> ed25519KeyEntities = new ArrayList<>();
+        final List<EncryptionKeyEntity> ed25519KeyEntities = new ArrayList<>();
         for (final PersistedEd25519VerificationMethod storedEd25519Key : wallet.getStoredEd25519Keys()) {
             // keep keys that are already in db or generate new ones
             // it should not be possible to update the key itself
-            walletEntity.getEd25519Keys().stream().filter(
+            walletEntity.getEncryptionKeys().stream().filter(
                             k -> k.getId().equals(storedEd25519Key.getId().getText())
                     ).findFirst()
                     .ifPresentOrElse(ed25519KeyEntities::add, () -> {
-                        final Ed25519KeyEntity keyEntity = new Ed25519KeyEntity();
+                        final EncryptionKeyEntity keyEntity = new EncryptionKeyEntity();
+                        keyEntity.setKeyType(EncryptionKeyEntityType.ED25519);
                         keyEntity.setId(storedEd25519Key.getId().getText());
                         keyEntity.setWallet(walletEntity);
                         keyEntity.setDidFragment(storedEd25519Key.getDidFragment().getText());
@@ -136,15 +138,15 @@ public class WalletRepository {
                     });
         }
 
-        walletEntity.getEd25519Keys().clear();
-        walletEntity.getEd25519Keys().addAll(ed25519KeyEntities);
+        walletEntity.getEncryptionKeys().clear();
+        walletEntity.getEncryptionKeys().addAll(ed25519KeyEntities);
 
         /* Write to DB */
         if (log.isTraceEnabled()) {
             log.trace("update: wallet={}", wallet);
         }
 
-        ed25519KeyJpaRepository.saveAll(ed25519KeyEntities);
+        encryptionKeyJpaRepository.saveAll(ed25519KeyEntities);
         walletJpaRepository.save(walletEntity);
     }
 
@@ -154,7 +156,7 @@ public class WalletRepository {
             log.trace("delete all");
         }
         verifiableCredentialWalletIntersectionJpaRepository.deleteAll();
-        ed25519KeyJpaRepository.deleteAll();
+        encryptionKeyJpaRepository.deleteAll();
         walletJpaRepository.deleteAll();
     }
 

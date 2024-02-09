@@ -30,14 +30,15 @@ import lombok.ToString;
 @Data
 @NoArgsConstructor
 @EqualsAndHashCode(of = "id", callSuper = false)
-@Entity(name = Ed25519KeyEntity.TABLE_NAME)
-@Table(name = Ed25519KeyEntity.TABLE_NAME)
+@Entity(name = EncryptionKeyEntity.TABLE_NAME)
+@Table(name = EncryptionKeyEntity.TABLE_NAME)
 @ToString
-public class Ed25519KeyEntity extends AbstractEntity {
+public class EncryptionKeyEntity extends AbstractEntity {
 
-    public static final String TABLE_NAME = "key_ed25519";
+    public static final String TABLE_NAME = "encryption_key";
     public static final String COLUMN_ID = "id";
     public static final String COLUMN_WALLET_ID = "wallet_id";
+    public static final String COLUMN_KEY_TYPE = "key_type";
     public static final String COLUMN_DID_FRAGMENT = "did_fragment";
     public static final String COLUMN_PUBLIC_KEY_CYPHER_TEXT_BASE_64 = "public_key_cypher_text_base64";
     public static final String COLUMN_PRIVATE_KEY_CYPHER_TEXT_BASE_64 = "private_key_cypher_text_base64";
@@ -46,6 +47,9 @@ public class Ed25519KeyEntity extends AbstractEntity {
     @ToString.Include
     @Column(name = COLUMN_ID, nullable = false, updatable = false)
     private String id;
+
+    @Column(name = COLUMN_KEY_TYPE, nullable = false, updatable = false)
+    private String keyType;
 
     @Column(name = COLUMN_DID_FRAGMENT, nullable = false, updatable = false)
     private String didFragment;

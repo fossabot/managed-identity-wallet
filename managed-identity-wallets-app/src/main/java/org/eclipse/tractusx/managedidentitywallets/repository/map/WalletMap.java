@@ -25,6 +25,7 @@ import lombok.NoArgsConstructor;
 import lombok.NonNull;
 import org.eclipse.tractusx.managedidentitywallets.exception.MappingException;
 import org.eclipse.tractusx.managedidentitywallets.models.*;
+import org.eclipse.tractusx.managedidentitywallets.repository.entity.EncryptionKeyEntityType;
 import org.eclipse.tractusx.managedidentitywallets.repository.entity.WalletEntity;
 import org.springframework.stereotype.Component;
 
@@ -40,8 +41,10 @@ public class WalletMap extends AbstractMap<Wallet, WalletEntity> {
         final WalletId walletId = new WalletId(entity.getId());
         final WalletName walletName = new WalletName(entity.getName());
 
-        final List<PersistedEd25519VerificationMethod> keys = entity.getEd25519Keys()
-                .stream().map(
+        final List<PersistedEd25519VerificationMethod> keys = entity.getEncryptionKeys()
+                .stream()
+                .filter(key -> EncryptionKeyEntityType.ED25519.equals(key.getKeyType()))
+                .map(
                         key -> PersistedEd25519VerificationMethod.builder()
                                 .id(new Ed25519KeyId(key.getId()))
                                 .didFragment(new DidFragment(key.getDidFragment()))

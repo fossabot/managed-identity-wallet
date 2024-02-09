@@ -78,7 +78,6 @@ public class VaultRepositoryImpl implements VaultRepository {
                 .build();
     }
 
-
     private PublicKeyPlainText decrypt(@NonNull VaultIdentifier vaultIdentifier, @NonNull PublicKeyCypherText PrivateKeyCypherText) {
         final String value = prepareEncryptKey(vaultIdentifier)
                 .decrypt(vaultIdentifier.getIdentifier(), PrivateKeyCypherText.getBase64());

@@ -26,7 +26,6 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.ToString;
-import org.apache.commons.lang3.builder.ToStringExclude;
 import org.checkerframework.common.aliasing.qual.Unique;
 
 import java.util.List;
@@ -54,7 +53,7 @@ public class WalletEntity extends AbstractEntity {
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "wallet", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude
-    private List<Ed25519KeyEntity> ed25519Keys;
+    private List<EncryptionKeyEntity> encryptionKeys;
 
     @OneToMany(mappedBy = "id.wallet", cascade = CascadeType.ALL, orphanRemoval = true)
     @ToString.Exclude

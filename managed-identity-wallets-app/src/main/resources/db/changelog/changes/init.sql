@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS wallet
 CREATE INDEX wallet_name ON wallet (name);
 
 /* Key */
-CREATE TABLE IF NOT EXISTS key_ed25519
+CREATE TABLE IF NOT EXISTS encryption_key
 (
     id                             varchar(255) NOT NULL,
     version                        varchar(8)               DEFAULT 'v1',
@@ -41,6 +41,7 @@ CREATE TABLE IF NOT EXISTS key_ed25519
     wallet_id                      varchar(255) NOT NULL,
     public_key_cypher_text_base64  text         NOT NULL,
     private_key_cypher_text_base64 text         NOT NULL,
+    key_type                       varchar(255) NOT NULL,
     created_at                     timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     modified_at                    timestamp with time zone DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (id),
