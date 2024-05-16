@@ -24,6 +24,14 @@ package org.eclipse.tractusx.managedidentitywallets.utils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.curiousoddman.rgxgen.RgxGen;
+import com.nimbusds.jose.JOSEException;
+import com.nimbusds.jose.JWSAlgorithm;
+import com.nimbusds.jose.JWSHeader;
+import com.nimbusds.jose.JWSSigner;
+import com.nimbusds.jose.crypto.Ed25519Signer;
+import com.nimbusds.jose.jwk.OctetKeyPair;
+import com.nimbusds.jwt.JWTClaimsSet;
+import com.nimbusds.jwt.SignedJWT;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.constant.MIWVerifiableCredentialType;
 import org.eclipse.tractusx.managedidentitywallets.constant.RestURI;
@@ -52,15 +60,26 @@ import org.springframework.http.ResponseEntity;
 
 import java.net.URI;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
+
+import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.ACCESS_TOKEN;
+import static org.springframework.security.oauth2.core.endpoint.OAuth2ParameterNames.SCOPE;
+import static org.springframework.security.oauth2.core.oidc.IdTokenClaimNames.NONCE;
+import static org.springframework.security.oauth2.jwt.JwtClaimNames.JTI;
 
 public class TestUtils {
 
-    public static ResponseEntity<String> createWallet(String bpn, String name, TestRestTemplate testTemplate, String baseBPN) {
+    public static ResponseEntity<String> createWallet(String bpn, String name, TestRestTemplate testTemplate, String baseBPN, String didUrl) {
         HttpHeaders headers = AuthenticationUtils.getValidUserHttpHeaders(baseBPN);
 
-        CreateWalletRequest request = CreateWalletRequest.builder().bpn(bpn).name(name).build();
+        CreateWalletRequest request = CreateWalletRequest.builder()
+                .businessPartnerNumber(bpn)
+                .companyName(name)
+                .didUrl(didUrl)
+                .build();
 
         HttpEntity<CreateWalletRequest> entity = new HttpEntity<>(request, headers);
 
@@ -204,5 +223,47 @@ public class TestUtils {
     public static String getRandomBpmNumber() {
         RgxGen rgxGen = new RgxGen(StringPool.BPN_NUMBER_REGEX);
         return rgxGen.generate();
+    }
+
+    public static String buildJWTToken(OctetKeyPair jwk, JWTClaimsSet claimsSet) throws JOSEException {
+        JWSSigner signer = new Ed25519Signer(jwk);
+        SignedJWT signedJWT = new SignedJWT(
+                new JWSHeader.Builder(JWSAlgorithm.EdDSA).keyID(jwk.getKeyID()).build(),
+                claimsSet);
+
+        signedJWT.sign(signer);
+
+        return signedJWT.serialize();
+    }
+
+    public static JWTClaimsSet buildClaimsSet(String issuer, String subject, String audience, String nonce, String scope, Date expiration, Date issuance, String jti) {
+        return new JWTClaimsSet.Builder()
+                .issuer(issuer)
+                .subject(subject)
+                .audience(audience)
+                .expirationTime(expiration)
+                .issueTime(issuance)
+                .claim(NONCE, nonce)
+                .claim(SCOPE, scope)
+                .claim(JTI, jti)
+                .build();
+    }
+
+    public static String generateUuid() {
+        return UUID.randomUUID().toString();
+    }
+
+    public static JWTClaimsSet addAccessTokenToClaimsSet(String accessToken, JWTClaimsSet initialSet) {
+        return new JWTClaimsSet.Builder(initialSet).claim(ACCESS_TOKEN, accessToken).build();
+    }
+
+    public static Wallet buildWallet(String bpn, String did, String didJson) {
+        return Wallet.builder()
+                .bpn(bpn)
+                .did(did)
+                .didDocument(DidDocument.fromJson(didJson))
+                .algorithm(StringPool.ED_25519)
+                .name(bpn)
+                .build();
     }
 }

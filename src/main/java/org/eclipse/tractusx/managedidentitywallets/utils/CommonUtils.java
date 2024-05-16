@@ -21,10 +21,14 @@
 
 package org.eclipse.tractusx.managedidentitywallets.utils;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
 import lombok.experimental.UtilityClass;
+import org.bouncycastle.util.io.pem.PemObject;
+import org.bouncycastle.util.io.pem.PemWriter;
 import org.eclipse.tractusx.managedidentitywallets.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.dao.entity.HoldersCredential;
+import org.eclipse.tractusx.managedidentitywallets.dto.SecureTokenRequest;
 import org.eclipse.tractusx.managedidentitywallets.exception.BadDataException;
 import org.eclipse.tractusx.ssi.lib.crypt.x21559.x21559PrivateKey;
 import org.eclipse.tractusx.ssi.lib.exception.InvalidePrivateKeyFormat;
@@ -37,12 +41,15 @@ import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCreden
 import org.eclipse.tractusx.ssi.lib.model.verifiable.credential.VerifiableCredentialType;
 import org.eclipse.tractusx.ssi.lib.proof.LinkedDataProofGenerator;
 import org.eclipse.tractusx.ssi.lib.proof.SignatureType;
+import org.springframework.util.MultiValueMap;
 
+import java.io.StringWriter;
 import java.net.URI;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 import java.util.regex.Pattern;
 
@@ -102,7 +109,7 @@ public class CommonUtils {
                 .build();
     }
 
-    @SneakyThrows({UnsupportedSignatureTypeException.class, InvalidePrivateKeyFormat.class})
+    @SneakyThrows({ UnsupportedSignatureTypeException.class, InvalidePrivateKeyFormat.class })
     private static VerifiableCredential createVerifiableCredential(DidDocument issuerDoc, List<String> verifiableCredentialType,
                                                                    VerifiableCredentialSubject verifiableCredentialSubject,
                                                                    byte[] privateKey, List<URI> contexts, Date expiryDate) {
@@ -144,5 +151,21 @@ public class CommonUtils {
 
         //Create Credential
         return builder.build();
+    }
+
+    @SneakyThrows
+    public static String getKeyString(byte[] privateKeyBytes, String keyType) {
+        StringWriter stringWriter = new StringWriter();
+        PemWriter pemWriter = new PemWriter(stringWriter);
+        pemWriter.writeObject(new PemObject(keyType, privateKeyBytes));
+        pemWriter.flush();
+        pemWriter.close();
+        return stringWriter.toString();
+    }
+
+    public static SecureTokenRequest getSecureTokenRequest(MultiValueMap<String, String> map) {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        Map<String, String> singleValueMap = map.toSingleValueMap();
+        return objectMapper.convertValue(singleValueMap, SecureTokenRequest.class);
     }
 }

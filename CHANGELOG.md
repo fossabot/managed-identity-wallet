@@ -1,3 +1,152 @@
+# [0.5.0-develop.14](https://github.com/eclipse-tractusx/managed-identity-wallet/compare/v0.5.0-develop.13...v0.5.0-develop.14) (2024-05-02)
+
+
+### Bug Fixes
+
+* STS Token API Response ([78b7dc3](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/78b7dc33d6ddf9fbe5d0aeccf6e540fc3110e1d5))
+* Test Cases ([8eda499](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/8eda499476604ee14001811df3c01297bd3e7f7a))
+
+# [0.5.0-develop.13](https://github.com/eclipse-tractusx/managed-identity-wallet/compare/v0.5.0-develop.12...v0.5.0-develop.13) (2024-04-18)
+
+
+### Bug Fixes
+
+* fix object name ([59ccdb2](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/59ccdb2e1b15633d7de442691d851a6a7d134025))
+
+
+### Features
+
+* added body type to /token endpoint ([6a67c92](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/6a67c9266170d77d5161ea38f6e9a8fc76a213ba))
+
+# [0.5.0-develop.12](https://github.com/eclipse-tractusx/managed-identity-wallet/compare/v0.5.0-develop.11...v0.5.0-develop.12) (2024-03-25)
+
+
+### Bug Fixes
+
+* fix did creation in did document ([c21f7af](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/c21f7af470a6db484a63e49df222a1b7132a0a1e))
+
+
+### Features
+
+* adapt request and wallet service ([c911d33](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/c911d332579f669f347dcec3399b430e685baaf0))
+
+# [0.5.0-develop.11](https://github.com/eclipse-tractusx/managed-identity-wallet/compare/v0.5.0-develop.10...v0.5.0-develop.11) (2024-03-21)
+
+
+### Bug Fixes
+
+* add "y" parameter and remove unused imports ([72b592c](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/72b592c0e09d1baef25ffd607a449ce8a9ca6589))
+* add WalletKey for ES256K algorithm to DidDocument ([9eb3294](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/9eb3294a9016befe7bcc469552a9266829bcba4b))
+* fix ES256K signature ([b33f8a6](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/b33f8a621e7c6429e1c89285b0eefa942e9e8828))
+* fix kid parameter ([97437b4](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/97437b4ef8c1ca07fd16fdf3321e61b1fcab2db0))
+
+
+### Features
+
+* add extra transaction ([b694d19](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/b694d19b591df8b460ba45351e7936ef24b84331))
+* support new algorithm (WIP) ([9dd6f27](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/9dd6f27f33311fc4e4467a412a4ee77eff617e18))
+
+# [0.5.0-develop.10](https://github.com/eclipse-tractusx/managed-identity-wallet/compare/v0.5.0-develop.9...v0.5.0-develop.10) (2024-03-08)
+
+
+### Features
+
+* upload miw jar to gh release ([a7d6aa6](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/a7d6aa66b3468e4975711c72f1cfdbf3055dcd20))
+
+# [0.5.0-develop.9](https://github.com/eclipse-tractusx/managed-identity-wallet/compare/v0.5.0-develop.8...v0.5.0-develop.9) (2024-03-08)
+
+
+### Features
+
+* add logging of auth failures ([ec60117](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/ec60117e68e7e139afb1f1f24179237bae03762c))
+
+# [0.5.0-develop.8](https://github.com/eclipse-tractusx/managed-identity-wallet/compare/v0.5.0-develop.7...v0.5.0-develop.8) (2024-03-08)
+
+
+### Bug Fixes
+
+* possible caching vulnerability in action ([eb2e38f](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/eb2e38f6c6650491fcc81b70d1cf6f6fc5a0886f))
+
+# [0.5.0-develop.7](https://github.com/eclipse-tractusx/managed-identity-wallet/compare/v0.5.0-develop.6...v0.5.0-develop.7) (2024-03-07)
+
+
+### Bug Fixes
+
+* fix bug with token re-wrapping ([e047550](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/e04755016aecdf6d6ade0eebae065f36ce80d429))
+
+
+### Features
+
+* add logic regarding jti info store and check ([6809578](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/6809578d208bc0380fa8a34bf119227e12ea1ecd))
+
+# [0.5.0-develop.6](https://github.com/eclipse-tractusx/managed-identity-wallet/compare/v0.5.0-develop.5...v0.5.0-develop.6) (2024-03-01)
+
+
+### Features
+
+* add api docs, option asJwt ([9dc628b](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/9dc628b3ff4812759e9762f984f0406073191e40))
+* add ignoring version ([1785080](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/1785080a7f3585ecf6fcb89cd94d91701c4906b9))
+* add service method, controller, config for scope matching ([4feebd4](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/4feebd40dabe45e94f73cafcec410c2e51016758))
+* improve filter, add exception handling ([579a5ec](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/579a5ec547d486f04fca4336545cd9f5bb0dc216))
+
+# [0.5.0-develop.5](https://github.com/eclipse-tractusx/managed-identity-wallet/compare/v0.5.0-develop.4...v0.5.0-develop.5) (2024-02-27)
+
+
+### Bug Fixes
+
+* fix integration test ([d8084ee](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/d8084eee8a4b562ce1242af1689791963b277783))
+
+
+### Features
+
+* add JWT verification and extend tests ([d83ce91](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/d83ce91b2e04b131ef3a83983bbd79331be6cac9))
+* add JWT verification and extend tests ([5ae223d](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/5ae223d61f23e71bf426d36ea3255f508abd254b))
+* adding draft for integration test, refactoring ([ce75056](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/ce75056a475ce39970de998376a91dcdc95e4065))
+* create initial class ([061faa7](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/061faa72591550d3a7a93cd2e492aaf8ace82ec2))
+* create initial classes with validation ([fc5db81](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/fc5db81092991da9686aa7f7855d30ae4f4e2e83))
+* Merge PR [#255](https://github.com/eclipse-tractusx/managed-identity-wallet/issues/255) ([a0d9bdf](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/a0d9bdfd1246c684156795523d64210fd828925f))
+
+# [0.5.0-develop.4](https://github.com/eclipse-tractusx/managed-identity-wallet/compare/v0.5.0-develop.3...v0.5.0-develop.4) (2024-02-23)
+
+
+### Bug Fixes
+
+* Add missing gradle validation PR [#257](https://github.com/eclipse-tractusx/managed-identity-wallet/issues/257) ([f9acf55](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/f9acf55fd7998895f463225eb6a8ed8a621d734b))
+
+# [0.5.0-develop.3](https://github.com/eclipse-tractusx/managed-identity-wallet/compare/v0.5.0-develop.2...v0.5.0-develop.3) (2024-02-23)
+
+
+### Bug Fixes
+
+* DAST scan PR [#256](https://github.com/eclipse-tractusx/managed-identity-wallet/issues/256) ([1c1f1fb](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/1c1f1fb3eacf0e34887ec78acdc4f51464c3f4de))
+
+# [0.5.0-develop.2](https://github.com/eclipse-tractusx/managed-identity-wallet/compare/v0.5.0-develop.1...v0.5.0-develop.2) (2024-02-22)
+
+
+### Bug Fixes
+
+* add missing JSON properties ([5330f64](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/5330f64dd51669d4bfd337a656c6151512ad915a))
+
+
+### Features
+
+* add domain objects needed by sts infrastructure ([effb480](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/effb4801b8788c9221f6a64b4a71c990d05f3a64))
+* add dto objects for sts infrastructure ([103e7f2](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/103e7f2100b2613a5ab82038795c9d8f3bf06d02))
+* add exceptions for sts infrastructure ([b4bb9b7](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/b4bb9b78be41c721e968e1a350bd22920467b8fe))
+* add missing relationships to entities ([56a48eb](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/56a48eb6b4eb8a6a451512d772bf4298fce8f4f4))
+* add sts properties ([018d9c0](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/018d9c03430ecb15a73e753837a7a838eb7cca81))
+* add token endpoint happy-path test ([d6c30bf](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/d6c30bff5cec4f31498c512ecf06ed8237741d30))
+* extend 'miw.security' properties ([e982919](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/e9829195245780605a97e1cee5d22439c2f44c64))
+* implement token endpoint ([4227f3e](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/4227f3e2d147f71de84e4db6c0540e1e60849078))
+* use a spring validator for SecureTokenRequest ([accc0d2](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/accc0d20404852035876cb7cb4ce5ce7b5da6e64))
+
+# [0.5.0-develop.1](https://github.com/eclipse-tractusx/managed-identity-wallet/compare/v0.4.0...v0.5.0-develop.1) (2024-02-09)
+
+
+### Features
+
+* Merge PR [#252](https://github.com/eclipse-tractusx/managed-identity-wallet/issues/252) ([8cb132b](https://github.com/eclipse-tractusx/managed-identity-wallet/commit/8cb132b035a60e7137e536a3a451ce314253ff7b))
+
 # [0.4.0](https://github.com/eclipse-tractusx/managed-identity-wallet/compare/v0.3.0...v0.4.0) (2024-02-09)
 
 

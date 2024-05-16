@@ -21,7 +21,12 @@
 
 package org.eclipse.tractusx.managedidentitywallets.vc;
 
-import lombok.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.SneakyThrows;
 import org.eclipse.tractusx.managedidentitywallets.ManagedIdentityWalletsApplication;
 import org.eclipse.tractusx.managedidentitywallets.config.MIWSettings;
 import org.eclipse.tractusx.managedidentitywallets.config.TestContextInitializer;
@@ -30,7 +35,6 @@ import org.eclipse.tractusx.managedidentitywallets.constant.StringPool;
 import org.eclipse.tractusx.managedidentitywallets.dao.entity.Wallet;
 import org.eclipse.tractusx.managedidentitywallets.dto.CreateWalletRequest;
 import org.eclipse.tractusx.managedidentitywallets.dto.IssueMembershipCredentialRequest;
-import org.eclipse.tractusx.managedidentitywallets.exception.WalletNotFoundProblem;
 import org.eclipse.tractusx.managedidentitywallets.service.IssuersCredentialService;
 import org.eclipse.tractusx.managedidentitywallets.service.PresentationService;
 import org.eclipse.tractusx.managedidentitywallets.service.WalletService;
@@ -43,7 +47,6 @@ import org.eclipse.tractusx.ssi.lib.model.verifiable.presentation.VerifiablePres
 import org.eclipse.tractusx.ssi.lib.model.verifiable.presentation.VerifiablePresentationBuilder;
 import org.eclipse.tractusx.ssi.lib.model.verifiable.presentation.VerifiablePresentationType;
 import org.eclipse.tractusx.ssi.lib.serialization.SerializeUtil;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -64,7 +67,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = {ManagedIdentityWalletsApplication.class})
+import static org.eclipse.tractusx.managedidentitywallets.constant.StringPool.COLON_SEPARATOR;
+
+@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.DEFINED_PORT, classes = { ManagedIdentityWalletsApplication.class })
 @ContextConfiguration(initializers = {TestContextInitializer.class})
 class PresentationValidationTest {
 
@@ -95,14 +100,18 @@ class PresentationValidationTest {
         bpnOperator = miwSettings.authorityWalletBpn();
 
         CreateWalletRequest createWalletRequest = new CreateWalletRequest();
-        createWalletRequest.setBpn(bpnTenant_1);
-        createWalletRequest.setName("My Test Tenant Wallet");
+        createWalletRequest.setBusinessPartnerNumber(bpnTenant_1);
+        createWalletRequest.setCompanyName("My Test Tenant Wallet");
+        String defaultLocation = miwSettings.host() + COLON_SEPARATOR + bpnTenant_1;
+        createWalletRequest.setDidUrl(defaultLocation);
         Wallet tenantWallet = walletService.createWallet(createWalletRequest, bpnOperator);
         tenant_1 = DidParser.parse(tenantWallet.getDid());
 
         CreateWalletRequest createWalletRequest2 = new CreateWalletRequest();
-        createWalletRequest2.setBpn(bpnTenant_2);
-        createWalletRequest2.setName("My Test Tenant Wallet");
+        createWalletRequest2.setBusinessPartnerNumber(bpnTenant_2);
+        createWalletRequest2.setCompanyName("My Test Tenant Wallet");
+        String defaultLocation2 = miwSettings.host() + COLON_SEPARATOR + bpnTenant_2;
+        createWalletRequest2.setDidUrl(defaultLocation2);
         Wallet tenantWallet2 = walletService.createWallet(createWalletRequest2, bpnOperator);
         tenant_2 = DidParser.parse(tenantWallet2.getDid());
 
@@ -113,22 +122,6 @@ class PresentationValidationTest {
         IssueMembershipCredentialRequest issueMembershipCredentialRequest2 = new IssueMembershipCredentialRequest();
         issueMembershipCredentialRequest2.setBpn(bpnTenant_2);
         membershipCredential_2 = issuersCredentialService.issueMembershipCredential(issueMembershipCredentialRequest2, bpnOperator);
-    }
-
-    @AfterEach
-    public void cleanUp() {
-        try {
-            Wallet tenantWallet = walletService.getWalletByIdentifier(bpnTenant_1, false, bpnOperator);
-            walletService.delete(tenantWallet.getId());
-        } catch (WalletNotFoundProblem e) {
-            // ignore
-        }
-        try {
-            Wallet tenantWallet = walletService.getWalletByIdentifier(bpnTenant_2, false, bpnOperator);
-            walletService.delete(tenantWallet.getId());
-        } catch (WalletNotFoundProblem e) {
-            // ignore
-        }
     }
 
     @Test

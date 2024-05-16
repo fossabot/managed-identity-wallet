@@ -25,9 +25,13 @@ import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.eclipse.tractusx.managedidentitywallets.constant.ApplicationRole;
 import org.eclipse.tractusx.managedidentitywallets.constant.RestURI;
+import org.eclipse.tractusx.managedidentitywallets.service.STSTokenValidationService;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
+import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.security.authentication.AuthenticationEventPublisher;
+import org.springframework.security.authentication.DefaultAuthenticationEventPublisher;
 import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -36,6 +40,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import static org.springframework.http.HttpMethod.GET;
@@ -51,6 +56,8 @@ import static org.springframework.http.HttpMethod.POST;
 @AllArgsConstructor
 public class SecurityConfig {
 
+    private final STSTokenValidationService validationService;
+
     private final SecurityConfigProperties securityConfigProperties;
 
     /**
@@ -65,12 +72,16 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
-                .headers(httpSecurityHeadersConfigurer -> httpSecurityHeadersConfigurer.xssProtection(Customizer.withDefaults()).contentSecurityPolicy(contentSecurityPolicyConfig -> contentSecurityPolicyConfig.policyDirectives("script-src 'self'")))
+                .headers(httpSecurityHeadersConfigurer -> httpSecurityHeadersConfigurer
+                        .xssProtection(Customizer.withDefaults())
+                        .contentSecurityPolicy(contentSecurityPolicyConfig -> contentSecurityPolicyConfig.policyDirectives("script-src 'self'")))
                 .sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorizeHttpRequests -> authorizeHttpRequests.requestMatchers(new AntPathRequestMatcher("/")).permitAll() // forwards to swagger
                         .requestMatchers(new AntPathRequestMatcher("/docs/api-docs/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/ui/swagger-ui/**")).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/actuator/health/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/token", POST.name())).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/presentations/iatp", GET.name())).permitAll()
                         .requestMatchers(new AntPathRequestMatcher("/actuator/loggers/**")).hasRole(ApplicationRole.ROLE_MANAGE_APP)
 
                         //did document resolve APIs
@@ -106,7 +117,9 @@ public class SecurityConfig {
                         //error
                         .requestMatchers(new AntPathRequestMatcher("/error")).permitAll()
                 ).oauth2ResourceServer(resourceServer -> resourceServer.jwt(jwt ->
-                        jwt.jwtAuthenticationConverter(new CustomAuthenticationConverter(securityConfigProperties.clientId()))));
+                        jwt.jwtAuthenticationConverter(new CustomAuthenticationConverter(securityConfigProperties.clientId()))))
+                .addFilterAfter(new PresentationIatpFilter(validationService), BasicAuthenticationFilter.class);
+
         return http.build();
     }
 
@@ -120,5 +133,14 @@ public class SecurityConfig {
     public WebSecurityCustomizer securityCustomizer() {
         log.warn("Disable security : This is not recommended to use in production environments.");
         return web -> web.ignoring().requestMatchers(new AntPathRequestMatcher("**"));
+    }
+
+    /**
+     * Needed to enable an event-listener for failed login attempts.
+     */
+    @Bean
+    public AuthenticationEventPublisher authenticationEventPublisher
+            (ApplicationEventPublisher applicationEventPublisher) {
+        return new DefaultAuthenticationEventPublisher(applicationEventPublisher);
     }
 }
