@@ -157,5 +157,4 @@ public class TokenRequestTest {
 
         Assertions.assertTrue(result2.getStatusCode().is2xxSuccessful());
     }
-
 }

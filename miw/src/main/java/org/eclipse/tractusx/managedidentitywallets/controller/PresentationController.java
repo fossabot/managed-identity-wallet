@@ -110,7 +110,6 @@ public class PresentationController {
      * Create presentation response entity for VC types provided in STS token.
      *
      * @param stsToken the STS token with required scopes
-     * @param asJwt    as JWT VP response
      * @return the VP response entity
      */
 
@@ -121,7 +120,6 @@ public class PresentationController {
     public ResponseEntity<PresentationResponseMessage> createPresentation(
             /* As filters are disabled for this endpoint set required to false and handle missing token manually */
             @Parameter(hidden = true) @RequestHeader(name = "Authorization", required = false) String stsToken,
-            @RequestParam(name = "asJwt", required = false, defaultValue = "false") boolean asJwt,
             InputStream is) {
         try {
 
@@ -147,8 +145,8 @@ public class PresentationController {
             final List<String> requestedScopes = presentationRequestReader.readVerifiableCredentialScopes(is);
 
             SignedJWT accessToken = getAccessToken(stsToken);
-            Map<String, Object> map = presentationService.createVpWithRequiredScopes(accessToken, asJwt);
-            VerifiablePresentation verifiablePresentation = new VerifiablePresentation((Map) map.get("vp"));
+            Map<String, Object> map = presentationService.createVpWithRequiredScopes(accessToken, true);
+            String verifiablePresentation = (String) map.get("vp");
             PresentationResponseMessage message = new PresentationResponseMessage(verifiablePresentation);
             return ResponseEntity.ok(message);
         } catch (TractusXPresentationRequestReader.InvalidPresentationQueryMessageResource e) {

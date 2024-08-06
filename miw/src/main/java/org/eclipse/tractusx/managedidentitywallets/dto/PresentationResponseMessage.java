@@ -39,11 +39,11 @@ import java.util.List;
 public class PresentationResponseMessage {
 
 
-    public PresentationResponseMessage(VerifiablePresentation verifiablePresentation) {
+    public PresentationResponseMessage(String verifiablePresentation) {
         this(List.of(verifiablePresentation));
     }
 
-    public PresentationResponseMessage(List<VerifiablePresentation> verifiablePresentations) {
+    public PresentationResponseMessage(List<String> verifiablePresentations) {
         this.verifiablePresentations = verifiablePresentations;
     }
 
@@ -54,5 +54,5 @@ public class PresentationResponseMessage {
     private List<String> types = List.of("PresentationResponseMessage");
 
     @JsonProperty("presentation")
-    private List<VerifiablePresentation> verifiablePresentations;
+    private List<String> verifiablePresentations;
 }

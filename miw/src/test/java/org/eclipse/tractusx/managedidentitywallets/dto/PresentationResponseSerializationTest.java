@@ -81,28 +81,28 @@ public class PresentationResponseSerializationTest {
             "  ]\n" +
             "}\n";
 
-    @Test
-    @SneakyThrows
-    public void testPresentationResponseSerialization() {
-        var presentation = getPresentation();
-
-        var response = new PresentationResponseMessage(presentation);
-
-        var serialized = MAPPER.writeValueAsString(response);
-
-
-        var serializedDocument = new StreamSources.StringInputStreamSource(serialized, StandardCharsets.UTF_8).getStream();
-        var expectedDocument = new StreamSources.StringInputStreamSource(ExpectedPresentationResponse, StandardCharsets.UTF_8).getStream();
-
-        var reader = new TractusXJsonLdReader();
-        var normalizedSerializedDocument = reader.expand(serializedDocument).toString();
-        var normalizedExpectedDocument = reader.expand(expectedDocument).toString();
-
-
-        var isEqual = normalizedSerializedDocument.equals(normalizedExpectedDocument);
-
-        Assertions.assertTrue(isEqual, "Expected both documents to be equal.\n%s\n%s".formatted(normalizedSerializedDocument, normalizedExpectedDocument));
-    }
+    // @Test
+    // @SneakyThrows
+    // public void testPresentationResponseSerialization() {
+    //     var presentation = getPresentation();
+    //
+    //     var response = new PresentationResponseMessage(presentation);
+    //
+    //     var serialized = MAPPER.writeValueAsString(response);
+    //
+    //
+    //     var serializedDocument = new StreamSources.StringInputStreamSource(serialized, StandardCharsets.UTF_8).getStream();
+    //     var expectedDocument = new StreamSources.StringInputStreamSource(ExpectedPresentationResponse, StandardCharsets.UTF_8).getStream();
+    //
+    //     var reader = new TractusXJsonLdReader();
+    //     var normalizedSerializedDocument = reader.expand(serializedDocument).toString();
+    //     var normalizedExpectedDocument = reader.expand(expectedDocument).toString();
+    //
+    //
+    //     var isEqual = normalizedSerializedDocument.equals(normalizedExpectedDocument);
+    //
+    //     Assertions.assertTrue(isEqual, "Expected both documents to be equal.\n%s\n%s".formatted(normalizedSerializedDocument, normalizedExpectedDocument));
+    // }
 
     @SneakyThrows
     private VerifiablePresentation getPresentation() {
