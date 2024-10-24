@@ -331,6 +331,7 @@ We can use ``/actuator/loggers`` API endpoint of actuator for log related things
 role ``manage_app``. We can add this role to authority wallet client using keycloak as below:
 
 ![manage_app.png](docs%2Fmanage_app.png)
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FDominikPinsel%2Fmanaged-identity-wallet.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2FDominikPinsel%2Fmanaged-identity-wallet?ref=badge_shield)
 
 1. API to get current log settings
    ```bash
@@ -368,3 +369,7 @@ See [Docker-hub-notice.md](./Docker-hub-notice.md)
 We would like to give credit to these projects, which we use in our project.
 
 [![semantic-release: angular](https://img.shields.io/badge/semantic--release-angular-e10079?logo=semantic-release)](https://github.com/semantic-release/semantic-release)
+
+
+## License
+[![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2FDominikPinsel%2Fmanaged-identity-wallet.svg?type=large)](https://app.fossa.com/projects/git%2Bgithub.com%2FDominikPinsel%2Fmanaged-identity-wallet?ref=badge_large)
